@@ -1,7 +1,7 @@
 ﻿using CounterStrikeSharp.API.Core;
 
 namespace FreakStrike2;
-public partial class FreakStrike2 : BasePlugin
+public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfiguration>
 {
     public override string ModuleName => "FreakStrike2";
     public override string ModuleVersion => "1.0.0";
@@ -17,7 +17,6 @@ public partial class FreakStrike2 : BasePlugin
 
         if (hotReload)
         {
-            ConfigurationInitialize();
             IgnoreRoundWinConditions();
         }
     }
@@ -26,4 +25,6 @@ public partial class FreakStrike2 : BasePlugin
     {
         ServerCommandInitialize();
     }
+    
+    
 }
