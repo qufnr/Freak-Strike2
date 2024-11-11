@@ -26,10 +26,6 @@ namespace FreakStrike2
                 CommonUtils
                     .GetGameRules()
                     .TerminateRound(CommonUtils.GetRoundRestartDelay(), RoundEndReason.RoundDraw);
-                // Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules")
-                //     .First()
-                //     .GameRules?
-                //     .TerminateRound(cvarRoundRestartDelay, RoundEndReason.RoundDraw);
             }
         }
         
@@ -50,7 +46,7 @@ namespace FreakStrike2
          */
         private void CreateGameTimer()
         {
-            _findInterval = cvarFindInterval.Value;
+            _findInterval = Config.ConVarFindInterval;
 
             if (Utilities.GetPlayers().Count <= 1)
             {
