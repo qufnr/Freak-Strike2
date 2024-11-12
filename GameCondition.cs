@@ -15,6 +15,23 @@ namespace FreakStrike2
 
         private int _findInterval = 0;   //  헤일을 찾는 시간
 
+        private void GameResetOnHotReload()
+        {
+            KillGameTimer();
+            _queuepoint.Clear();
+            
+            Server.ExecuteCommand("mp_restartgame 1");
+            
+            var players = Utilities.GetPlayers();
+            foreach (var player in players)
+            {
+                if (player.IsValid && player.PawnIsAlive)
+                {
+                    player.CommitSuicide(false, true);
+                }
+            }
+        }
+
         /**
          * 클라이언트가 서버에 접속했을 때 게임 시작 체크
          */
@@ -46,7 +63,7 @@ namespace FreakStrike2
          */
         private void CreateGameTimer()
         {
-            _findInterval = Config.ConVarFindInterval;
+            _findInterval = Config.FindInterval;
 
             if (Utilities.GetPlayers().Count <= 1)
             {
