@@ -20,8 +20,35 @@ namespace FreakStrike2
 
             DebugPlayers[player.Slot] = !DebugPlayers[player.Slot];
 
-            string text = DebugPlayers[player.Slot] ? "활성화" : "비활성화";
+            var text = DebugPlayers[player.Slot] ? "활성화" : "비활성화";
             player.PrintToChat($"[FS2] 디버그 모드가 {text} 되었습니다.");
+        }
+
+        [ConsoleCommand("css_hales", "헤일 정보를 확인합니다.")]
+        public void OnHaleInfoCommand(CCSPlayerController? player, CommandInfo cmdInfo)
+        {
+            if (player is null || !player.IsValid)
+            {
+                return;
+            }
+            
+            if (_hales.Count == 0)
+            {
+                player.PrintToChat("[FS2] 서버에 설정된 헤일 클래스가 없습니다.");
+                return;
+            }
+            
+            player.PrintToChat("[FS2] 콘솔에 출력되었습니다.");
+
+            player.PrintToConsole("= = = = = = = = = = = = = = = = = = = = = = = = = = = ");
+            player.PrintToConsole("[#Id]\t[Name]\t\t[Description]\t\t[Designer Name]");
+            var haleIndex = 0;
+            foreach(var hale in _hales)
+            {
+                player.PrintToConsole($"#{haleIndex}\t{hale.Name}\t\t{hale.Description}\t\t{hale.DesignerName}");
+                haleIndex++;
+            }
+            player.PrintToConsole("= = = = = = = = = = = = = = = = = = = = = = = = = = = ");
         }
     }
 }
