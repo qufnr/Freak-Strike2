@@ -4,7 +4,7 @@ namespace FreakStrike2
 {
     public partial class FreakStrike2
     {
-        private static void ServerCommandInitialize()
+        private void ServerCommandInitialize()
         {
             Server.ExecuteCommand("mp_restartgame 1");
             
@@ -20,7 +20,7 @@ namespace FreakStrike2
             Server.ExecuteCommand("bot_join_team t");
         }
 
-        private static void IgnoreRoundWinConditions()
+        private void IgnoreRoundWinConditions()
         {
             Server.ExecuteCommand("mp_ignore_round_win_conditions 0");
         }
