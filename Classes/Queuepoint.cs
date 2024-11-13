@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Models;
 
 namespace FreakStrike2.Classes;
 
@@ -66,8 +67,14 @@ public class Queuepoint
     /// Queuepoint 계산 (OnRoundEnd)
     /// </summary>
     /// <param name="playerHaleMap">플레이어 헤일 맵</param>
-    public void CalculatePlayerQueuepoints(Dictionary<int, BaseHalePlayer> playerHaleMap)
+    /// <param name="gameStatus">게임 상태</param>
+    public void CalculatePlayerQueuepoints(Dictionary<int, BaseHalePlayer> playerHaleMap, GameStatus gameStatus)
     {
+        if (gameStatus is not GameStatus.Start)
+        {
+            return;
+        }
+        
         var players = Utilities.GetPlayers();
         foreach (var player in players)
         {
