@@ -37,7 +37,7 @@ public partial class FreakStrike2
             _hales.Clear();
         }
 
-        _hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile));
+        _hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile), hotReload);
     }
 
     private void CleanUpHalePlayerOnClientPutInServer(int client)
