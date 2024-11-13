@@ -18,30 +18,56 @@ public class BaseHalePlayer
         Flags = HaleFlags.None;
     }
     
-    public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool respawn = true)
+    public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
     {
         if (!player.PawnIsAlive)
         {
             return;
         }
+
+        if (player.Team is not CsTeam.CounterTerrorist)
+        {
+            player.SwitchTeam(CsTeam.CounterTerrorist);
+        }
+
+        if (spawnTeleport)
+        {
+            var entities = Utilities.FindAllEntitiesByDesignerName<CBaseEntity>("info_player_counterterrorist")
+                .ToArray();
+            var entity = entities[CommonUtils.GetRandomInt(0, entities.Length - 1)];
+            if (entity.IsValid)
+            {
+                var origin = entity.AbsOrigin;
+                origin!.Y += 1.0f;
+                player.Teleport(origin);
+            }
+        }
         
         Hale = hale;
         Flags = HaleFlags.Hale;
 
-        player.MaxHealth = Convert.ToInt32(Math.Round(hale.MaxHealth * hale.HealthMultiplier));
-        player.Health = player.MaxHealth;
-        player.PawnArmor = hale.Armor;
+        var playerCount = Utilities.GetPlayers().Count - 1;
+        
+        player.PlayerPawn.Value!.MaxHealth = Convert.ToInt32(Math.Round(hale.MaxHealth * (hale.HealthMultiplier * playerCount)));
+        player.PlayerPawn.Value!.Health = player.PlayerPawn.Value!.MaxHealth;
+        player.PlayerPawn.Value!.ArmorValue = Convert.ToInt32(Math.Round(hale.Armor * (hale.ArmorMultiplier * playerCount)));
         player.PawnHasHelmet = true;
-        player.Speed = hale.Laggedmovement;
-        player.GravityScale = hale.Gravity;
+        player.PlayerPawn.Value!.Speed = hale.Laggedmovement;
+        player.PlayerPawn.Value!.GravityScale = hale.Gravity;
         
-        player.RemoveWeapons();
-        player.GiveNamedItem(CsItem.Knife);
-        
-        
+        CommonUtils.ForceRemoveWeapons(player, false, true);
+        if (!CommonUtils.HasWeaponByDesignerName(player, "knife", true))
+        {
+            player.GiveNamedItem(CsItem.Knife);
+        }
         
         Server.NextFrame(() =>
         {
+            if (!string.IsNullOrEmpty(hale.Model))
+            {
+                player.PlayerPawn.Value!.SetModel(hale.Model);
+            }
+            
             player.ExecuteClientCommand("use weapon_knife");
         });
     }
