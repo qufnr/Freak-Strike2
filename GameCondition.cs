@@ -65,7 +65,11 @@ namespace FreakStrike2
         {
             _findInterval = Config.FindInterval;
 
-            if (Utilities.GetPlayers().Count <= 1)
+            if (CommonUtils.GetGameRules().WarmupPeriod)
+            {
+                _gameStatus = GameStatus.Warmup;
+            }
+            else if (Utilities.GetPlayers().Count <= 1)
             {
                 _gameStatus = GameStatus.PlayerWaiting;
             }
@@ -109,11 +113,15 @@ namespace FreakStrike2
             {
                 if (player.IsValid && !player.IsBot && !player.IsHLTV)
                 {
-                    if (_gameStatus == GameStatus.PlayerWaiting)
+                    if (_gameStatus is GameStatus.PlayerWaiting)
                     {
                         player.PrintToCenter("다른 플레이어를 기다리고 있습니다.");
                     }
-                    else if (_gameStatus == GameStatus.PlayerFinding)
+                    else if (_gameStatus is GameStatus.Warmup)
+                    {
+                        player.PrintToCenter("준비 시간이 종료되면 게임이 시작됩니다.");
+                    }
+                    else if (_gameStatus is GameStatus.PlayerFinding)
                     {
                         player.PrintToCenter($"{_findInterval}초 후 헤일이 등장합니다.");
                         _findInterval--;
