@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace FreakStrike2.Classes;
-public class CBaseHale
+public class BaseHale
 {
     public string Name { get; set; }                            //  헤일 이름
     public string Description { get; set; } = "No Description"; //  설명
@@ -35,9 +35,9 @@ public class CBaseHale
     /**
      * 헤일 설정 JSON 파일로 부터 헤일 정보 찾기
      */
-    public static List<CBaseHale> GetHalesFromJson(string jsonString)
+    public static List<BaseHale> GetHalesFromJson(string jsonString)
     {
-        var hales = JsonConvert.DeserializeObject<List<CBaseHale>>(jsonString);
+        var hales = JsonConvert.DeserializeObject<List<BaseHale>>(jsonString);
         if (hales is null || hales.Count is 0)
         {
             throw new NullReferenceException("No hale found.");

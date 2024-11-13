@@ -7,18 +7,18 @@ using FreakStrike2.Utils;
 
 namespace FreakStrike2.Classes;
 
-public class CBaseHalePlayer
+public class BaseHalePlayer
 {
-    private CBaseHale? Hale { get; set; } = null;
+    private BaseHale? Hale { get; set; } = null;
     private HaleFlags Flags { get; set; } = HaleFlags.None;
 
-    public CBaseHalePlayer()
+    public BaseHalePlayer()
     {
         Hale = null;
         Flags = HaleFlags.None;
     }
     
-    public CBaseHalePlayer(CCSPlayerController player, CBaseHale hale, bool respawn = true)
+    public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool respawn = true)
     {
         if (!player.PawnIsAlive)
         {

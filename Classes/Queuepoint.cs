@@ -4,11 +4,11 @@ using CounterStrikeSharp.API.Modules.Utils;
 
 namespace FreakStrike2.Classes;
 
-public class CQueuepoint
+public class Queuepoint
 {
     private Dictionary<int, int> _playerQueuepoints;
 
-    public CQueuepoint()
+    public Queuepoint()
     {
         _playerQueuepoints = new Dictionary<int, int>();
     }
@@ -66,7 +66,7 @@ public class CQueuepoint
     /// Queuepoint 계산 (OnRoundEnd)
     /// </summary>
     /// <param name="playerHaleMap">플레이어 헤일 맵</param>
-    public void CalculatePlayerQueuepoints(Dictionary<int, CBaseHalePlayer> playerHaleMap)
+    public void CalculatePlayerQueuepoints(Dictionary<int, BaseHalePlayer> playerHaleMap)
     {
         var players = Utilities.GetPlayers();
         foreach (var player in players)

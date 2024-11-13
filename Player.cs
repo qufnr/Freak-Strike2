@@ -7,14 +7,14 @@ namespace FreakStrike2
 {
     public partial class FreakStrike2
     {
-        private CQueuepoint _queuepoint = new CQueuepoint();
+        private Queuepoint _queuepoint = new Queuepoint();
 
         /// <summary>
         /// 큐포인트 객체 생성 (OnMapStart)
         /// </summary>
         private void CreatePlayerQueuepoint()
         {
-            _queuepoint = new CQueuepoint();
+            _queuepoint = new Queuepoint();
         }
         
         /// <summary>
