@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CounterStrikeSharp.API;
+using Newtonsoft.Json;
 
 namespace FreakStrike2.Classes;
 public class BaseHale
@@ -32,15 +33,40 @@ public class BaseHale
     
     public List<string>? BGMTheme { get; set; }      //  테마 음악
 
-    /**
-     * 헤일 설정 JSON 파일로 부터 헤일 정보 찾기
-     */
-    public static List<BaseHale> GetHalesFromJson(string jsonString)
+    /// <summary>
+    /// 헤일 설정 JSON 파일로 부터 헤일 정보 찾기
+    /// </summary>
+    /// <param name="jsonString">JSON 파일 내용</param>
+    /// <param name="hotReload">핫리로드 유무</param>
+    /// <returns>파싱된 헤일 정보 목록</returns>
+    /// <exception cref="NullReferenceException">예외 던지기</exception>
+    public static List<BaseHale> GetHalesFromJson(string jsonString, bool hotReload)
     {
         var hales = JsonConvert.DeserializeObject<List<BaseHale>>(jsonString);
         if (hales is null || hales.Count is 0)
         {
             throw new NullReferenceException("No hale found.");
+        }
+        
+        else if (!hotReload)
+        {
+            foreach (var hale in hales)
+            {
+                if (hale.Model is not null)
+                {
+                    Server.PrecacheModel(hale.Model);
+                }
+
+                if (hale.ArmsModel is not null)
+                {
+                    Server.PrecacheModel(hale.ArmsModel);
+                }
+
+                if (hale.Viewmodel is not null)
+                {
+                    Server.PrecacheModel(hale.Viewmodel);
+                }
+            }
         }
 
         return hales;
