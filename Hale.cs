@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
+    public static string PLUGIN_CONFIG_DIRECTORY = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
     public static string HALE_CONFIG_FILE = "playable_hales.json";
     
     private List<BaseHale> _hales = new List<BaseHale>();
@@ -17,10 +18,17 @@ public partial class FreakStrike2
     /// <param name="hotReload">핫리로드 유무</param>
     private void GetHaleJsonOnLoad(bool hotReload)
     {
-        var path = Path.Combine(Server.GameDirectory, $"csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\{HALE_CONFIG_FILE}");
-        if (!Directory.Exists(path))
+        var directory = Path.Combine(Server.GameDirectory, PLUGIN_CONFIG_DIRECTORY);
+        if (!Directory.Exists(directory))
         {
-            Logger.LogError($"Couldn't find Hale Configuration file. Path: {path}");
+            Logger.LogError($"Couldn't find Plugin Configuration directory. [Directory Path: {directory}]");
+            return;
+        }
+        
+        var jsonFile = Path.Combine(directory, HALE_CONFIG_FILE);
+        if (!File.Exists(jsonFile))
+        {
+            Logger.LogError($"Couldn't find Hale Configuration file. [Path: {jsonFile}]");
             return;
         }
 
@@ -29,7 +37,7 @@ public partial class FreakStrike2
             _hales.Clear();
         }
 
-        _hales = BaseHale.GetHalesFromJson(File.ReadAllText(path));
+        _hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile));
     }
 
     private void CleanUpHalePlayerOnClientPutInServer(int client)
@@ -37,7 +45,7 @@ public partial class FreakStrike2
         _halePlayers[client] = new BaseHalePlayer();
     }
 
-    private void ChooseHaleOnGameTimerEnd()
+    private void SetHalePlayerOnTimerEnd()
     {
         //  TODO : 랜덤으로 헤일 뽑기
     }
