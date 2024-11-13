@@ -11,7 +11,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
 
     public override void Load(bool hotReload)
     {
-        Console.WriteLine("[FreakStrike2] Freak-Strike 2 loaded!");
+        Console.WriteLine($"[FreakStrike2] Freak-Strike 2 ({ModuleVersion}) loaded!");
         
         if (hotReload)
         {
