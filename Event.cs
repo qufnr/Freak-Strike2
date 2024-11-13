@@ -48,15 +48,10 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientPutInServer(int client)
     {
-        GameStartOnClientPutInServer();
-        DebugDisableOnClientPutInServer(client);
-        TeamChangeOnClientPutInServer(client);
-        // var player = Utilities.GetPlayerFromSlot(client);
-        // if (player is not null && player.IsValid && !player.IsBot && !player.IsHLTV)
-        // {
-        //     Logger.LogInformation($"[FreakStrike2] Player {player.PlayerName} ({player.AuthorizedSteamID?.SteamId64}) is put in server with {player.Slot}.");
-        //
-        // }
+        CleanUpHalePlayerOnClientPutInServer(client);   //  플레이어 헤일 정보 초기화
+        GameStartOnClientPutInServer();                 //  게임 시작 처리
+        DebugDisableOnClientPutInServer(client);        //  디버그 모드 비활성화
+        TeamChangeOnClientPutInServer(client);          //  접속 시 팀 변경 처리
     }
 
     /// <summary>
@@ -65,7 +60,7 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientDisconnect(int client)
     {
-        ResetQueuepointOnClientDisconnect(client);
+        ResetQueuepointOnClientDisconnect(client);  //  Queuepoint 초기화
     }
 
     /// <summary>
@@ -73,7 +68,7 @@ public partial class FreakStrike2
     /// </summary>
     private void OnTick()
     {
-        DebugPrintGameCondition();
+        DebugPrintGameCondition();  //  디버그 모드 출력
     }
 
     /// <summary>
@@ -84,8 +79,8 @@ public partial class FreakStrike2
     /// <returns>이벤트 훅</returns>
     private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo eventInfo)
     {
-        RemoveEntities();
-        CreateGameTimer();
+        RemoveEntities();           //  맵에 불필요한 엔티티 제거
+        CreateGameTimer();          //  게임 타이머 생성
         
         return HookResult.Continue;
     }
@@ -103,8 +98,8 @@ public partial class FreakStrike2
             return HookResult.Handled;
         }
         
+        _queuepoint.CalculatePlayerQueuepoints(_halePlayers, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
         _gameStatus = GameStatus.End;
-        _queuepoint.CalculatePlayerQueuepoints(_halePlayers);
         
         return HookResult.Continue;
     }
