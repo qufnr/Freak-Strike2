@@ -1,7 +1,8 @@
 ﻿using CounterStrikeSharp.API.Core;
+using FreakStrike2.Classes;
 
 namespace FreakStrike2;
-public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfiguration>
+public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
 {
     public override string ModuleName => "FreakStrike2";
     public override string ModuleVersion => "1.0.0";
