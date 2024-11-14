@@ -49,7 +49,14 @@ public class HudText
         Entity.DispatchSpawn();
         
         Entity.AcceptInput("SetParent", playerPawn, null, "!activator");
-        Entity.AcceptInput("SetParentAttachmentMaintainOffset", playerPawn, null, "axis_of_intent");
+
+        var viewmodelServices = (CCSPlayer_ViewModelServices) player.PlayerPawn.Value!.ViewModelServices!;
+        if (viewmodelServices.GetType() == typeof(CCSPlayer_ViewModelServices))
+        {
+            var viewmodel = viewmodelServices.ViewModel[0].Value;
+            Entity.AcceptInput("FollowEntity", viewmodel, Entity, "!activator");
+        }
+        // Entity.AcceptInput("SetParentAttachmentMaintainOffset", playerPawn, null, "axis_of_intent");
     }
 
     public void SetText(string text)
