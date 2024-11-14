@@ -55,8 +55,8 @@ public class BaseHalePlayer
         player.PlayerPawn.Value!.Speed = hale.Laggedmovement;
         player.PlayerPawn.Value!.GravityScale = hale.Gravity;
         
-        CommonUtils.ForceRemoveWeapons(player, false, true);
-        if (!CommonUtils.HasWeaponByDesignerName(player, "knife", true))
+        WeaponUtils.ForceRemoveWeapons(player, false, true);
+        if (!WeaponUtils.HasWeaponByDesignerName(player, "knife", true))
         {
             player.GiveNamedItem(CsItem.Knife);
         }
