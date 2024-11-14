@@ -6,6 +6,7 @@ namespace FreakStrike2.Utils.Classes;
 
 public class HudTextAttribute
 {
+    public float Duration { get; set; } = 5.0f;
     public float FontSize { get; set; } = 20.0f;
     public Color Color { get; set; } = Color.White;
     public float Scale { get; set; } = 1.0f;
