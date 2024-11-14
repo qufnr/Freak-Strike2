@@ -59,10 +59,15 @@ namespace FreakStrike2
         }
 
         /// <summary>
-        /// 게임 타이머를 생성합니다. (OnMapStart, OnRoundStart)
+        /// 게임 타이머를 생성합니다. (OnRoundFreezeEnd, OnRoundStart)
         /// </summary>
-        private void CreateGameTimer()
+        private void CreateGameTimer(bool isFreezeEnd = true)
         {
+            if (!isFreezeEnd && ConVarUtils.GetFreezeTime() > 0)
+            {
+                return;
+            }
+            
             _findInterval = Config.FindInterval;
 
             if (CommonUtils.GetGameRules().WarmupPeriod)

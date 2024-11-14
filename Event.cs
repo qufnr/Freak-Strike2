@@ -10,6 +10,7 @@ public partial class FreakStrike2
     private void GameEventInitialize()
     {
         RegisterEventHandler<EventRoundStart>(OnRoundStart);
+        RegisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
         
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
@@ -24,6 +25,7 @@ public partial class FreakStrike2
     private void GameEventDeregister()
     {
         DeregisterEventHandler<EventRoundStart>(OnRoundStart);
+        DeregisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
 
         RemoveListener(OnMapStart);
@@ -80,8 +82,21 @@ public partial class FreakStrike2
     private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo eventInfo)
     {
         RemoveEntities();           //  맵에 불필요한 엔티티 제거
-        CreateGameTimer();          //  게임 타이머 생성
+        CreateGameTimer(false);     //  게임 타이머 생성
         
+        return HookResult.Continue;
+    }
+
+    /// <summary>
+    /// 라운드 시작 전 대기 시간
+    /// </summary>
+    /// <param name="event">이벤트</param>
+    /// <param name="eventInfo">이벤트 정보</param>
+    /// <returns>이벤트 훅</returns>
+    private HookResult OnRoundFreezeEnd(EventRoundFreezeEnd @event, GameEventInfo eventInfo)
+    {
+        CreateGameTimer();
+
         return HookResult.Continue;
     }
 
