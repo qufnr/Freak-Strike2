@@ -98,7 +98,7 @@ public partial class FreakStrike2
             return HookResult.Handled;
         }
         
-        _queuepoint.CalculatePlayerQueuepoints(_halePlayers, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
+        _queuepoint.Calculate(_halePlayers, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
         _gameStatus = GameStatus.End;
         
         return HookResult.Continue;
