@@ -18,9 +18,9 @@ public class ConVarUtils
     /// Convar "mp_freezetime" 값을 float 형태로 반환합니다.
     /// </summary>
     /// <returns>mp_freezetime</returns>
-    public static float GetFreezeTime()
+    public static int GetFreezeTime()
     {
         var cvar = ConVar.Find("mp_freezetime");
-        return cvar != null ? cvar.GetPrimitiveValue<float>() : .0f;
+        return cvar != null ? cvar.GetPrimitiveValue<int>() : 0;
     }
 }
