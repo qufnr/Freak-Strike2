@@ -104,7 +104,7 @@ public class BaseHalePlayer
                 CommonUtils.GetTeamAlivePlayers(player.Team) <= 0)
             {
                 CommonUtils.GetGameRules()
-                    .TerminateRound(CommonUtils.GetRoundRestartDelay(), RoundEndReason.TerroristsWin);
+                    .TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.TerroristsWin);
             }
         }
     }

@@ -32,9 +32,9 @@ namespace FreakStrike2
             }
         }
 
-        /**
-         * 클라이언트가 서버에 접속했을 때 게임 시작 체크
-         */
+        /// <summary>
+        /// 클라이언트가 서버에 접속했을 때 게임 시작 체크
+        /// </summary>
         private void GameStartOnClientPutInServer()
         {
             var playerCount = Utilities.GetPlayers().Count;
@@ -42,13 +42,13 @@ namespace FreakStrike2
             {
                 CommonUtils
                     .GetGameRules()
-                    .TerminateRound(CommonUtils.GetRoundRestartDelay(), RoundEndReason.RoundDraw);
+                    .TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.RoundDraw);
             }
         }
         
-        /**
-         * 게임 타이머를 죽입니다. (OnMapStart, OnRoundEnd)
-         */
+        /// <summary>
+        /// 게임 타이머를 죽입니다. (OnMapStart, OnRoundEnd)
+        /// </summary>
         private void KillGameTimer()
         {
             if (_gameTimer is not null)
@@ -58,9 +58,9 @@ namespace FreakStrike2
             }
         }
 
-        /**
-         * 게임 타이머를 생성합니다. (OnMapStart, OnRoundStart)
-         */
+        /// <summary>
+        /// 게임 타이머를 생성합니다. (OnMapStart, OnRoundStart)
+        /// </summary>
         private void CreateGameTimer()
         {
             _findInterval = Config.FindInterval;
@@ -84,9 +84,9 @@ namespace FreakStrike2
             }
         }
 
-        /**
-         * 게임 전역 타이머
-         */
+        /// <summary>
+        /// 게임 전역 타이머
+        /// </summary>
         private void OnGameTimerInterval()
         {
             if (_gameStatus == GameStatus.End)
