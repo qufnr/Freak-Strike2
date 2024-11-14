@@ -68,7 +68,7 @@ public class Queuepoint
     /// </summary>
     /// <param name="playerHaleMap">플레이어 헤일 맵</param>
     /// <param name="gameStatus">게임 상태</param>
-    public void CalculatePlayerQueuepoints(Dictionary<int, BaseHalePlayer> playerHaleMap, GameStatus gameStatus)
+    public void Calculate(Dictionary<int, BaseHalePlayer> playerHaleMap, GameStatus gameStatus)
     {
         if (gameStatus is not GameStatus.Start)
         {
@@ -100,5 +100,30 @@ public class Queuepoint
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Queuepoint 순위를 계산합니다.
+    /// </summary>
+    /// <remarks>
+    /// 전체 플레이어 중에서 봇은 제외하고 계산됩니다.
+    /// </remarks>
+    /// <returns>Queuepoint 순위 Map</returns>
+    public Dictionary<CCSPlayerController, int>? GetRank()
+    {
+        if (_playerQueuepoints.Count > 0)
+        {
+            return _playerQueuepoints
+                .Where(pqp =>
+                {
+                    var player = Utilities.GetPlayerFromSlot(pqp.Key);
+                    return player is not null && player.IsValid && !player.IsBot;
+                })
+                .OrderBy(pqp => pqp.Value)
+                .Reverse()
+                .ToDictionary(slot => Utilities.GetPlayerFromSlot(slot.Value)!, qp => qp.Value);
+        }
+
+        return null;
     }
 }
