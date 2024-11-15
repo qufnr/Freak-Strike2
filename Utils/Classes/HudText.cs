@@ -1,6 +1,8 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Runtime.InteropServices;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Utils.Exceptions;
 
@@ -16,16 +18,16 @@ public class HudText
         var playerPawn = player?.PlayerPawn.Value;
         var playerCameraService = playerPawn?.CameraServices;
         if (player is null || playerPawn is null || playerCameraService is null)
-        {
             throw new Exception("플레이어 객체가 잘못 되었습니다.");
-        }
 
         Target = player;
         Entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext");
         if (Entity is null)
-        {
             throw new GameNotSupportedException();
-        }
+        
+        var vmHandle = playerPawn.ViewModelServices!.Handle;
+        if (vmHandle == IntPtr.Zero)
+            throw new Exception("ViewModelServices.Handle is null.");
 
         SetText(message);
         Entity.Enabled = true;
@@ -49,14 +51,13 @@ public class HudText
         Entity.Teleport(playerPawn.AbsOrigin! + eyePosition, angles, new Vector(0, 0, 0));
         Entity.DispatchSpawn();
         
+        CCSPlayer_ViewModelServices vmServices = new(vmHandle);
+        var vmOffset = vmServices.Handle + Schema.GetSchemaOffset("CCSPlayer_ViewModelServices", "m_hViewModel");
+        var viewmodels = MemoryMarshal.CreateSpan(ref vmOffset, 3);
+        CHandle<CBaseViewModel> viewmodel = new(viewmodels[0]);
+        
         Entity.AcceptInput("SetParent", playerPawn, null, "!activator");
-
-        var viewmodelServices = (CCSPlayer_ViewModelServices) player.PlayerPawn.Value!.ViewModelServices!;
-        if (viewmodelServices.GetType() == typeof(CCSPlayer_ViewModelServices))
-        {
-            var viewmodel = viewmodelServices.ViewModel[0].Value;
-            Entity.AcceptInput("FollowEntity", viewmodel, Entity, "!activator");
-        }
+        Entity.AcceptInput("FollowEntity", viewmodel.Value, Entity, "!activator");
         // Entity.AcceptInput("SetParentAttachmentMaintainOffset", playerPawn, null, "axis_of_intent");
     }
 
