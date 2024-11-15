@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using FreakStrike2.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -37,7 +38,17 @@ public partial class FreakStrike2
             _hales.Clear();
         }
 
-        _hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile), hotReload);
+        _hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile));
+    }
+
+    private void PrecacheHaleModels(ResourceManifest manifest)
+    {
+        foreach (var hale in _hales)
+        {
+            if(!string.IsNullOrEmpty(hale.Model)) manifest.AddResource(hale.Model);
+            if(!string.IsNullOrEmpty(hale.ArmsModel)) manifest.AddResource(hale.ArmsModel);
+            if(!string.IsNullOrEmpty(hale.Viewmodel)) manifest.AddResource(hale.Viewmodel);
+        }
     }
 
     private void CleanUpHalePlayerOnClientPutInServer(int client)

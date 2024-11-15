@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Models;
 
 namespace FreakStrike2;
@@ -13,6 +14,7 @@ public partial class FreakStrike2
         RegisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
         
+        RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
         RegisterListener<Listeners.OnClientPutInServer>(OnClientPutInServer);
         RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnect);
@@ -28,10 +30,16 @@ public partial class FreakStrike2
         DeregisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
 
+        RemoveListener(OnServerPrecacheResources);
         RemoveListener(OnMapStart);
         RemoveListener(OnClientPutInServer);
         RemoveListener(OnClientDisconnect);
         RemoveListener(OnTick);
+    }
+
+    private void OnServerPrecacheResources(ResourceManifest manifest)
+    {
+        PrecacheHaleModels(manifest);
     }
 
     /// <summary>
