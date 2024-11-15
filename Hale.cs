@@ -34,9 +34,7 @@ public partial class FreakStrike2
         }
 
         if (hotReload)
-        {
             _hales.Clear();
-        }
 
         _hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile));
     }
@@ -45,9 +43,13 @@ public partial class FreakStrike2
     {
         foreach (var hale in _hales)
         {
-            if(!string.IsNullOrEmpty(hale.Model)) manifest.AddResource(hale.Model);
-            if(!string.IsNullOrEmpty(hale.ArmsModel)) manifest.AddResource(hale.ArmsModel);
-            if(!string.IsNullOrEmpty(hale.Viewmodel)) manifest.AddResource(hale.Viewmodel);
+            if (!string.IsNullOrEmpty(hale.Model) || !string.IsNullOrEmpty(hale.ArmsModel) || !string.IsNullOrEmpty(hale.Viewmodel))
+            {
+                if (!string.IsNullOrEmpty(hale.Model)) manifest.AddResource(hale.Model);
+                if (!string.IsNullOrEmpty(hale.ArmsModel)) manifest.AddResource(hale.ArmsModel);
+                if (!string.IsNullOrEmpty(hale.Viewmodel)) manifest.AddResource(hale.Viewmodel);
+                Logger.LogInformation($"[FreakStrike2] Precaching {hale.DesignerName} models...");
+            }
         }
     }
 
