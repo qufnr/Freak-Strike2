@@ -63,12 +63,21 @@ public class BaseHalePlayer
         
         Server.NextFrame(() =>
         {
+            player.ExecuteClientCommand("use weapon_knife");
+            
             if (!string.IsNullOrEmpty(hale.Model))
             {
                 player.PlayerPawn.Value!.SetModel(hale.Model);
             }
-            
-            player.ExecuteClientCommand("use weapon_knife");
+
+            if (!string.IsNullOrEmpty(hale.Viewmodel))
+            {
+                var weapon = WeaponUtils.FindPlayerWeapon(player, "weapon_knife");
+                if (weapon is not null)
+                {
+                    WeaponUtils.UpdatePlayerWeaponModel(player, weapon, hale.Viewmodel, true);
+                }
+            }
         });
     }
 
