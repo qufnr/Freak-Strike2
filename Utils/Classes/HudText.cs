@@ -127,8 +127,8 @@ public class HudText
             if (attribute.Duration > 0.0)
             {
                 //  TODO :: HOW?????? `SetVariantString("OnUser1 !self:kill::1.0:1");` in CSSharp?!
-                Entity.AcceptInput("AddOutput", Entity, null, $"OnUser1 !self:kill::{attribute.Duration}:1");   //  ??
-                Entity.AcceptInput("FireUser1");
+                Entity.AddEntityIOEvent("Kill", Entity, null, "", attribute.Duration);
+                // Entity.AcceptInput("FireUser1");
             }
         }
     }
