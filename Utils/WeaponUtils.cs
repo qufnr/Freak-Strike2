@@ -61,7 +61,38 @@ public class WeaponUtils
     {
         GetViewmodel(player)?.SetModel(model);
     }
-    
+
+    /// <summary>
+    /// 플레이어의 무기 모델을 업데이트합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="weapon">플레이어 무기 객체</param>
+    /// <param name="model">모델 </param>
+    /// <param name="updateViewmodel">Viewmodel 업데이트 여부</param>
+    public static void UpdatePlayerWeaponModel(CCSPlayerController player, CBasePlayerWeapon weapon, string model, bool updateViewmodel)
+    {
+        weapon.Globalname = $"{GetViewmodelName(player)}:{model}";
+        weapon.SetModel(model);
+        if(updateViewmodel)
+            SetViewmodel(player, model);
+    }
+
+    /// <summary>
+    /// 플레이어 무기의 모델을 삭제합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="weapon">무기 객체</param>
+    /// <param name="updateViewmodel">Viewmodel 업데이트 여부</param>
+    public static void RemovePlayerWeaponModel(CCSPlayerController player, CBasePlayerWeapon weapon, bool updateViewmodel)
+    {
+        if (string.IsNullOrEmpty(weapon.Globalname))
+            return;
+        var weaponModel = weapon.Globalname.Split(':')[0];
+        weapon.Globalname = string.Empty;
+        weapon.SetModel(weaponModel);
+        if(updateViewmodel)
+            SetViewmodel(player, weaponModel);
+    }
 
     /// <summary>
     /// 무기를 모두 삭제합니다.
