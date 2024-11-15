@@ -25,11 +25,17 @@ namespace FreakStrike2
             var players = Utilities.GetPlayers();
             foreach (var player in players)
             {
-                if (player.IsValid && player.PawnIsAlive)
+                if (player.IsValid)
                 {
-                    player.CommitSuicide(false, true);
+                    if (_halePlayers[player.Slot].IsHale())
+                        _halePlayers[player.Slot].Remove(_gameStatus, player.Slot);
+                    
+                    if (player.PawnIsAlive)
+                        player.CommitSuicide(false, true);
                 }
             }
+
+            _halePlayers.Clear();
         }
 
         /// <summary>
@@ -39,11 +45,8 @@ namespace FreakStrike2
         {
             var playerCount = Utilities.GetPlayers().Count;
             if (_gameStatus == GameStatus.PlayerWaiting && playerCount > 1)
-            {
-                CommonUtils
-                    .GetGameRules()
+                CommonUtils.GetGameRules()
                     .TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.RoundDraw);
-            }
         }
         
         /// <summary>
@@ -64,29 +67,16 @@ namespace FreakStrike2
         private void CreateGameTimer(bool isFreezeEnd = true)
         {
             if (!isFreezeEnd && ConVarUtils.GetFreezeTime() > 0)
-            {
                 return;
-            }
             
             _findInterval = Config.FindInterval;
 
-            if (CommonUtils.GetGameRules().WarmupPeriod)
-            {
-                _gameStatus = GameStatus.Warmup;
-            }
-            else if (Utilities.GetPlayers().Count <= 1)
-            {
-                _gameStatus = GameStatus.PlayerWaiting;
-            }
-            else
-            {
-                _gameStatus = GameStatus.PlayerFinding;
-            }
+            if (CommonUtils.GetGameRules().WarmupPeriod) _gameStatus = GameStatus.Warmup;
+            else if (Utilities.GetPlayers().Count <= 1) _gameStatus = GameStatus.PlayerWaiting;
+            else _gameStatus = GameStatus.PlayerFinding;
             
             if (_gameTimer is null)
-            {
                 _gameTimer = AddTimer(1.0f, OnGameTimerInterval, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
-            }
         }
 
         /// <summary>
@@ -99,14 +89,18 @@ namespace FreakStrike2
                 KillGameTimer();
                 return;
             }
+
+            if (_hales.Count == 0)
+            {
+                Server.PrintToChatAll("[FS] 서버에 플레이 가능한 헤일이 없습니다. 'configs/plugins/FreakStrike2/playable_hales.json' 파일에서 헤일 정보를 추가해주세요.");
+                return;
+            }
             
             var players = Utilities.GetPlayers();
             
             //  도중에 플레이어가 나갔을 때, 서버 인원이 1명 이하일 경우
             if (players.Count <= 1)
-            {
                 _gameStatus = GameStatus.PlayerWaiting;
-            }
 
             if (_findInterval < 0)
             {
@@ -118,18 +112,18 @@ namespace FreakStrike2
             {
                 if (player.IsValid && !player.IsBot && !player.IsHLTV)
                 {
-                    if (_gameStatus is GameStatus.PlayerWaiting)
+                    switch (_gameStatus)
                     {
-                        player.PrintToCenter("다른 플레이어를 기다리고 있습니다.");
-                    }
-                    else if (_gameStatus is GameStatus.Warmup)
-                    {
-                        player.PrintToCenter("준비 시간이 종료되면 게임이 시작됩니다.");
-                    }
-                    else if (_gameStatus is GameStatus.PlayerFinding)
-                    {
-                        player.PrintToCenter($"{_findInterval}초 후 헤일이 등장합니다.");
-                        _findInterval--;
+                        case GameStatus.PlayerWaiting:
+                            player.PrintToCenter("다른 플레이어를 기다리고 있습니다.");
+                            break;
+                        case GameStatus.Warmup:
+                            player.PrintToCenter("준비 시간이 종료되면 게임이 시작됩니다.");
+                            break;
+                        case GameStatus.PlayerFinding:
+                            player.PrintToCenter($"{_findInterval}초 후 헤일이 등장합니다.");
+                            _findInterval--;
+                            break;
                     }
                 }
             }
