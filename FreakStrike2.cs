@@ -15,14 +15,19 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
         
         if (hotReload)
         {
-            IgnoreRoundWinConditions();
-            GameResetOnHotReload();
-            GameEventDeregister();
+            Unload(hotReload);
         }
         
         GameEventInitialize();
         GetHaleJsonOnLoad(hotReload);
         // ServerCommandInitialize();
+    }
+
+    public override void Unload(bool hotReload)
+    {
+        IgnoreRoundWinConditions();
+        GameResetOnHotReload();
+        GameEventDeregister();
     }
 
     public override void OnAllPluginsLoaded(bool hotReload)
