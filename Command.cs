@@ -97,11 +97,11 @@ namespace FreakStrike2
                     return;
                 }
                 Server.PrintToConsole("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
-                Server.PrintToConsole("[#Id]\t[Name]\t\t[Description]\t\t[Designer Name]");
+                Server.PrintToConsole("[#Id]\t[Name]\t\t[Designer Name]\t\t\t[[Description]");
                 foreach(var hale in _hales)
                 {
                     haleIndex++;
-                    Server.PrintToConsole($"#{haleIndex}\t{hale.Name}\t\t{hale.Description}\t\t{hale.DesignerName}");
+                    Server.PrintToConsole($"#{haleIndex}\t{hale.Name}\t\t{hale.DesignerName}\t\t\t{hale.Description}");
                 }
                 Server.PrintToConsole("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
                 return;
@@ -116,11 +116,11 @@ namespace FreakStrike2
             player.PrintToChat("[FS2] 콘솔에 출력되었습니다.");
 
             player.PrintToConsole("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
-            player.PrintToConsole("[#Id]\t[Name]\t\t[Description]\t\t[Designer Name]");
+            player.PrintToConsole("[#Id]\t[Name]\t\t[Designer Name]\t\t\t[Description]");
             foreach(var hale in _hales)
             {
                 haleIndex++;
-                player.PrintToConsole($"#{haleIndex}\t{hale.Name}\t\t{hale.Description}\t\t{hale.DesignerName}");
+                player.PrintToConsole($"#{haleIndex}\t{hale.Name}\t\t{hale.DesignerName}\t\t\t{hale.Description}");
             }
             player.PrintToConsole("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
         }
