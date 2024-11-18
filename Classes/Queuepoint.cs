@@ -49,18 +49,8 @@ public class Queuepoint
     /// <returns>Queuepoint 가 가장 높은 플레이어 객체</returns>
     public CCSPlayerController? GetPlayerWithMostQueuepoints()
     {
-        var winner = 0;
-        var players = Utilities.GetPlayers();
-        foreach (var player in players)
-        {
-            if (!player.IsBot &&
-                !player.IsHLTV &&
-                player.Team is not CsTeam.Spectator &&
-                _playerQueuepoints[player.Slot] >= _playerQueuepoints[winner])
-                winner = player.Slot;
-        }
-
-        return Utilities.GetPlayerFromSlot(winner);
+        var winner = _playerQueuepoints.OrderBy(pq => pq.Value).Reverse().FirstOrDefault();
+        return Utilities.GetPlayerFromSlot(winner.Key);
     }
 
     /// <summary>
@@ -71,9 +61,7 @@ public class Queuepoint
     public void Calculate(Dictionary<int, BaseHalePlayer> playerHaleMap, GameStatus gameStatus)
     {
         if (gameStatus is not GameStatus.Start)
-        {
             return;
-        }
         
         var players = Utilities.GetPlayers();
         foreach (var player in players)
