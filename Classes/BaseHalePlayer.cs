@@ -21,14 +21,10 @@ public class BaseHalePlayer
     public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
     {
         if (!player.PawnIsAlive)
-        {
-            return;
-        }
+            player.Respawn();
 
         if (player.Team is not CsTeam.CounterTerrorist)
-        {
             player.SwitchTeam(CsTeam.CounterTerrorist);
-        }
 
         if (spawnTeleport)
         {
@@ -52,31 +48,26 @@ public class BaseHalePlayer
         player.PlayerPawn.Value!.Health = player.PlayerPawn.Value!.MaxHealth;
         player.PlayerPawn.Value!.ArmorValue = Convert.ToInt32(Math.Round(hale.Armor * (hale.ArmorMultiplier * playerCount)));
         player.PawnHasHelmet = true;
-        player.PlayerPawn.Value!.Speed = hale.Laggedmovement;
+        player.PlayerPawn.Value!.VelocityModifier *= hale.Laggedmovement;
         player.PlayerPawn.Value!.GravityScale = hale.Gravity;
         
         WeaponUtils.ForceRemoveWeapons(player, false, true);
-        if (!WeaponUtils.HasWeaponByDesignerName(player, "knife", true))
-        {
+        if (!WeaponUtils.HasWeaponByDesignerName(player, "weapon_knife"))
             player.GiveNamedItem(CsItem.Knife);
-        }
         
         Server.NextFrame(() =>
         {
+            //  이거 작동하냐?
             player.ExecuteClientCommand("use weapon_knife");
             
             if (!string.IsNullOrEmpty(hale.Model))
-            {
                 player.PlayerPawn.Value!.SetModel(hale.Model);
-            }
 
             if (!string.IsNullOrEmpty(hale.Viewmodel))
             {
                 var weapon = WeaponUtils.FindPlayerWeapon(player, "weapon_knife");
                 if (weapon is not null)
-                {
                     WeaponUtils.UpdatePlayerWeaponModel(player, weapon, hale.Viewmodel, true);
-                }
             }
         });
     }
@@ -90,6 +81,15 @@ public class BaseHalePlayer
     public bool IsHale()
     {
         return Hale is not null && Flags is HaleFlags.Hale;
+    }
+
+    /// <summary>
+    /// 플레이어가 인간인지 유무를 반환합니다.
+    /// </summary>
+    /// <returns>인간일 경우 true 아니면 false 반환</returns>
+    public bool IsHuman()
+    {
+        return !IsHale();
     }
 
     /// <summary>
