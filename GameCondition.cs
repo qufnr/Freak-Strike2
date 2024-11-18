@@ -108,26 +108,22 @@ public partial class FreakStrike2
             KillGameTimer();
             return;
         }
-        
-        foreach (var player in players)
+
+        var message = string.Empty;
+        switch (_gameStatus)
         {
-            if (player.IsValid && !player.IsBot && !player.IsHLTV)
-            {
-                switch (_gameStatus)
-                {
-                    case GameStatus.PlayerWaiting:
-                        player.PrintToCenter("다른 플레이어를 기다리고 있습니다.");
-                        break;
-                    case GameStatus.Warmup:
-                        player.PrintToCenter("준비 시간이 종료되면 게임이 시작됩니다.");
-                        break;
-                    case GameStatus.PlayerFinding:
-                        player.PrintToCenter($"{_findInterval}초 후 헤일이 등장합니다.");
-                        _findInterval--;
-                        break;
-                }
-            }
+            case GameStatus.PlayerWaiting:
+                message = "다른 플레이어를 기다리고 있습니다.";
+                break;
+            case GameStatus.Warmup:
+                message = "준비 시간이 종료되면 게임이 시작됩니다.";
+                break;
+            case GameStatus.PlayerFinding:
+                message = $"{_findInterval}초 후 헤일 플레이어가 선택됩니다!";
+                _findInterval--;
+                break;
         }
+        ServerUtils.PrintToCenterAll(message);
     }
 
     /// <summary>
