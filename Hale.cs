@@ -85,6 +85,7 @@ public partial class FreakStrike2
 
         var hale = _hales[CommonUtils.GetRandomInt(0, _hales.Count - 1)];
         _halePlayers[player.Slot] = new BaseHalePlayer(player, hale, Config.HaleTeleportToSpawn);
+        _queuepoint.SetPlayerQueuepoint(player.Slot, 0);
         
         ServerUtils.PrintToCenterAlertAll($"[FS2] {player.PlayerName} 이(가) {hale.Name} 헤일로 선택 되었습니다!");
     }
