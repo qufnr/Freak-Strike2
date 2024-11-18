@@ -13,6 +13,7 @@ public partial class FreakStrike2
         RegisterEventHandler<EventRoundStart>(OnRoundStart);
         RegisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
+        RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
         
         RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
@@ -29,6 +30,7 @@ public partial class FreakStrike2
         DeregisterEventHandler<EventRoundStart>(OnRoundStart);
         DeregisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
+        DeregisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
 
         RemoveListener(OnServerPrecacheResources);
         RemoveListener(OnMapStart);
@@ -124,6 +126,27 @@ public partial class FreakStrike2
         _queuepoint.Calculate(_halePlayers, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
         _gameStatus = GameStatus.End;
         
+        return HookResult.Continue;
+    }
+
+    /// <summary>
+    /// 플레이어 피해
+    /// </summary>
+    /// <param name="event">이벤트</param>
+    /// <param name="eventInfo">이벤트 정보</param>
+    /// <returns>이벤트 훅</returns>
+    private HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo eventInfo)
+    {
+        var victim = @event.Userid;
+        var attacker = @event.Attacker;
+        var damage = @event.DmgHealth;
+        var weapon = @event.Weapon;
+        var hitgroup = @event.Hitgroup;
+        
+        if (GameNotStartDamageIgnoreOnPlayerHurt(victim, attacker))
+            return HookResult.Handled;
+        
+        KnockbackOnPlayerTakeDamage(victim, attacker, damage, weapon, hitgroup);
         return HookResult.Continue;
     }
 }
