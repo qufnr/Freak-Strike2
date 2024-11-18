@@ -56,9 +56,9 @@ public class Queuepoint
     /// <summary>
     /// Queuepoint 계산 (OnRoundEnd)
     /// </summary>
-    /// <param name="playerHaleMap">플레이어 헤일 맵</param>
+    /// <param name="baseHalePlayer">플레이어 헤일 정보 객체</param>
     /// <param name="gameStatus">게임 상태</param>
-    public void Calculate(Dictionary<int, BaseHalePlayer> playerHaleMap, GameStatus gameStatus)
+    public void Calculate(BaseHalePlayer baseHalePlayer, GameStatus gameStatus)
     {
         if (gameStatus is not GameStatus.Start)
             return;
@@ -68,7 +68,7 @@ public class Queuepoint
         {
             if (player.IsValid)
             {
-                if (playerHaleMap[player.Slot].IsHale())
+                if (baseHalePlayer.PlayerIsHale(player))
                 {
                     if (player.IsBot || player.IsHLTV)
                     {
