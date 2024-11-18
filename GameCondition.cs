@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Models;
@@ -128,5 +129,16 @@ public partial class FreakStrike2
             }
         }
     }
+
+    /// <summary>
+    /// 게임 시작이 아니고, 플레이어(victim)가 얻어 맞았을 때 피해 무효 처리
+    /// </summary>
+    /// <param name="victim">피해자 플레이어</param>
+    /// <param name="attacker">가해자 플레이어</param>
+    /// <returns>기능 설명에 대한 조건이 참인지 거짓인지 반환. (true 반환 시 EventPlayerHurt 에서 Hook 을 Handled 처리합니다.)</returns>
+    private bool GameNotStartDamageIgnoreOnPlayerHurt(CCSPlayerController? victim, CCSPlayerController? attacker) => 
+        _gameStatus is not GameStatus.Start && 
+        victim is not null && victim.IsValid && 
+        attacker is not null && attacker.IsValid;
 }
 
