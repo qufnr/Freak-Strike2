@@ -102,25 +102,26 @@ public class WeaponUtils
     /// <param name="ignoreKnife">삭제 무기 중 근접무기 제외 여부</param>
     public static void ForceRemoveWeapons(CCSPlayerController player, bool drop = false, bool ignoreKnife = false)
     {
-        var weapons = player.PlayerPawn.Value!.WeaponServices!.MyWeapons;
-        for (var i = weapons.Count - 1; i >= 0; i--)
+        //  TODO :: 크래시남 고치기
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn is null || !playerPawn.IsValid)
+            return;
+        var weaponServices = playerPawn.WeaponServices;
+        if (weaponServices is null)
+            return;
+        
+        var weapons = weaponServices.MyWeapons;
+        foreach (var weapon in weapons)
         {
-            if (weapons[i].IsValid)
+            if (weapon.Value is not null && weapon.IsValid)
             {
-                var weaponVData = weapons[i].Value!.As<CCSWeaponBase>().GetVData<CCSWeaponBaseVData>();
+                var weaponVData = weapon.Value.As<CCSWeaponBase>().GetVData<CCSWeaponBaseVData>();
                 if (ignoreKnife && weaponVData!.GearSlot is gear_slot_t.GEAR_SLOT_KNIFE)
-                {
                     continue;
-                }
-
                 if (drop)
-                {
-                    ForceDropPlayerWeaponByDesignerName(player, weapons[i].Value!.DesignerName);
-                }
+                    ForceDropPlayerWeaponByDesignerName(player, weapon.Value.DesignerName);
                 else
-                {
-                    weapons[i].Value!.Remove();
-                }
+                    weapon.Value.Remove();
             }
         }
     }
