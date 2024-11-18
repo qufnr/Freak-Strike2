@@ -123,7 +123,9 @@ public partial class FreakStrike2
                 _findInterval--;
                 break;
         }
-        ServerUtils.PrintToCenterAll(message);
+        
+        if (!string.IsNullOrEmpty(message))
+            ServerUtils.PrintToCenterAll(message);
     }
 
     /// <summary>
