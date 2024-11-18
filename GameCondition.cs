@@ -4,6 +4,7 @@ using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Models;
 using FreakStrike2.Utils;
+using Microsoft.Extensions.Logging;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace FreakStrike2;
@@ -120,6 +121,7 @@ public partial class FreakStrike2
                 break;
             case GameStatus.PlayerFinding:
                 message = $"{_findInterval}초 후 헤일 플레이어가 선택됩니다!";
+                Logger.LogInformation($"Countdown: {_findInterval} seconds");
                 _findInterval--;
                 break;
         }
