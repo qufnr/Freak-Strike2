@@ -1,7 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
-using FreakStrike2.Exceptions;
 using FreakStrike2.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -88,5 +87,6 @@ public partial class FreakStrike2
         _queuepoint.SetPlayerQueuepoint(player.Slot, 0);
         
         ServerUtils.PrintToCenterAlertAll($"[FS2] {player.PlayerName} 이(가) {hale.Name} 헤일로 선택 되었습니다!");
+        Logger.LogInformation($"[FreakStrike2] {player.PlayerName}({player.AuthorizedSteamID!.SteamId64}) has been chosen as the Hale for {hale.Name}!");
     }
 }
