@@ -20,23 +20,9 @@ public partial class FreakStrike2
     {
         KillGameTimer();
         _queuepoint.Clear();
+        _halePlayer.Clear();
         
         Server.ExecuteCommand("mp_restartgame 1");
-        
-        var players = Utilities.GetPlayers();
-        foreach (var player in players)
-        {
-            if (player.IsValid)
-            {
-                if (_halePlayers[player.Slot].IsHale())
-                    _halePlayers[player.Slot].Remove(_gameStatus, player.Slot);
-                
-                if (player.PawnIsAlive)
-                    player.CommitSuicide(false, true);
-            }
-        }
-
-        _halePlayers.Clear();
     }
 
     /// <summary>

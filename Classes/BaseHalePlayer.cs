@@ -9,17 +9,26 @@ namespace FreakStrike2.Classes;
 
 public class BaseHalePlayer
 {
-    private BaseHale? Hale { get; set; }
-    private HaleFlags Flags { get; set; }
-
+    private Dictionary<int, BaseHale?> _playerHales;            //  선택된 헤일 정보
+    private Dictionary<int, HaleFlags?> _playerHaleFlags;       //  헤일 플레그
+    
     public BaseHalePlayer()
     {
-        Hale = null;
-        Flags = HaleFlags.None;
+        _playerHales = new Dictionary<int, BaseHale?>();
+        _playerHaleFlags = new Dictionary<int, HaleFlags?>();
+    }
+
+    public void CreateByPlayerSlot(int clientSlot)
+    {
+        _playerHales[clientSlot] = null;
+        _playerHaleFlags[clientSlot] = HaleFlags.None;
     }
     
-    public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
+    public void SetPlayerHale(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
     {
+        if (!player.IsValid)
+            return;
+        
         if (!player.PawnIsAlive)
             player.Respawn();
 
@@ -44,9 +53,9 @@ public class BaseHalePlayer
         //         }
         //     }
         // }
-        
-        Hale = hale;
-        Flags = HaleFlags.Hale;
+
+        _playerHales[player.Slot] = hale;
+        _playerHaleFlags[player.Slot] = HaleFlags.Hale;
 
         var playerCount = Utilities.GetPlayers().Count - 1;
         
@@ -57,9 +66,11 @@ public class BaseHalePlayer
         player.PlayerPawn.Value!.VelocityModifier *= hale.Laggedmovement;
         player.PlayerPawn.Value!.GravityScale = hale.Gravity;
         
-        WeaponUtils.ForceRemoveWeapons(player, false, true);
-        if (!WeaponUtils.HasWeaponByDesignerName(player, "weapon_knife"))
-            player.GiveNamedItem(CsItem.Knife);
+        player.RemoveWeapons();
+        player.GiveNamedItem(CsItem.Knife);
+        // WeaponUtils.ForceRemoveWeapons(player, false, true);
+        // if (!WeaponUtils.HasWeaponByDesignerName(player, "weapon_knife"))
+        //     player.GiveNamedItem(CsItem.Knife);
         
         Server.NextFrame(() =>
         {
@@ -81,34 +92,35 @@ public class BaseHalePlayer
     /// <returns>
     /// 헤일일 경우 true 아니면 flase 반환
     /// </returns>
-    public bool IsHale()
+    public bool PlayerIsHale(CCSPlayerController? player)
     {
-        return Hale is not null && Flags is HaleFlags.Hale;
+        return player is not null && _playerHales[player.Slot] is not null && _playerHaleFlags[player.Slot] is HaleFlags.Hale;
     }
 
     /// <summary>
     /// 플레이어가 인간인지 유무를 반환합니다.
     /// </summary>
     /// <returns>인간일 경우 true 아니면 false 반환</returns>
-    public bool IsHuman()
-    {
-        return !IsHale();
-    }
+    public bool PlayerIsHuman(CCSPlayerController player) => !PlayerIsHale(player);
+
+    /// <summary>
+    /// 모든 플레이어를 헤일에서 제거합니다.
+    /// </summary>
+    public void Clear() => Utilities.GetPlayers().ForEach(player => Clear(player));
 
     /// <summary>
     /// 플레이어를 헤일에서 제거합니다.
     /// </summary>
-    /// <param name="gameStatus">게임 상태</param>
-    /// <param name="slot">Player Slot</param>
-    public void Remove(GameStatus gameStatus, int slot)
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="gameStatus">게임 상태 (매개변수로 넘기지 않을 시 GameStatus.None 으로 판별)</param>
+    public void Clear(CCSPlayerController? player, GameStatus? gameStatus = GameStatus.None)
     {
-        if (!IsHale()) return;
+        if (player is null || PlayerIsHuman(player)) return;
         
-        Hale = null;
-        Flags = HaleFlags.None;
+        _playerHales[player.Slot] = null;
+        _playerHaleFlags[player.Slot] = HaleFlags.None;
         
-        var player = Utilities.GetPlayerFromSlot(slot);
-        if (player is not null && player.IsValid)
+        if (player.IsValid)
         {
             player.CommitSuicide(false, true);
             if (gameStatus is GameStatus.Start && 

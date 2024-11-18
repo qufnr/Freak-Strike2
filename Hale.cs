@@ -11,7 +11,7 @@ public partial class FreakStrike2
     public static string HaleConfigFilename = "playable_hales.json";
     
     private List<BaseHale> _hales = new List<BaseHale>();
-    private Dictionary<int, BaseHalePlayer> _halePlayers = new Dictionary<int, BaseHalePlayer>();
+    private BaseHalePlayer _halePlayer = new BaseHalePlayer();
     
     /// <summary>
     /// 헤일 설정 파일을 읽어옵니다.
@@ -58,32 +58,20 @@ public partial class FreakStrike2
     }
 
     /// <summary>
-    /// 플레이어 접속 시 헤일 클래스 초기화
-    /// </summary>
-    /// <param name="client">클라이언트 슬롯</param>
-    private void CleanUpHalePlayerOnClientPutInServer(int client)
-    {
-        _halePlayers[client] = new BaseHalePlayer();
-    }
-
-    /// <summary>
     /// 타이머가 종료되는 시점에서 무작위(또는 Queuepoint 가 높은 플레이어)로 헤일 선택
     /// </summary>
     private void SetHalePlayerOnTimerEnd()
     {
-        var player = _queuepoint.GetPlayerWithMostQueuepoints();
+        var player = _queuepoint.GetPlayerWithMostQueuepoints() ?? PlayerUtils.GetRandomPlayer();
+
         if (player is null)
         {
-            while (true)
-            {
-                player = PlayerUtils.GetRandomPlayer();
-                if (player is not null)
-                    break;
-            }
+            Logger.LogError("[FreakStrike2] No player has been selected.");
+            return;
         }
-
+        
         var hale = _hales[CommonUtils.GetRandomInt(0, _hales.Count - 1)];
-        _halePlayers[player.Slot] = new BaseHalePlayer(player, hale, Config.HaleTeleportToSpawn);
+        _halePlayer.SetPlayerHale(player, hale, Config.HaleTeleportToSpawn);
         _queuepoint.SetPlayerQueuepoint(player.Slot, 0);
         
         ServerUtils.PrintToCenterAlertAll($"[FS2] {player.PlayerName} 이(가) {hale.Name} 헤일로 선택 되었습니다!");
