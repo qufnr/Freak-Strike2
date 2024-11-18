@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Models;
 
@@ -14,6 +15,7 @@ public partial class FreakStrike2
         RegisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
         RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
+        RegisterEventHandler<EventItemEquip>(OnItemEquip);
         
         RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
@@ -31,6 +33,7 @@ public partial class FreakStrike2
         DeregisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
         DeregisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
+        DeregisterEventHandler<EventItemEquip>(OnItemEquip);
 
         RemoveListener(OnServerPrecacheResources);
         RemoveListener(OnMapStart);
@@ -51,7 +54,7 @@ public partial class FreakStrike2
     private void OnMapStart(string mapName)
     {
         KillGameTimer();
-        CreatePlayerQueuepoint();
+        CreateBasePlayerClasses();
     }
 
     /// <summary>
@@ -60,9 +63,9 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientPutInServer(int client)
     {
-        CleanUpHalePlayerOnClientPutInServer(client);   //  플레이어 헤일 정보 초기화
+        _gamePlayer.CreateByPlayerSlot(client);
+        _halePlayer.CreateByPlayerSlot(client);
         GameStartOnClientPutInServer();                 //  게임 시작 처리
-        DebugDisableOnClientPutInServer(client);        //  디버그 모드 비활성화
         TeamChangeOnClientPutInServer(client);          //  접속 시 팀 변경 처리
     }
 
@@ -72,7 +75,8 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientDisconnect(int client)
     {
-        ResetQueuepointOnClientDisconnect(client);  //  Queuepoint 초기화
+        _queuepoint.SetPlayerQueuepoint(client, 0); //  Queuepoint 초기화
+        _halePlayer.Clear(Utilities.GetPlayerFromSlot(client), _gameStatus);
     }
 
     /// <summary>
@@ -123,7 +127,7 @@ public partial class FreakStrike2
             return HookResult.Handled;
         }
         
-        _queuepoint.Calculate(_halePlayers, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
+        _queuepoint.Calculate(_halePlayer, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
         _gameStatus = GameStatus.End;
         
         return HookResult.Continue;
@@ -143,10 +147,22 @@ public partial class FreakStrike2
         var weapon = @event.Weapon;
         var hitgroup = @event.Hitgroup;
         
+        _gamePlayer.AddPlayerDamage(victim, attacker, _halePlayer, _gameStatus, damage);
+        
         if (GameNotStartDamageIgnoreOnPlayerHurt(victim, attacker))
             return HookResult.Handled;
         
         KnockbackOnPlayerTakeDamage(victim, attacker, damage, weapon, hitgroup);
+        return HookResult.Continue;
+    }
+
+    private HookResult OnItemEquip(EventItemEquip @event, GameEventInfo eventInfo)
+    {
+        var player = @event.Userid;
+
+        if (_halePlayer.PlayerIsHale(player))
+            return HookResult.Handled;
+
         return HookResult.Continue;
     }
 }

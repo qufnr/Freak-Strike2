@@ -16,9 +16,9 @@ namespace FreakStrike2
             if (player is null || !player.IsValid)
                 return;
             
-            DebugPlayers[player.Slot] = !DebugPlayers[player.Slot];
+            _gamePlayer.SetPlayerDebugMode(player, !_gamePlayer.PlayerIsDebugMode(player));
 
-            var text = DebugPlayers[player.Slot] ? "활성화" : "비활성화";
+            var text = _gamePlayer.PlayerIsDebugMode(player) ? "활성화" : "비활성화";
             player.PrintToChat($"[FS2] 디버그 모드가 {text} 되었습니다.");
         }
 
@@ -111,17 +111,6 @@ namespace FreakStrike2
                 player.PrintToConsole($"#{haleIndex}\t{hale.Name}\t\t{hale.DesignerName}\t\t\t{hale.Description}");
             }
             player.PrintToConsole("-----------------------------------------------------------------------------------------------------------------------");
-        }
-
-        private bool IsServerSideCalled(CCSPlayerController? player)
-        {
-            if (player is null || player.IsBot)
-            {
-                Server.PrintToConsole("[FS2] 클라이언트 측 명령어입니다.");
-                return true;
-            }
-
-            return false;
         }
     }
 }
