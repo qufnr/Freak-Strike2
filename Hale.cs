@@ -2,13 +2,14 @@
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using FreakStrike2.Exceptions;
+using FreakStrike2.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
-    public static string PLUGIN_CONFIG_DIRECTORY = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
-    public static string HALE_CONFIG_FILE = "playable_hales.json";
+    public static string PluginConfigDirectory = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
+    public static string HaleConfigFilename = "playable_hales.json";
     
     private List<BaseHale> _hales = new List<BaseHale>();
     private Dictionary<int, BaseHalePlayer> _halePlayers = new Dictionary<int, BaseHalePlayer>();
@@ -19,14 +20,14 @@ public partial class FreakStrike2
     /// <param name="hotReload">핫리로드 유무</param>
     private void GetHaleJsonOnLoad(bool hotReload)
     {
-        var directory = Path.Combine(Server.GameDirectory, PLUGIN_CONFIG_DIRECTORY);
+        var directory = Path.Combine(Server.GameDirectory, PluginConfigDirectory);
         if (!Directory.Exists(directory))
         {
             Logger.LogError($"Couldn't find Plugin Configuration directory. [Directory Path: {directory}]");
             return;
         }
         
-        var jsonFile = Path.Combine(directory, HALE_CONFIG_FILE);
+        var jsonFile = Path.Combine(directory, HaleConfigFilename);
         if (!File.Exists(jsonFile))
         {
             Logger.LogError($"Couldn't find Hale Configuration file. [Path: {jsonFile}]");
@@ -39,6 +40,10 @@ public partial class FreakStrike2
         _hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile));
     }
 
+    /// <summary>
+    /// 헤일 모델 프리캐싱
+    /// </summary>
+    /// <param name="manifest">리소스 매니페스트</param>
     private void PrecacheHaleModels(ResourceManifest manifest)
     {
         foreach (var hale in _hales)
@@ -53,13 +58,34 @@ public partial class FreakStrike2
         }
     }
 
+    /// <summary>
+    /// 플레이어 접속 시 헤일 클래스 초기화
+    /// </summary>
+    /// <param name="client">클라이언트 슬롯</param>
     private void CleanUpHalePlayerOnClientPutInServer(int client)
     {
         _halePlayers[client] = new BaseHalePlayer();
     }
 
+    /// <summary>
+    /// 타이머가 종료되는 시점에서 무작위(또는 Queuepoint 가 높은 플레이어)로 헤일 선택
+    /// </summary>
     private void SetHalePlayerOnTimerEnd()
     {
-        //  TODO : 랜덤으로 헤일 뽑기
+        var player = _queuepoint.GetPlayerWithMostQueuepoints();
+        if (player is null)
+        {
+            while (true)
+            {
+                player = PlayerUtils.GetRandomPlayer();
+                if (player is not null)
+                    break;
+            }
+        }
+
+        var hale = _hales[CommonUtils.GetRandomInt(0, _hales.Count - 1)];
+        _halePlayers[player.Slot] = new BaseHalePlayer(player, hale, Config.HaleTeleportToSpawn);
+        
+        ServerUtils.PrintToCenterAlertAll($"[FS2] {player.PlayerName} 이(가) {hale.Name} 헤일로 선택 되었습니다!");
     }
 }
