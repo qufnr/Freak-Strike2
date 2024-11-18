@@ -9,8 +9,8 @@ namespace FreakStrike2.Classes;
 
 public class BaseHalePlayer
 {
-    private BaseHale? Hale { get; set; } = null;
-    private HaleFlags Flags { get; set; } = HaleFlags.None;
+    private BaseHale? Hale { get; set; }
+    private HaleFlags Flags { get; set; }
 
     public BaseHalePlayer()
     {
@@ -26,18 +26,24 @@ public class BaseHalePlayer
         if (player.Team is not CsTeam.CounterTerrorist)
             player.SwitchTeam(CsTeam.CounterTerrorist);
 
-        if (spawnTeleport)
-        {
-            var entities = Utilities.FindAllEntitiesByDesignerName<CBaseEntity>("info_player_counterterrorist")
-                .ToArray();
-            var entity = entities[CommonUtils.GetRandomInt(0, entities.Length - 1)];
-            if (entity.IsValid)
-            {
-                var origin = entity.AbsOrigin;
-                origin!.Y += 1.0f;
-                player.Teleport(origin);
-            }
-        }
+        //  TODO :: Crash
+        // if (spawnTeleport)
+        // {
+        //     var entities = Utilities.FindAllEntitiesByDesignerName<CInfoPlayerCounterterrorist>("info_player_counterterrorist")
+        //         .ToList();
+        //     if (entities.Count() > 0)
+        //     {
+        //         var entity = entities.Where((_, index) => index == CommonUtils.GetRandomInt(0, entities.Count() - 1))
+        //                 .FirstOrDefault();
+        //         
+        //         if (entity is not null && entity.IsValid && entity.AbsOrigin is not null)
+        //         {
+        //             var spawnOrigin = entity.AbsOrigin;
+        //             spawnOrigin.Y += 1.0f;
+        //             player.Teleport(spawnOrigin);
+        //         }
+        //     }
+        // }
         
         Hale = hale;
         Flags = HaleFlags.Hale;
@@ -57,12 +63,9 @@ public class BaseHalePlayer
         
         Server.NextFrame(() =>
         {
-            //  이거 작동하냐?
-            player.ExecuteClientCommand("use weapon_knife");
-            
             if (!string.IsNullOrEmpty(hale.Model))
                 player.PlayerPawn.Value!.SetModel(hale.Model);
-
+        
             if (!string.IsNullOrEmpty(hale.Viewmodel))
             {
                 var weapon = WeaponUtils.FindPlayerWeapon(player, "weapon_knife");
