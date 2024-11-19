@@ -62,7 +62,7 @@ public partial class FreakStrike2
     /// </summary>
     private void SetHalePlayerOnTimerEnd()
     {
-        var player = _queuepoint.GetPlayerWithMostQueuepoints() ?? PlayerUtils.GetRandomPlayer();
+        var player = _queuepoint.GetPlayerWithMostQueuepoints() ?? PlayerUtils.GetRandomAlivePlayer();
 
         if (player is null)
         {
