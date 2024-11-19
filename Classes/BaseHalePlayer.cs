@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Exceptions;
 using FreakStrike2.Models;
 using FreakStrike2.Utils;
 
@@ -12,12 +13,19 @@ public class BaseHalePlayer
     private Dictionary<int, BaseHale?> _playerHales;            //  선택된 헤일 정보
     private Dictionary<int, HaleFlags?> _playerHaleFlags;       //  헤일 플레그
     
+    /// <summary>
+    /// 맴버 변수(딕셔너리) 생성
+    /// </summary>
     public BaseHalePlayer()
     {
         _playerHales = new Dictionary<int, BaseHale?>();
         _playerHaleFlags = new Dictionary<int, HaleFlags?>();
     }
 
+    /// <summary>
+    /// 맴버 변수에 플레이어 할당
+    /// </summary>
+    /// <param name="clientSlot">플레이어 슬롯</param>
     public void CreateByPlayerSlot(int clientSlot)
     {
         _playerHales[clientSlot] = null;
@@ -26,8 +34,10 @@ public class BaseHalePlayer
     
     public void SetPlayerHale(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
     {
-        if (!player.IsValid)
-            return;
+        var playerPawn = player.PlayerPawn.Value;
+        
+        if (!player.IsValid || playerPawn is null || !playerPawn.IsValid)
+            throw new PlayerNotFoundException();
         
         if (!player.PawnIsAlive)
             player.Respawn();
@@ -59,12 +69,12 @@ public class BaseHalePlayer
 
         var playerCount = Utilities.GetPlayers().Count - 1;
         
-        player.PlayerPawn.Value!.MaxHealth = Convert.ToInt32(Math.Round(hale.MaxHealth * (hale.HealthMultiplier * playerCount)));
-        player.PlayerPawn.Value!.Health = player.PlayerPawn.Value!.MaxHealth;
-        player.PlayerPawn.Value!.ArmorValue = Convert.ToInt32(Math.Round(hale.Armor * (hale.ArmorMultiplier * playerCount)));
+        playerPawn.MaxHealth = Convert.ToInt32(Math.Round(hale.MaxHealth * (hale.HealthMultiplier * playerCount)));
+        playerPawn.Health = playerPawn.MaxHealth;
+        playerPawn.ArmorValue = Convert.ToInt32(Math.Round(hale.Armor * (hale.ArmorMultiplier * playerCount)));
         player.PawnHasHelmet = true;
-        player.PlayerPawn.Value!.VelocityModifier *= hale.Laggedmovement;
-        player.PlayerPawn.Value!.GravityScale = hale.Gravity;
+        playerPawn.VelocityModifier *= hale.Laggedmovement; //  태깅 걸리거나 뭐 어떤짓 하면 원래 속도로 바뀜... 
+        playerPawn.GravityScale = hale.Gravity; //  사다리 타면 초기화 됨 (소스1 때랑 동일한 현상)
         
         player.RemoveWeapons();
         player.GiveNamedItem(CsItem.Knife);
@@ -75,7 +85,7 @@ public class BaseHalePlayer
         Server.NextFrame(() =>
         {
             if (!string.IsNullOrEmpty(hale.Model))
-                player.PlayerPawn.Value!.SetModel(hale.Model);
+                playerPawn.SetModel(hale.Model);
         
             if (!string.IsNullOrEmpty(hale.Viewmodel))
             {
