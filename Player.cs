@@ -8,9 +8,6 @@ using FreakStrike2.Utils;
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
-    public required Queuepoint PlayerQueuePoint;
-    public required BaseGamePlayer GamePlayer;
-
     /// <summary>
     /// 플레이어 관련 객체 생성 (OnMapStart)
     /// </summary>

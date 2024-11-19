@@ -10,9 +10,6 @@ public partial class FreakStrike2
     public static string PluginConfigDirectory = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
     public static string HaleConfigFilename = "playable_hales.json";
     
-    public List<BaseHale> Hales = new();
-    public required BaseHalePlayer HalePlayer;
-    
     /// <summary>
     /// 헤일 설정 파일을 읽어옵니다.
     /// </summary>
