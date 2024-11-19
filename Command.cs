@@ -16,9 +16,9 @@ namespace FreakStrike2
             if (player is null || !player.IsValid)
                 return;
             
-            _gamePlayer.SetPlayerDebugMode(player, !_gamePlayer.PlayerIsDebugMode(player));
+            GamePlayer.SetPlayerDebugMode(player, !GamePlayer.PlayerIsDebugMode(player));
 
-            var text = _gamePlayer.PlayerIsDebugMode(player) ? "활성화" : "비활성화";
+            var text = GamePlayer.PlayerIsDebugMode(player) ? "활성화" : "비활성화";
             player.PrintToChat($"[FS2] 디버그 모드가 {text} 되었습니다.");
         }
 
@@ -44,22 +44,26 @@ namespace FreakStrike2
                         return;
                     }
                     
-                    _queuepoint.SetPlayerQueuepoint(player!.Slot, 0);
+                    PlayerQueuePoint.SetPlayerQueuepoint(player!.Slot, 0);
                     player.PrintToChat("[FS2] Queuepoint 를 초기화 했습니다.");
                     
                     return;
                 
                 //  순위
                 case "rank":
-                    var rankMap = _queuepoint.GetRank();
+                    var rankMap = PlayerQueuePoint.GetRank();
                     if (rankMap is not null && rankMap.Count > 0)
                     {
-                        cmdInfo.ReplyToCommand("[FS2] -- [#Rank]\t[Player Name]\t\t[Queuepoints]");
+                        cmdInfo.ReplyToCommand(player is null ? 
+                            "[FS2] -- [#Rank]\t[Player Name]\t\t[Queuepoints]" : 
+                            "[FS2] -- Queuepoint 소지 순위");
 
                         var index = 1;
                         foreach (var rank in rankMap)
                         {
-                            cmdInfo.ReplyToCommand($"[FS2] -- [#{index}]\t[{rank.Key.PlayerName}]\t\t[{rank.Value}qp]");
+                            cmdInfo.ReplyToCommand(player is null ? 
+                                $"[FS2] -- [#{index}]\t[{rank.Key.PlayerName}]\t\t[{rank.Value} QP]" : 
+                                $"[FS2] -- #{index} | ${rank.Key.PlayerName} | {rank.Value} QP");
                         }
                     }
                     else
@@ -69,7 +73,7 @@ namespace FreakStrike2
             }
 
             if(player is not null && player.IsValid)
-                cmdInfo.ReplyToCommand($"[FS2] 소지중인 Queuepoints: {_queuepoint.GetPlayerQueuepoint(player.Slot)} qp");
+                cmdInfo.ReplyToCommand($"[FS2] 소지중인 Queuepoints: {PlayerQueuePoint.GetPlayerQueuepoint(player.Slot)} QP");
         }
 
         [ConsoleCommand("css_hales", "헤일 정보를 확인합니다.")]
@@ -78,7 +82,7 @@ namespace FreakStrike2
             var haleIndex = 0;
             if (player is null || !player.IsValid)
             {
-                if (_hales.Count == 0)
+                if (Hales.Count == 0)
                 {
                     
                     Server.PrintToConsole("[FS2] 서버에 설정된 헤일 클래스가 없습니다.");
@@ -86,7 +90,7 @@ namespace FreakStrike2
                 }
                 Server.PrintToConsole("-----------------------------------------------------------------------------------------------------------------------");
                 Server.PrintToConsole("[#Id]\t[Name]\t\t[Designer Name]\t\t\t[[Description]");
-                foreach(var hale in _hales)
+                foreach(var hale in Hales)
                 {
                     haleIndex++;
                     Server.PrintToConsole($"#{haleIndex}\t{hale.Name}\t\t{hale.DesignerName}\t\t\t{hale.Description}");
@@ -95,7 +99,7 @@ namespace FreakStrike2
                 return;
             }
             
-            if (_hales.Count == 0)
+            if (Hales.Count == 0)
             {
                 player.PrintToChat("[FS2] 서버에 설정된 헤일 클래스가 없습니다.");
                 return;
@@ -105,7 +109,7 @@ namespace FreakStrike2
 
             player.PrintToConsole("-----------------------------------------------------------------------------------------------------------------------");
             player.PrintToConsole("[#Id]\t[Name]\t\t[Designer Name]\t\t\t[Description]");
-            foreach(var hale in _hales)
+            foreach(var hale in Hales)
             {
                 haleIndex++;
                 player.PrintToConsole($"#{haleIndex}\t{hale.Name}\t\t{hale.DesignerName}\t\t\t{hale.Description}");

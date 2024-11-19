@@ -63,8 +63,8 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientPutInServer(int client)
     {
-        _gamePlayer.CreateByPlayerSlot(client);
-        _halePlayer.CreateByPlayerSlot(client);
+        GamePlayer.CreateByPlayerSlot(client);
+        HalePlayer.CreateByPlayerSlot(client);
         GameStartOnClientPutInServer();                 //  게임 시작 처리
         TeamChangeOnClientPutInServer(client);          //  접속 시 팀 변경 처리
     }
@@ -75,8 +75,8 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientDisconnect(int client)
     {
-        _queuepoint.SetPlayerQueuepoint(client, 0); //  Queuepoint 초기화
-        _halePlayer.Clear(Utilities.GetPlayerFromSlot(client), _gameStatus);
+        PlayerQueuePoint.SetPlayerQueuepoint(client, 0); //  Queuepoint 초기화
+        HalePlayer.Clear(Utilities.GetPlayerFromSlot(client), _gameStatus);
     }
 
     /// <summary>
@@ -127,7 +127,7 @@ public partial class FreakStrike2
             return HookResult.Handled;
         }
         
-        _queuepoint.Calculate(_halePlayer, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
+        PlayerQueuePoint.Calculate(HalePlayer, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
         _gameStatus = GameStatus.End;
         
         return HookResult.Continue;
@@ -147,7 +147,7 @@ public partial class FreakStrike2
         var weapon = @event.Weapon;
         var hitgroup = @event.Hitgroup;
         
-        _gamePlayer.AddPlayerDamage(victim, attacker, _halePlayer, _gameStatus, damage);
+        GamePlayer.AddPlayerDamage(victim, attacker, HalePlayer, _gameStatus, damage);
         
         if (GameNotStartDamageIgnoreOnPlayerHurt(victim, attacker))
             return HookResult.Handled;
@@ -160,7 +160,7 @@ public partial class FreakStrike2
     {
         var player = @event.Userid;
 
-        if (_halePlayer.PlayerIsHale(player))
+        if (HalePlayer.PlayerIsHale(player))
             return HookResult.Handled;
 
         return HookResult.Continue;

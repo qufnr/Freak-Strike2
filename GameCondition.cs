@@ -19,8 +19,8 @@ public partial class FreakStrike2
     private void GameResetOnHotReload()
     {
         KillGameTimer();
-        _queuepoint.Clear();
-        _halePlayer.Clear();
+        PlayerQueuePoint.Clear();
+        HalePlayer.Clear();
         
         Server.ExecuteCommand("mp_restartgame 1");
     }
@@ -77,7 +77,7 @@ public partial class FreakStrike2
             return;
         }
 
-        if (_hales.Count == 0)
+        if (Hales.Count == 0)
         {
             Server.PrintToChatAll("[FS] 서버에 플레이 가능한 헤일이 없습니다. 'configs/plugins/FreakStrike2/playable_hales.json' 파일에서 헤일 정보를 추가해주세요.");
             return;

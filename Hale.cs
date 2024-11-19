@@ -10,8 +10,8 @@ public partial class FreakStrike2
     public static string PluginConfigDirectory = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
     public static string HaleConfigFilename = "playable_hales.json";
     
-    private List<BaseHale> _hales = new List<BaseHale>();
-    private BaseHalePlayer _halePlayer = new BaseHalePlayer();
+    public List<BaseHale> Hales = new();
+    public required BaseHalePlayer HalePlayer;
     
     /// <summary>
     /// 헤일 설정 파일을 읽어옵니다.
@@ -34,9 +34,9 @@ public partial class FreakStrike2
         }
 
         if (hotReload)
-            _hales.Clear();
+            Hales.Clear();
 
-        _hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile));
+        Hales = BaseHale.GetHalesFromJson(File.ReadAllText(jsonFile));
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public partial class FreakStrike2
     /// <param name="manifest">리소스 매니페스트</param>
     private void PrecacheHaleModels(ResourceManifest manifest)
     {
-        foreach (var hale in _hales)
+        foreach (var hale in Hales)
         {
             if (!string.IsNullOrEmpty(hale.Model) || !string.IsNullOrEmpty(hale.ArmsModel) || !string.IsNullOrEmpty(hale.Viewmodel))
             {
@@ -62,7 +62,7 @@ public partial class FreakStrike2
     /// </summary>
     private void SetHalePlayerOnTimerEnd()
     {
-        var player = _queuepoint.GetPlayerWithMostQueuepoints() ?? PlayerUtils.GetRandomAlivePlayer();
+        var player = PlayerQueuePoint.GetPlayerWithMostQueuepoints() ?? PlayerUtils.GetRandomAlivePlayer();
 
         if (player is null)
         {
@@ -70,9 +70,9 @@ public partial class FreakStrike2
             return;
         }
         
-        var hale = _hales[CommonUtils.GetRandomInt(0, _hales.Count - 1)];
-        _halePlayer.SetPlayerHale(player, hale, Config.HaleTeleportToSpawn);
-        _queuepoint.SetPlayerQueuepoint(player.Slot, 0);
+        var hale = Hales[CommonUtils.GetRandomInt(0, Hales.Count - 1)];
+        HalePlayer.SetPlayerHale(player, hale, Config.HaleTeleportToSpawn);
+        PlayerQueuePoint.SetPlayerQueuepoint(player.Slot, 0);
         
         ServerUtils.PrintToCenterAlertAll($"[FS2] {player.PlayerName} 이(가) {hale.Name} 헤일로 선택 되었습니다!");
         Logger.LogInformation($"[FreakStrike2] {player.PlayerName}({player.AuthorizedSteamID!.SteamId64}) has been chosen as the Hale for {hale.Name}!");

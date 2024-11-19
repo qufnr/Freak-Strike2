@@ -14,13 +14,15 @@ public class Queuepoint
         _playerQueuepoints = new Dictionary<int, int>();
     }
 
-    public void Clear()
+    public void Clear() => Utilities.GetPlayers().ForEach(player =>
     {
-        var players = Utilities.GetPlayers();
-        foreach (var player in players)
-        {
-            _playerQueuepoints[player.Slot] = 0;
-        }
+        if (player.IsValid)
+            Clear(player.Slot);
+    });
+
+    public void Clear(int clientSlot)
+    {
+        _playerQueuepoints[clientSlot] = 0;
     }
 
     /// <summary>

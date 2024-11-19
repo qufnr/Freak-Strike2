@@ -12,7 +12,7 @@ namespace FreakStrike2
         {
             var players = Utilities.GetPlayers();
             foreach (var player in players)
-                if (player.IsValid && !player.IsBot && _gamePlayer.PlayerIsDebugMode(player))
+                if (player.IsValid && !player.IsBot && GamePlayer.PlayerIsDebugMode(player))
                     player.PrintToCenterHtml($"Game Status: {_gameStatus}<br/>Game Timer: {_gameTimer?.Handle}", 1);
         }
     }
