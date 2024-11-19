@@ -6,41 +6,39 @@ namespace FreakStrike2.Classes;
 
 public class BaseGamePlayer
 {
-    private Dictionary<int, int> _damages;
-    private Dictionary<int, bool> _debugMode;
+    public int Damages { get; set; }            //  플레이어가 입힌 피해량
+    public bool DebugMode { get; set; }         //  디버그 모드 활성화 여부
 
     public BaseGamePlayer()
     {
-        _damages = new Dictionary<int, int>();
-        _debugMode = new Dictionary<int, bool>();
+        Damages = 0;
+        DebugMode = false;
     }
 
-    public void CreateByPlayerSlot(int clientSlot)
+    /// <summary>
+    /// 플레이어의 디버그 모드를 토글합니다.
+    /// </summary>
+    /// <returns>디버그 모드 여부</returns>
+    public bool ToggleDebugMode()
     {
-        _damages[clientSlot] = 0;
-        _debugMode[clientSlot] = false;
+        DebugMode = !DebugMode;
+        return DebugMode;
     }
-
-    public bool PlayerIsDebugMode(CCSPlayerController player) => _debugMode[player.Slot];
     
-    public void SetPlayerDebugMode(CCSPlayerController player, bool value) => _debugMode[player.Slot] = value;
-    
-    public int GetPlayerDamage(CCSPlayerController player) => _damages[player.Slot];
-
-    public void AddPlayerDamage(CCSPlayerController? victim, CCSPlayerController? attacker, BaseHalePlayer baseHalePlayer, GameStatus gameStatus, int damage)
+    /// <summary>
+    /// 플레이어의 입힌 피해량을 추가합니다. (OnPlayerHurt)
+    /// </summary>
+    /// <param name="victim">피해자</param>
+    /// <param name="attacker">가해자</param>
+    /// <param name="baseHalePlayers">플레이어 헤일 정보</param>
+    /// <param name="gameStatus">게임 상태</param>
+    /// <param name="damage">피해량</param>
+    public void AddPlayerDamage(CCSPlayerController? victim, CCSPlayerController? attacker, Dictionary<int, BaseHalePlayer> baseHalePlayers, GameStatus gameStatus, int damage)
     {
         if (victim is not null && attacker is not null &&
-            gameStatus is GameStatus.Start && 
-            baseHalePlayer.PlayerIsHale(victim) && 
-            baseHalePlayer.PlayerIsHuman(attacker))
-            _damages[attacker.Slot] += damage;
+            gameStatus is GameStatus.Start &&
+            baseHalePlayers[victim.Slot].IsHale() &&
+            baseHalePlayers[attacker.Slot].IsHuman())
+            Damages += damage;
     }
-
-    public void Clear(CCSPlayerController player)
-    {
-        _damages[player.Slot] = 0;
-        _debugMode[player.Slot] = false;
-    }
-
-    public void Clear() => Utilities.GetPlayers().ForEach(player => Clear(player));
 }

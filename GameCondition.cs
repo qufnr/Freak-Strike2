@@ -19,8 +19,6 @@ public partial class FreakStrike2
     private void GameResetOnHotReload()
     {
         KillGameTimer();
-        PlayerQueuePoint.Clear();
-        HalePlayer.Clear();
         
         Server.ExecuteCommand("mp_restartgame 1");
     }

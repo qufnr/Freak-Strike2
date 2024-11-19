@@ -6,33 +6,27 @@ using FreakStrike2.Exceptions;
 using FreakStrike2.Models;
 using FreakStrike2.Utils;
 
+using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
+
 namespace FreakStrike2.Classes;
 
 public class BaseHalePlayer
 {
-    private Dictionary<int, BaseHale?> _playerHales;            //  선택된 헤일 정보
-    private Dictionary<int, HaleFlags?> _playerHaleFlags;       //  헤일 플레그
+    private BaseHale? _baseHale;
+    private HaleFlags _haleFlags;
+    private Timer? _weightDownCooldownTimer;
     
     /// <summary>
     /// 맴버 변수(딕셔너리) 생성
     /// </summary>
     public BaseHalePlayer()
     {
-        _playerHales = new Dictionary<int, BaseHale?>();
-        _playerHaleFlags = new Dictionary<int, HaleFlags?>();
-    }
-
-    /// <summary>
-    /// 맴버 변수에 플레이어 할당
-    /// </summary>
-    /// <param name="clientSlot">플레이어 슬롯</param>
-    public void CreateByPlayerSlot(int clientSlot)
-    {
-        _playerHales[clientSlot] = null;
-        _playerHaleFlags[clientSlot] = HaleFlags.None;
+        _baseHale = null;
+        _haleFlags = HaleFlags.None;
+        _weightDownCooldownTimer = null;
     }
     
-    public void SetPlayerHale(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
+    public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
     {
         var playerPawn = player.PlayerPawn.Value;
         
@@ -64,8 +58,8 @@ public class BaseHalePlayer
         //     }
         // }
 
-        _playerHales[player.Slot] = hale;
-        _playerHaleFlags[player.Slot] = HaleFlags.Hale;
+        _baseHale = hale;
+        _haleFlags = HaleFlags.Hale;
 
         var playerCount = Utilities.GetPlayers().Count - 1;
         
@@ -102,35 +96,30 @@ public class BaseHalePlayer
     /// <returns>
     /// 헤일일 경우 true 아니면 flase 반환
     /// </returns>
-    public bool PlayerIsHale(CCSPlayerController? player)
-    {
-        return player is not null && _playerHales[player.Slot] is not null && _playerHaleFlags[player.Slot] is HaleFlags.Hale;
-    }
+    public bool IsHale() => _haleFlags is HaleFlags.Hale && _baseHale is not null;
 
     /// <summary>
     /// 플레이어가 인간인지 유무를 반환합니다.
     /// </summary>
     /// <returns>인간일 경우 true 아니면 false 반환</returns>
-    public bool PlayerIsHuman(CCSPlayerController player) => !PlayerIsHale(player);
-
-    /// <summary>
-    /// 모든 플레이어를 헤일에서 제거합니다.
-    /// </summary>
-    public void Clear() => Utilities.GetPlayers().ForEach(player => Clear(player));
-
+    public bool IsHuman() => !IsHale();
+    
     /// <summary>
     /// 플레이어를 헤일에서 제거합니다.
     /// </summary>
-    /// <param name="player">플레이어 객체</param>
+    /// <param name="clientSlot">플레이어 슬롯</param>
     /// <param name="gameStatus">게임 상태 (매개변수로 넘기지 않을 시 GameStatus.None 으로 판별)</param>
-    public void Clear(CCSPlayerController? player, GameStatus? gameStatus = GameStatus.None)
+    public void Clear(int clientSlot, GameStatus? gameStatus = GameStatus.None)
     {
-        if (player is null || PlayerIsHuman(player)) return;
+        if (IsHuman())
+            return;
+
+        var player = Utilities.GetPlayerFromSlot(clientSlot);
         
-        _playerHales[player.Slot] = null;
-        _playerHaleFlags[player.Slot] = HaleFlags.None;
+        _baseHale = null;
+        _haleFlags = HaleFlags.None;
         
-        if (player.IsValid)
+        if (player is not null && player.IsValid)
         {
             player.CommitSuicide(false, true);
             if (gameStatus is GameStatus.Start && 

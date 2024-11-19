@@ -3,6 +3,8 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
+using FreakStrike2.Classes;
+using FreakStrike2.Utils;
 
 namespace FreakStrike2
 {
@@ -15,10 +17,10 @@ namespace FreakStrike2
         {
             if (player is null || !player.IsValid)
                 return;
-            
-            GamePlayer.SetPlayerDebugMode(player, !GamePlayer.PlayerIsDebugMode(player));
 
-            var text = GamePlayer.PlayerIsDebugMode(player) ? "활성화" : "비활성화";
+            BaseGamePlayers[player.Slot].ToggleDebugMode();
+
+            var text = BaseGamePlayers[player.Slot].DebugMode ? "활성화" : "비활성화";
             player.PrintToChat($"[FS2] 디버그 모드가 {text} 되었습니다.");
         }
 
@@ -43,16 +45,22 @@ namespace FreakStrike2
                         cmdInfo.ReplyToCommand("[FS2] 서버 측에서 Queuepoint 초기화가 비활성화 되어있습니다.");
                         return;
                     }
-                    
-                    PlayerQueuePoint.SetPlayerQueuepoint(player!.Slot, 0);
+
+                    if (player is null || !player.IsValid)
+                    {
+                        cmdInfo.ReplyToCommand("[FS2] 클라이언트 측 명령어입니다.");
+                        return;
+                    }
+
+                    PlayerQueuePoints[player.Slot].Points = 0;
                     player.PrintToChat("[FS2] Queuepoint 를 초기화 했습니다.");
                     
                     return;
                 
                 //  순위
                 case "rank":
-                    var rankMap = PlayerQueuePoint.GetRank();
-                    if (rankMap is not null && rankMap.Count > 0)
+                    var rankMap = BaseQueuePoint.GetRank(PlayerQueuePoints);
+                    if (rankMap.Count > 0)
                     {
                         cmdInfo.ReplyToCommand(player is null ? 
                             "[FS2] -- [#Rank]\t[Player Name]\t\t[Queuepoints]" : 
@@ -61,9 +69,13 @@ namespace FreakStrike2
                         var index = 1;
                         foreach (var rank in rankMap)
                         {
+                            var ranker = Utilities.GetPlayerFromSlot(rank.Key);
+                            if (ranker is null || !ranker.IsValid)
+                                continue;
+                            
                             cmdInfo.ReplyToCommand(player is null ? 
-                                $"[FS2] -- [#{index}]\t[{rank.Key.PlayerName}]\t\t[{rank.Value} QP]" : 
-                                $"[FS2] -- #{index} | ${rank.Key.PlayerName} | {rank.Value} QP");
+                                $"[FS2] -- [#{index}]\t[{ranker.PlayerName}]\t\t[{rank.Value} QP]" : 
+                                $"[FS2] -- #{index} | ${ranker.PlayerName} | {rank.Value} QP");
                         }
                     }
                     else
@@ -73,7 +85,7 @@ namespace FreakStrike2
             }
 
             if(player is not null && player.IsValid)
-                cmdInfo.ReplyToCommand($"[FS2] 소지중인 Queuepoints: {PlayerQueuePoint.GetPlayerQueuepoint(player.Slot)} QP");
+                cmdInfo.ReplyToCommand($"[FS2] 소지중인 Queuepoints: {PlayerQueuePoints[player.Slot].Points} QP");
         }
 
         [ConsoleCommand("css_hales", "헤일 정보를 확인합니다.")]

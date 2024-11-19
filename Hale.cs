@@ -59,7 +59,7 @@ public partial class FreakStrike2
     /// </summary>
     private void SetHalePlayerOnTimerEnd()
     {
-        var player = PlayerQueuePoint.GetPlayerWithMostQueuepoints() ?? PlayerUtils.GetRandomAlivePlayer();
+        var player = BaseQueuePoint.GetPlayerWithMostQueuepoints(PlayerQueuePoints) ?? PlayerUtils.GetRandomAlivePlayer();
 
         if (player is null)
         {
@@ -68,8 +68,8 @@ public partial class FreakStrike2
         }
         
         var hale = Hales[CommonUtils.GetRandomInt(0, Hales.Count - 1)];
-        HalePlayer.SetPlayerHale(player, hale, Config.HaleTeleportToSpawn);
-        PlayerQueuePoint.SetPlayerQueuepoint(player.Slot, 0);
+        BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale, Config.HaleTeleportToSpawn);
+        PlayerQueuePoints[player.Slot].Points = 0;
         
         ServerUtils.PrintToCenterAlertAll($"[FS2] {player.PlayerName} 이(가) {hale.Name} 헤일로 선택 되었습니다!");
         Logger.LogInformation($"[FreakStrike2] {player.PlayerName}({player.AuthorizedSteamID!.SteamId64}) has been chosen as the Hale for {hale.Name}!");

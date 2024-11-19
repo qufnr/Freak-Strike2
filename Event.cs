@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Classes;
 using FreakStrike2.Models;
 
 namespace FreakStrike2;
@@ -54,7 +55,6 @@ public partial class FreakStrike2
     private void OnMapStart(string mapName)
     {
         KillGameTimer();
-        CreateBasePlayerClasses();
     }
 
     /// <summary>
@@ -63,8 +63,9 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientPutInServer(int client)
     {
-        GamePlayer.CreateByPlayerSlot(client);
-        HalePlayer.CreateByPlayerSlot(client);
+        BaseGamePlayers[client] = new BaseGamePlayer();
+        BaseHalePlayers[client] = new BaseHalePlayer();
+        PlayerQueuePoints[client] = new BaseQueuePoint();
         GameStartOnClientPutInServer();                 //  게임 시작 처리
         TeamChangeOnClientPutInServer(client);          //  접속 시 팀 변경 처리
     }
@@ -75,8 +76,10 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientDisconnect(int client)
     {
-        PlayerQueuePoint.SetPlayerQueuepoint(client, 0); //  Queuepoint 초기화
-        HalePlayer.Clear(Utilities.GetPlayerFromSlot(client), _gameStatus);
+        PlayerQueuePoints.Remove(client);
+        BaseGamePlayers.Remove(client);
+        BaseHalePlayers[client].Clear(client, _gameStatus);
+        BaseHalePlayers.Remove(client);
     }
 
     /// <summary>
@@ -127,7 +130,7 @@ public partial class FreakStrike2
             return HookResult.Handled;
         }
         
-        PlayerQueuePoint.Calculate(HalePlayer, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
+        BaseQueuePoint.Calculate(PlayerQueuePoints, BaseHalePlayers, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
         _gameStatus = GameStatus.End;
         
         return HookResult.Continue;
@@ -147,7 +150,8 @@ public partial class FreakStrike2
         var weapon = @event.Weapon;
         var hitgroup = @event.Hitgroup;
         
-        GamePlayer.AddPlayerDamage(victim, attacker, HalePlayer, _gameStatus, damage);
+        if (attacker is not null && attacker.IsValid)
+            BaseGamePlayers[attacker.Slot].AddPlayerDamage(victim, attacker, BaseHalePlayers, _gameStatus, damage);
         
         if (GameNotStartDamageIgnoreOnPlayerHurt(victim, attacker))
             return HookResult.Handled;
@@ -160,7 +164,8 @@ public partial class FreakStrike2
     {
         var player = @event.Userid;
 
-        if (HalePlayer.PlayerIsHale(player))
+        if (player is not null && 
+            BaseHalePlayers[player.Slot].IsHale())
             return HookResult.Handled;
 
         return HookResult.Continue;

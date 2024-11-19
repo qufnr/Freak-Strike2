@@ -9,16 +9,6 @@ namespace FreakStrike2;
 public partial class FreakStrike2
 {
     /// <summary>
-    /// 플레이어 관련 객체 생성 (OnMapStart)
-    /// </summary>
-    private void CreateBasePlayerClasses()
-    {
-        PlayerQueuePoint = new Queuepoint();
-        GamePlayer = new BaseGamePlayer();
-        HalePlayer = new BaseHalePlayer();
-    }
-    
-    /// <summary>
     /// 클라이언트 접속 시 팀 변경
     /// </summary>
     /// <param name="client">클라이언트</param>
@@ -51,7 +41,7 @@ public partial class FreakStrike2
     {
         if (victim is null || !victim.IsValid || 
             attacker is null || !attacker.IsValid || 
-            HalePlayer.PlayerIsHuman(victim) && HalePlayer.PlayerIsHale(attacker))
+            BaseHalePlayers[victim.Slot].IsHuman() && BaseHalePlayers[attacker.Slot].IsHale())
             return;
 
         var victimPawn = victim.PlayerPawn.Value!;
