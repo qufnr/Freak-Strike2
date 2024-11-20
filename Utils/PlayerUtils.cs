@@ -16,7 +16,8 @@ public class PlayerUtils
     /// 살아있는 플레이어들을 반환합니다.
     /// </summary>
     /// <returns>살아있는 플레이어들</returns>
-    public static List<CCSPlayerController> GetValidPawnAlivePlayers() => Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive).ToList();
+    public static List<CCSPlayerController> GetValidPawnAlivePlayers() => 
+        Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive).ToList();
 
     /// <summary>
     /// 살아있는 플레이어 중에서 무작위로 한 명을 뽑습니다.
@@ -25,6 +26,15 @@ public class PlayerUtils
     /// 이는 null 을 반환할 수 있습니다.
     /// </remarks>
     /// <returns>무작위로 뽑힌 한 명의 플레이어</returns>
-    public static CCSPlayerController? GetRandomAlivePlayer() =>
-        GetValidPawnAlivePlayers().Where(p => p.Slot == CommonUtils.GetRandomInt(0, Server.MaxPlayers)).FirstOrDefault();
+    public static CCSPlayerController? GetRandomAlivePlayer()
+    {
+        var pawnAlivePlayers = new List<CCSPlayerController>();
+        GetValidPawnAlivePlayers().ForEach(player =>
+        {
+            if(player.IsValid && player.PawnIsAlive)
+                pawnAlivePlayers.Add(player);
+        });
+        
+        return pawnAlivePlayers.Count > 0 ? pawnAlivePlayers[new Random().Next(pawnAlivePlayers.Count)] : null;
+    }
 }
