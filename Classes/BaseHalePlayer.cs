@@ -75,9 +75,15 @@ public class BaseHalePlayer
         playerPawn.MaxHealth = Convert.ToInt32(Math.Round(hale.MaxHealth * (hale.HealthMultiplier * playerCount)));
         playerPawn.Health = playerPawn.MaxHealth;
         playerPawn.ArmorValue = Convert.ToInt32(Math.Round(hale.Armor * (hale.ArmorMultiplier * playerCount)));
-        player.PawnHasHelmet = true;
         playerPawn.VelocityModifier *= hale.Laggedmovement; //  태깅 걸리거나 뭐 어떤짓 하면 원래 속도로 바뀜... 
         playerPawn.GravityScale = hale.Gravity; //  사다리 타면 초기화 됨 (소스1 때랑 동일한 현상)
+        var itemServices = playerPawn.ItemServices;
+        if (itemServices is not null)
+        {
+            CCSPlayer_ItemServices services = new(itemServices.Handle);
+            services.HasHelmet = true;
+            Utilities.SetStateChanged(playerPawn, "CBasePlayerPawn", "m_pItemServices");
+        }
         
         player.RemoveWeapons();
         player.GiveNamedItem(CsItem.Knife);
