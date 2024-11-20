@@ -1,5 +1,4 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using FreakStrike2.Models;
@@ -10,13 +9,12 @@ public partial class FreakStrike2
     /// <summary>
     /// 이벤트 등록
     /// </summary>
-    private void GameEventInitialize()
+    private void GameEventRegister()
     {
         RegisterEventHandler<EventRoundStart>(OnRoundStart);
         RegisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
         RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
-        RegisterEventHandler<EventItemEquip>(OnItemEquip);
         
         RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
@@ -34,7 +32,6 @@ public partial class FreakStrike2
         DeregisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
         DeregisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
-        DeregisterEventHandler<EventItemEquip>(OnItemEquip);
 
         RemoveListener(OnServerPrecacheResources);
         RemoveListener(OnMapStart);
@@ -157,17 +154,6 @@ public partial class FreakStrike2
             return HookResult.Handled;
         
         KnockbackOnPlayerTakeDamage(victim, attacker, damage, weapon, hitgroup);
-        return HookResult.Continue;
-    }
-
-    private HookResult OnItemEquip(EventItemEquip @event, GameEventInfo eventInfo)
-    {
-        var player = @event.Userid;
-
-        if (player is not null && 
-            BaseHalePlayers[player.Slot].IsHale())
-            return HookResult.Handled;
-
         return HookResult.Continue;
     }
 }

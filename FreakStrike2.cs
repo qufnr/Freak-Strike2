@@ -34,7 +34,8 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
             Unload(hotReload);
         }
         
-        GameEventInitialize();
+        GameEventRegister();
+        HookVirtualFunctions();
         GetHaleJsonOnLoad(hotReload);
         // ServerCommandInitialize();
     }
@@ -44,6 +45,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
         IgnoreRoundWinConditions();
         GameResetOnHotReload();
         GameEventDeregister();
+        UnhookVirtualFunctions();
     }
 
     public override void OnAllPluginsLoaded(bool hotReload)
