@@ -1,6 +1,9 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using FreakStrike2.Classes;
+using FreakStrike2.Models;
+
+using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace FreakStrike2;
 public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
@@ -10,14 +13,17 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
     public override string ModuleAuthor => "byeoruk";
     public override string ModuleDescription => "Freak Fortress 2 in Counter-Strike 2.";
 
+    public GameConfig Config { get; set; }              //  플러그인 콘피그
+    
     public List<BaseHale> Hales = new();            //  서버에서 설정한 헤일 List 객체
-
-    //  서버 내 플레이어 정보
-    public Dictionary<int, BaseGamePlayer> BaseGamePlayers = new(Server.MaxPlayers);
-    //  서버 내 플레이어 헤일 정보
-    public Dictionary<int, BaseHalePlayer> BaseHalePlayers = new(Server.MaxPlayers);
-    //  서버 내 플레이어 큐포인트 정보
-    public Dictionary<int, BaseQueuePoint> PlayerQueuePoints = new(Server.MaxPlayers);
+    
+    public GameStatus InGameStatus = GameStatus.None;   //  게임 상태
+    public Timer? InGameTimer = null;                   //  게임 타이머
+    public int FindInterval = 0;                        //  헤일을 찾는 시간
+    
+    public Dictionary<int, BaseGamePlayer> BaseGamePlayers = new(Server.MaxPlayers);    //  서버 내 플레이어 정보
+    public Dictionary<int, BaseHalePlayer> BaseHalePlayers = new(Server.MaxPlayers);    //  서버 내 플레이어 헤일 정보
+    public Dictionary<int, BaseQueuePoint> PlayerQueuePoints = new(Server.MaxPlayers);  //  서버 내 플레이어 큐포인트 정보
     
     public override void Load(bool hotReload)
     {

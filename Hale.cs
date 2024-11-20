@@ -67,7 +67,7 @@ public partial class FreakStrike2
             return;
         }
         
-        var hale = Hales[CommonUtils.GetRandomInt(0, Hales.Count - 1)];
+        var hale = Hales[new Random().Next(Hales.Count)];
         BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale, Config.HaleTeleportToSpawn);
         PlayerQueuePoints[player.Slot].Points = 0;
         

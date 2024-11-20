@@ -17,7 +17,7 @@ public partial class FreakStrike2
         var player = Utilities.GetPlayerFromSlot(client);
         if (player is not null && player.IsValid && !player.IsHLTV)
         {
-            switch (_gameStatus)
+            switch (InGameStatus)
             {
                 case GameStatus.PlayerWaiting:
                 case GameStatus.PlayerFinding:

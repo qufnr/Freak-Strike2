@@ -5,8 +5,6 @@ using FreakStrike2.Classes;
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
-    public GameConfig Config { get; set; }
-    
     /// <summary>
     /// 설정 파일 불러오기
     /// </summary>

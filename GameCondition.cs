@@ -5,17 +5,10 @@ using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Models;
 using FreakStrike2.Utils;
 using Microsoft.Extensions.Logging;
-using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
-    private GameStatus _gameStatus = GameStatus.None;
-    
-    private Timer? _gameTimer = null; //  게임 타이머
-
-    private int _findInterval = 0;   //  헤일을 찾는 시간
-
     private void GameResetOnHotReload()
     {
         KillGameTimer();
@@ -29,7 +22,7 @@ public partial class FreakStrike2
     private void GameStartOnClientPutInServer()
     {
         var playerCount = Utilities.GetPlayers().Count;
-        if (_gameStatus == GameStatus.PlayerWaiting && playerCount > 1)
+        if (InGameStatus == GameStatus.PlayerWaiting && playerCount > 1)
             CommonUtils.GetGameRules()
                 .TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.RoundDraw);
     }
@@ -39,10 +32,10 @@ public partial class FreakStrike2
     /// </summary>
     private void KillGameTimer()
     {
-        if (_gameTimer is not null)
+        if (InGameTimer is not null)
         {
-            _gameTimer.Kill();
-            _gameTimer = null;
+            InGameTimer.Kill();
+            InGameTimer = null;
         }
     }
 
@@ -54,14 +47,14 @@ public partial class FreakStrike2
         if (!isFreezeEnd && ConVarUtils.GetFreezeTime() > 0)
             return;
         
-        _findInterval = Config.FindInterval;
+        FindInterval = Config.FindInterval;
 
-        if (CommonUtils.GetGameRules().WarmupPeriod) _gameStatus = GameStatus.Warmup;
-        else if (Utilities.GetPlayers().Count <= 1) _gameStatus = GameStatus.PlayerWaiting;
-        else _gameStatus = GameStatus.PlayerFinding;
+        if (CommonUtils.GetGameRules().WarmupPeriod) InGameStatus = GameStatus.Warmup;
+        else if (Utilities.GetPlayers().Count <= 1) InGameStatus = GameStatus.PlayerWaiting;
+        else InGameStatus = GameStatus.PlayerFinding;
         
-        if (_gameTimer is null)
-            _gameTimer = AddTimer(1.0f, OnGameTimerInterval, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+        if (InGameTimer is null)
+            InGameTimer = AddTimer(1.0f, OnGameTimerInterval, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
 
     /// <summary>
@@ -69,7 +62,7 @@ public partial class FreakStrike2
     /// </summary>
     private void OnGameTimerInterval()
     {
-        if (_gameStatus == GameStatus.End)
+        if (InGameStatus == GameStatus.End)
         {
             KillGameTimer();
             return;
@@ -85,9 +78,9 @@ public partial class FreakStrike2
         
         //  도중에 플레이어가 나갔을 때, 서버 인원이 1명 이하일 경우
         if (players.Count <= 1)
-            _gameStatus = GameStatus.PlayerWaiting;
+            InGameStatus = GameStatus.PlayerWaiting;
 
-        if (_findInterval < 0)
+        if (FindInterval < 0)
         {
             SetHalePlayerOnTimerEnd();
             KillGameTimer();
@@ -95,7 +88,7 @@ public partial class FreakStrike2
         }
 
         var message = string.Empty;
-        switch (_gameStatus)
+        switch (InGameStatus)
         {
             case GameStatus.PlayerWaiting:
                 message = "다른 플레이어를 기다리고 있습니다.";
@@ -104,9 +97,9 @@ public partial class FreakStrike2
                 message = "준비 시간이 종료되면 게임이 시작됩니다.";
                 break;
             case GameStatus.PlayerFinding:
-                message = $"{_findInterval}초 후 헤일 플레이어가 선택됩니다!";
-                Logger.LogInformation($"Countdown: {_findInterval} seconds");
-                _findInterval--;
+                message = $"{FindInterval}초 후 헤일 플레이어가 선택됩니다!";
+                Logger.LogInformation($"Countdown: {FindInterval} seconds");
+                FindInterval--;
                 break;
         }
         
@@ -121,7 +114,7 @@ public partial class FreakStrike2
     /// <param name="attacker">가해자 플레이어</param>
     /// <returns>기능 설명에 대한 조건이 참인지 거짓인지 반환. (true 반환 시 EventPlayerHurt 에서 Hook 을 Handled 처리합니다.)</returns>
     private bool GameNotStartDamageIgnoreOnPlayerHurt(CCSPlayerController? victim, CCSPlayerController? attacker) => 
-        _gameStatus is not GameStatus.Start && 
+        InGameStatus is not GameStatus.Start && 
         victim is not null && victim.IsValid && 
         attacker is not null && attacker.IsValid;
 }

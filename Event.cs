@@ -78,7 +78,7 @@ public partial class FreakStrike2
     {
         PlayerQueuePoints.Remove(client);
         BaseGamePlayers.Remove(client);
-        BaseHalePlayers[client].Clear(client, _gameStatus);
+        BaseHalePlayers[client].Clear(client, InGameStatus);
         BaseHalePlayers.Remove(client);
     }
 
@@ -125,13 +125,13 @@ public partial class FreakStrike2
     /// <returns>이벤트 훅</returns>
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo eventInfo)
     {
-        if (_gameStatus is GameStatus.PlayerWaiting)
+        if (InGameStatus is GameStatus.PlayerWaiting)
         {
             return HookResult.Handled;
         }
         
-        BaseQueuePoint.Calculate(PlayerQueuePoints, BaseHalePlayers, _gameStatus);   //  게임 종료 시 Queuepoint 계산 
-        _gameStatus = GameStatus.End;
+        BaseQueuePoint.Calculate(PlayerQueuePoints, BaseHalePlayers, InGameStatus);   //  게임 종료 시 Queuepoint 계산 
+        InGameStatus = GameStatus.End;
         
         return HookResult.Continue;
     }
@@ -151,7 +151,7 @@ public partial class FreakStrike2
         var hitgroup = @event.Hitgroup;
         
         if (attacker is not null && attacker.IsValid)
-            BaseGamePlayers[attacker.Slot].AddPlayerDamage(victim, attacker, BaseHalePlayers, _gameStatus, damage);
+            BaseGamePlayers[attacker.Slot].AddPlayerDamage(victim, attacker, BaseHalePlayers, InGameStatus, damage);
         
         if (GameNotStartDamageIgnoreOnPlayerHurt(victim, attacker))
             return HookResult.Handled;

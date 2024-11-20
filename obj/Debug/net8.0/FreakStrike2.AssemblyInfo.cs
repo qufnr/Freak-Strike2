@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FreakStrike2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d2db01fb8e9e20954a7ae06e5a679abf1bdcc74a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fce28ea8686d04cedbda3535dcbf52eb29edb175")]
 [assembly: System.Reflection.AssemblyProductAttribute("FreakStrike2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FreakStrike2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
