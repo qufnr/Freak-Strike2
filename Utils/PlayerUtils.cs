@@ -1,11 +1,21 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Drawing;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Memory;
+using CounterStrikeSharp.API.Modules.UserMessages;
 using CounterStrikeSharp.API.Modules.Utils;
 
 namespace FreakStrike2.Utils;
 
 public class PlayerUtils
 {
+    public enum ScreenFadeFlags
+    {
+        FadeIn,
+        FadeOut,
+        FadeStayout
+    };
+    
     /// <summary>
     /// 플레이어가 콘솔인지 유무를 반환합니다.
     /// </summary>
@@ -49,5 +59,86 @@ public class PlayerUtils
         return Utilities.GetPlayers()
             .Where(player => player.IsValid && player.PawnIsAlive && player.Team == team)
             .Count();
+    }
+
+    /// <summary>
+    /// 시점 위치 반환
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <returns>시점 위치 벡터</returns>
+    public static Vector? GetEyePosition(CCSPlayerController player)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn is null)
+            return null;
+        
+        var origin = playerPawn.AbsOrigin;
+        var cameraServices = playerPawn.CameraServices;
+        if (origin is null || cameraServices is null)
+            return null;
+        
+        return new Vector(origin.X, origin.Y, origin.Z + cameraServices.OldPlayerViewOffsetZ);
+    }
+
+    /// <summary>
+    /// 플레이어가 조준하고 있는 상대 플레이어 객체를 반환합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <returns>조준 대상 플레이어 객체</returns>
+    /// <remarks>
+    /// 참고 자료: https://discord.com/channels/1160907911501991946/1175947333880524962/1230542480903110716
+    /// </remarks>
+    public static CCSPlayerController? GetTargetPlayer(CCSPlayerController player)
+    {
+        var gameRules = CommonUtils.GetGameRules();
+        VirtualFunctionWithReturn<IntPtr, IntPtr, IntPtr> findPickerEntity = new(gameRules.Handle, 28);
+        var target = new CBaseEntity(findPickerEntity.Invoke(gameRules.Handle, player.Handle));
+        return target.DesignerName is "player" ? target.As<CCSPlayerController>().OriginalControllerOfCurrentPawn.Value : null;
+    }
+
+    /// <summary>
+    /// 화면 색상 효과를 입힙니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="color">색상</param>
+    /// <param name="hold">유지 시간</param>
+    /// <param name="fade">페이딩 시간</param>
+    /// <param name="screenFadeFlags">페이드 플레그</param>
+    /// <param name="withPurge">제거 효과 유무</param>
+    /// <remarks>
+    /// 참고 자료: https://discord.com/channels/1160907911501991946/1175947333880524962/1277984855384260762
+    /// </remarks>
+    public static void SetColorScreen(CCSPlayerController player, Color color, float hold = .1f, float fade = .2f, ScreenFadeFlags screenFadeFlags = ScreenFadeFlags.FadeIn, bool withPurge = true)
+    {
+        var userMessage = UserMessage.FromId(106);
+        userMessage.SetInt("hold_time", Convert.ToInt32(hold * 512));
+        userMessage.SetInt("duration", Convert.ToInt32(fade * 512));
+        userMessage.SetInt("color", color.R | color.G << 8 | color.B << 16 | color.A << 24);
+        var flags = screenFadeFlags switch
+        {
+            ScreenFadeFlags.FadeIn => 0x0001,
+            ScreenFadeFlags.FadeOut => 0x0002,
+            ScreenFadeFlags.FadeStayout => 0x0008,
+            _ => 0x0001
+        };
+        userMessage.SetInt("flags", withPurge ? flags | 0x0010 : flags);
+        userMessage.Send(player);
+    }
+
+    /// <summary>
+    /// 플레이어 모델 크기를 변경합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="scale">크기</param>
+    /// <remarks>
+    /// 참고 자료: https://discord.com/channels/1160907911501991946/1175947333880524962/1237721748376518666
+    /// </remarks>
+    public static void SetPlayerModelSize(CCSPlayerController player, float scale)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn is null)
+            return;
+        playerPawn.CBodyComponent!.SceneNode!.Scale = scale;
+        Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_CBodyComponent");
     }
 }
