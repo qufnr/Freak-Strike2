@@ -66,8 +66,8 @@ public partial class FreakStrike2
             Logger.LogError("[FreakStrike2] No player has been selected.");
             return;
         }
-        
-        var hale = Hales[new Random().Next(Hales.Count)];
+
+        var hale = CommonUtils.GetRandomInList(Hales);
         BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale, Config.HaleTeleportToSpawn);
         PlayerQueuePoints[player.Slot].Points = 0;
         

@@ -39,24 +39,27 @@ public class BaseHalePlayer
         if (player.Team is not CsTeam.CounterTerrorist)
             player.SwitchTeam(CsTeam.CounterTerrorist);
 
-        //  TODO :: Crash
-        // if (spawnTeleport)
-        // {
-        //     var entities = Utilities.FindAllEntitiesByDesignerName<CInfoPlayerCounterterrorist>("info_player_counterterrorist")
-        //         .ToList();
-        //     if (entities.Count() > 0)
-        //     {
-        //         var entity = entities.Where((_, index) => index == CommonUtils.GetRandomInt(0, entities.Count() - 1))
-        //                 .FirstOrDefault();
-        //         
-        //         if (entity is not null && entity.IsValid && entity.AbsOrigin is not null)
-        //         {
-        //             var spawnOrigin = entity.AbsOrigin;
-        //             spawnOrigin.Y += 1.0f;
-        //             player.Teleport(spawnOrigin);
-        //         }
-        //     }
-        // }
+        if (spawnTeleport)
+        {
+            var infoPlayerCounterterrorists = Utilities.FindAllEntitiesByDesignerName<CInfoPlayerCounterterrorist>("info_player_counterterrorist")
+                .ToList();
+            
+            var entities = new List<CInfoPlayerCounterterrorist>();
+            foreach (var infoPlayerCounterterrorist in infoPlayerCounterterrorists)
+                if(infoPlayerCounterterrorist.IsValid)
+                    entities.Add(infoPlayerCounterterrorist);
+            
+            if (entities.Count() > 0)
+            {
+                var candidate = CommonUtils.GetRandomInList(entities);
+                if (candidate.IsValid && candidate.AbsOrigin is not null)
+                {
+                    var spawnOrigin = candidate.AbsOrigin;
+                    spawnOrigin.Y += 1.0f;
+                    player.Teleport(spawnOrigin);
+                }
+            }
+        }
 
         _baseHale = hale;
         _haleFlags = HaleFlags.Hale;
@@ -124,7 +127,7 @@ public class BaseHalePlayer
             player.CommitSuicide(false, true);
             if (gameStatus is GameStatus.Start && 
                 player.Team is CsTeam.CounterTerrorist && 
-                CommonUtils.GetTeamAlivePlayers(player.Team) <= 0)
+                PlayerUtils.GetTeamAlivePlayers(player.Team) <= 0)
             {
                 CommonUtils.GetGameRules()
                     .TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.TerroristsWin);
