@@ -14,7 +14,8 @@ public class BaseHalePlayer
 {
     private BaseHale? _baseHale;
     private HaleFlags _haleFlags;
-    private Timer? _weightDownCooldownTimer;
+    private Timer? _weightDownCooldown;
+    private Timer? _highestJumpCooldown;
     
     /// <summary>
     /// 맴버 변수(딕셔너리) 생성
@@ -23,7 +24,8 @@ public class BaseHalePlayer
     {
         _baseHale = null;
         _haleFlags = HaleFlags.None;
-        _weightDownCooldownTimer = null;
+        _weightDownCooldown = null;
+        _highestJumpCooldown = null;
     }
     
     public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
@@ -54,8 +56,12 @@ public class BaseHalePlayer
                 var candidate = CommonUtils.GetRandomInList(entities);
                 if (candidate.IsValid && candidate.AbsOrigin is not null)
                 {
-                    var spawnOrigin = candidate.AbsOrigin;
-                    spawnOrigin.Y += 1.0f;
+                    var spawnOrigin = new Vector()
+                    {
+                        X = candidate.AbsOrigin.X,
+                        Y = candidate.AbsOrigin.Y + 1.0f,
+                        Z = candidate.AbsOrigin.Z
+                    };
                     player.Teleport(spawnOrigin);
                 }
             }
