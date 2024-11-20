@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 
 namespace FreakStrike2.Utils;
 
@@ -35,6 +36,18 @@ public class PlayerUtils
                 pawnAlivePlayers.Add(player);
         });
         
-        return pawnAlivePlayers.Count > 0 ? pawnAlivePlayers[new Random().Next(pawnAlivePlayers.Count)] : null;
+        return pawnAlivePlayers.Count > 0 ? CommonUtils.GetRandomInList(pawnAlivePlayers) : null;
+    }
+    
+    /// <summary>
+    /// 특정한 팀에서 살아있는 플레이어 수를 반환합니다.
+    /// </summary>
+    /// <param name="team">팀</param>
+    /// <returns>팀에 살아있는 플레이어 수</returns>
+    public static int GetTeamAlivePlayers(CsTeam team)
+    {
+        return Utilities.GetPlayers()
+            .Where(player => player.IsValid && player.PawnIsAlive && player.Team == team)
+            .Count();
     }
 }
