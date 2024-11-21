@@ -8,12 +8,11 @@ namespace FreakStrike2
         /// <summary>
         /// 디버그 표시자
         /// </summary>
-        private void DebugPrintGameCondition()
-        {
-            var players = Utilities.GetPlayers();
-            foreach (var player in players)
-                if (player.IsValid && !player.IsBot && BaseGamePlayers[player.Slot].DebugMode)
-                    player.PrintToCenterHtml($"Game Status: {InGameStatus}<br/>Game Timer: {InGameTimer?.Handle}", 1);
-        }
+        private void DebugPrintGameCondition() =>
+            Utilities.GetPlayers()
+                .Where(player => player.IsValid && !player.IsBot && BaseGamePlayers[player.Slot].DebugMode)
+                .ToList()
+                .ForEach(player =>
+                    player.PrintToCenter($"Game Status: {InGameStatus}\nGame Timer: {InGameTimer?.Handle}"));
     }
 }
