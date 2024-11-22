@@ -37,21 +37,41 @@ public partial class FreakStrike2
         }
     }
 
-    private void KnockbackOnPlayerTakeDamage(CCSPlayerController? victim, CCSPlayerController? attacker, float damage, string weapon, int hitgroup)
+    /// <summary>
+    /// 피해자가 가해자로 부터 피해를 입을 때 넉백을 처리합니다.
+    /// </summary>
+    /// <param name="victim">피해자</param>
+    /// <param name="attacker">가해자</param>
+    /// <param name="damage">피해량</param>
+    /// <param name="weapon">무기 이름</param>
+    /// <param name="hitgroup">히트 그룹</param>
+    private void KnockbackOnPlayerHurt(CCSPlayerController victim, CCSPlayerController attacker, int damage, string weapon, int hitgroup)
     {
-        if (victim is null || !victim.IsValid || 
-            attacker is null || !attacker.IsValid || 
-            !BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale)
+        if (!BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale)
             return;
 
-        var victimPawn = victim.PlayerPawn.Value!;
-        var attackerPawn = attacker.PlayerPawn.Value!;
+        var victimPawn = victim.PlayerPawn.Value;
+        var attackerPawn = attacker.PlayerPawn.Value;
+
+        if (victimPawn == null || attackerPawn == null)
+            return;
 
         var victimPosition = victimPawn.AbsOrigin ?? new Vector();
         var attackerPosition = attackerPawn.AbsOrigin ?? new Vector();
 
         var direction = VectorUtils.NormalizeVector(victimPosition - attackerPosition);
         
-        victimPawn.AbsVelocity.Add(direction * damage);
+        //  TODO : 무기 설정에 따라 넉백량 처리
+
+        // victimPawn.AbsVelocity.Add(direction * damage);
+        victimPawn.Teleport(null, null, direction * damage);
+    }
+
+    private void AddDamageOnPlayerHurt(CCSPlayerController victim, CCSPlayerController attacker, int damage)
+    {
+        if (!victim.PawnIsAlive || !BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale)
+            return;
+
+        BaseGamePlayers[attacker.Slot].Damages += damage;
     }
 }
