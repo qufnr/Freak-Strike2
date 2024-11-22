@@ -49,23 +49,4 @@ public class BaseQueuePoint
             }
         });
     }
-
-    /// <summary>
-    /// PlayerQueuePoints 에 대해 랭크를 매깁니다.
-    /// </summary>
-    /// <param name="playerQueuePoints">플레이어 큐포인트 딕셔너리</param>
-    /// <param name="top">TOP 몇 까지 보여줄지 (Optional, Default: 5)</param>
-    /// <returns>큐포인트 랭크</returns>
-    public static Dictionary<int, int> GetRank(Dictionary<int, BaseQueuePoint> playerQueuePoints, int top = 5)
-    {
-        var results = playerQueuePoints
-            .Where(queuepoint =>
-            {
-                var player = Utilities.GetPlayerFromSlot(queuepoint.Key);
-                return player is not null && player.IsValid && !player.IsBot && !player.IsHLTV;
-            })
-            .OrderByDescending(pair => pair.Value.Points)
-            .Take(top);
-        return results.ToDictionary(entry => entry.Key, entry => entry.Value.Points);
-    }
 }
