@@ -57,13 +57,16 @@ public partial class FreakStrike2
         }
     }
 
-    private void RemoveAllHalePlayers() =>
+    /// <summary>
+    /// 라운드 시작 시 모든 플레이어의 헤일 정보를 제거합니다.
+    /// </summary>
+    private void RemoveAllHalePlayerOnRoundStart() =>
         Utilities.GetPlayers().Where(player => player.IsValid)
             .ToList()
             .ForEach(player => BaseHalePlayers[player.Slot].Remove());
 
     /// <summary>
-    /// 타이머가 종료되는 시점에서 무작위(또는 Queuepoint 가 높은 플레이어)로 헤일 선택
+    /// 타이머가 종료되는 시점에서 무작위 플레이어(또는 큐포인트가 높은 플레이어)를 헤일로 선택
     /// </summary>
     private void SetHalePlayerOnTimerEnd()
     {
@@ -81,7 +84,7 @@ public partial class FreakStrike2
         BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale, Config.HaleTeleportToSpawn);
         PlayerQueuePoints[player.Slot].Points = 0;
         
-        ServerUtils.PrintToCenterAlertAll($"{player.PlayerName} 이(가) {hale.Name} 헤일로 선택 되었습니다!");
+        ServerUtils.PrintToCenterAlertAll($"플레이어 {player.PlayerName} 이(가) 헤일 {hale.Name} (으)로 선택 되었습니다!");
         Logger.LogInformation($"[FreakStrike2] {player.PlayerName}({player.AuthorizedSteamID!.SteamId64}) has been chosen as the Hale for {hale.Name}!");
     }
 
@@ -185,4 +188,8 @@ public partial class FreakStrike2
             BaseHalePlayers[slot].DynamicJumpCooldownCallback(player, InGameStatus, BaseGamePlayers[slot].DebugMode), 
             TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
+
+    private BaseHale? FindHaleByDesignerName(string name) =>
+        Hales.Where(hale => hale.DesignerName == name)
+            .FirstOrDefault();
 }
