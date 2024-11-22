@@ -37,8 +37,8 @@ public class BaseGamePlayer
     {
         if (victim is not null && attacker is not null &&
             gameStatus is GameStatus.Start &&
-            baseHalePlayers[victim.Slot].IsHale() &&
-            baseHalePlayers[attacker.Slot].IsHuman())
+            baseHalePlayers[victim.Slot].IsHale &&
+            !baseHalePlayers[attacker.Slot].IsHale)
             Damages += damage;
     }
 }

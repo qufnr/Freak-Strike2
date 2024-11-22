@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using FreakStrike2.Models;
@@ -52,6 +53,10 @@ public partial class FreakStrike2
     private void OnMapStart(string mapName)
     {
         KillGameTimer();
+        
+        BaseGamePlayers = new Dictionary<int, BaseGamePlayer>(Server.MaxPlayers);
+        BaseHalePlayers = new Dictionary<int, BaseHalePlayer>(Server.MaxPlayers);
+        PlayerQueuePoints = new Dictionary<int, BaseQueuePoint>(Server.MaxPlayers);
     }
 
     /// <summary>
@@ -75,7 +80,7 @@ public partial class FreakStrike2
     {
         PlayerQueuePoints.Remove(client);
         BaseGamePlayers.Remove(client);
-        BaseHalePlayers[client].Clear(client, InGameStatus);
+        BaseHalePlayers[client].Remove(client, InGameStatus);
         BaseHalePlayers.Remove(client);
     }
 
@@ -96,6 +101,7 @@ public partial class FreakStrike2
     private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo eventInfo)
     {
         RemoveEntities();           //  맵에 불필요한 엔티티 제거
+        RemoveAllHalePlayers();     //  헤일 플레이어 초기화
         CreateGameTimer(false);     //  게임 타이머 생성
         
         return HookResult.Continue;

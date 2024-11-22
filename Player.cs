@@ -41,7 +41,7 @@ public partial class FreakStrike2
     {
         if (victim is null || !victim.IsValid || 
             attacker is null || !attacker.IsValid || 
-            BaseHalePlayers[victim.Slot].IsHuman() && BaseHalePlayers[attacker.Slot].IsHale())
+            !BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale)
             return;
 
         var victimPawn = victim.PlayerPawn.Value!;

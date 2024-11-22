@@ -1,6 +1,6 @@
 ﻿namespace FreakStrike2.Models;
 
-public enum HaleFlags
+public enum HaleType
 {
     None = -1,
     Hale,

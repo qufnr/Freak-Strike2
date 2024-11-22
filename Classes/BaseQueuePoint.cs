@@ -42,7 +42,7 @@ public class BaseQueuePoint
         {
             if (player.IsValid)
             {
-                if (player.IsBot || player.IsHLTV || baseHalePlayers[player.Slot].IsHale())
+                if (player.IsBot || player.IsHLTV || baseHalePlayers[player.Slot].IsHale)
                     playerQueuePoints[player.Slot].Points = 0;
                 else if (player.Team is not CsTeam.Spectator)
                     playerQueuePoints[player.Slot].Points += 10;

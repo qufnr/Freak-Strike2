@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Reflection;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -12,133 +13,129 @@ namespace FreakStrike2.Classes;
 
 public class BaseHalePlayer
 {
-    private BaseHale? _baseHale;
-    private HaleFlags _haleFlags;
-    private Timer? _weightDownCooldown;
-    private Timer? _highestJumpCooldown;
+    public bool DoWeightDown { get; set; } = false;             //  내려찍기 준비
     
+    public bool DynamicJumpReady { get; set; } = true;          //  높이 점프 준비
+    public bool DoDynamicJumpHold { get; set; } = false;        //  높이 점프 홀드
+    public float DynamicJumpHoldTicks { get; set; } = 0f;      //  높이 점프 홀드 틱
+    public float DynamicJumpHoldStartTicks { get; set; } = 0f; //  높이 점프 홀드 시작 틱
+    public float DynamicJumpCooldown { get; set; } = 5f;
+    public Timer? DynamicJumpCooldownTimer { get; set; } = null;
+    
+    public bool IsHale { get; private set; } = false;
+    public bool IsStun { get; private set; } = false;
+
+    public BaseHale? MyHale { get; private set; } = null;
+    public HaleType Type { get; private set; } = HaleType.None;
+
     /// <summary>
     /// 맴버 변수(딕셔너리) 생성
     /// </summary>
-    public BaseHalePlayer()
-    {
-        _baseHale = null;
-        _haleFlags = HaleFlags.None;
-        _weightDownCooldown = null;
-        _highestJumpCooldown = null;
-    }
+    public BaseHalePlayer() => Remove();
     
+    /// <summary>
+    /// 헤일 플레이어 생성
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="hale">헤일</param>
+    /// <param name="spawnTeleport">스폰 이동 여부</param>
+    /// <exception cref="PlayerNotFoundException">플레이어가 유효하지 않으면 던집니다.</exception>
     public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
     {
         var playerPawn = player.PlayerPawn.Value;
         
-        if (!player.IsValid || playerPawn is null || !playerPawn.IsValid)
+        if (!player.IsValid || playerPawn == null || !playerPawn.IsValid)
             throw new PlayerNotFoundException();
         
         if (!player.PawnIsAlive)
             player.Respawn();
 
-        if (player.Team is not CsTeam.CounterTerrorist)
+        if (player.Team != CsTeam.CounterTerrorist)
             player.SwitchTeam(CsTeam.CounterTerrorist);
 
-        if (spawnTeleport)
-        {
-            var infoPlayerCounterterrorists = Utilities.FindAllEntitiesByDesignerName<CInfoPlayerCounterterrorist>("info_player_counterterrorist")
-                .ToList();
-            
-            var entities = new List<CInfoPlayerCounterterrorist>();
-            foreach (var infoPlayerCounterterrorist in infoPlayerCounterterrorists)
-                if(infoPlayerCounterterrorist.IsValid)
-                    entities.Add(infoPlayerCounterterrorist);
-            
-            if (entities.Count() > 0)
-            {
-                var candidate = CommonUtils.GetRandomInList(entities);
-                if (candidate.IsValid && candidate.AbsOrigin is not null)
-                {
-                    var spawnOrigin = new Vector()
-                    {
-                        X = candidate.AbsOrigin.X,
-                        Y = candidate.AbsOrigin.Y + 1.0f,
-                        Z = candidate.AbsOrigin.Z
-                    };
-                    player.Teleport(spawnOrigin);
-                }
-            }
-        }
+        MyHale = hale;
+        Type = HaleType.Hale;
+        IsHale = true;
 
-        _baseHale = hale;
-        _haleFlags = HaleFlags.Hale;
-
-        var playerCount = Utilities.GetPlayers().Count - 1;
+        if (spawnTeleport && !MyHale.TeleportToHaleSpawn(player))
+            Console.WriteLine("[FreakStrike2] The player failed to teleport to the spawn.");
         
-        playerPawn.MaxHealth = Convert.ToInt32(Math.Round(hale.MaxHealth * (hale.HealthMultiplier * playerCount)));
-        playerPawn.Health = playerPawn.MaxHealth;
-        playerPawn.ArmorValue = Convert.ToInt32(Math.Round(hale.Armor * (hale.ArmorMultiplier * playerCount)));
-        playerPawn.VelocityModifier *= hale.Laggedmovement; //  태깅 걸리거나 뭐 어떤짓 하면 원래 속도로 바뀜... 
-        playerPawn.GravityScale = hale.Gravity; //  사다리 타면 초기화 됨 (소스1 때랑 동일한 현상)
-        var itemServices = playerPawn.ItemServices;
-        if (itemServices is not null)
-        {
-            CCSPlayer_ItemServices services = new(itemServices.Handle);
-            services.HasHelmet = true;
-            Utilities.SetStateChanged(playerPawn, "CBasePlayerPawn", "m_pItemServices");
-        }
-        
-        player.RemoveWeapons();
-        player.GiveNamedItem(CsItem.Knife);
-        // WeaponUtils.ForceRemoveWeapons(player, false, true);
-        // if (!WeaponUtils.HasWeaponByDesignerName(player, "weapon_knife"))
-        //     player.GiveNamedItem(CsItem.Knife);
-        
-        Server.NextFrame(() =>
-        {
-            if (!string.IsNullOrEmpty(hale.Model))
-                playerPawn.SetModel(hale.Model);
-        
-            if (!string.IsNullOrEmpty(hale.Viewmodel))
-            {
-                var weapon = WeaponUtils.FindPlayerWeapon(player, "weapon_knife");
-                if (weapon is not null)
-                    WeaponUtils.UpdatePlayerWeaponModel(player, weapon, hale.Viewmodel, true);
-            }
-        });
+        MyHale.SetPlayerHaleState(player);
     }
 
     /// <summary>
-    /// 플레이어가 헤일인지 유무를 반환합니다.
+    /// 높이 점프 타이머 콜백
     /// </summary>
-    /// <returns>
-    /// 헤일일 경우 true 아니면 flase 반환
-    /// </returns>
-    public bool IsHale() => _haleFlags is HaleFlags.Hale && _baseHale is not null;
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="gameStatus">게임 상태</param>
+    /// <param name="debug">디버깅 여부</param>
+    /// <returns>타이머 콜백</returns>
+    public Action DynamicJumpCooldownCallback(CCSPlayerController player, GameStatus gameStatus = GameStatus.None, bool debug = false) => () =>
+    {
+        var slot = player.Slot;
+        
+        if (!player.IsValid || !IsHale)
+        {
+            Remove(slot, gameStatus);
+            return;
+        }
+        
+        if (debug)
+            player.PrintToCenterAlert($"Dynamic Jump Cooldown: {DynamicJumpCooldown}");
+        
+        DynamicJumpCooldown -= 0.1f;
+
+        if (DynamicJumpCooldown <= 0.0f)
+        {
+            if (debug)
+                player.PrintToChat("[FS2 Debugger] Dynamic Jump is Ready!");
+            DynamicJumpCooldown = 0.0f;
+            DynamicJumpReady = true;
+            DynamicJumpCooldownTimer!.Kill();
+        }
+    };
 
     /// <summary>
-    /// 플레이어가 인간인지 유무를 반환합니다.
+    /// 멤버 변수 초기화
     /// </summary>
-    /// <returns>인간일 경우 true 아니면 false 반환</returns>
-    public bool IsHuman() => !IsHale();
+    /// <returns>초기화 전에 헤일이었다면 true, 아니면 false 반환</returns>
+    public bool Remove()
+    {
+        var isHale = IsHale;
+        
+        MyHale = null;
+        Type = HaleType.None;
+        IsHale = false;
+        IsStun = false;
+        DoWeightDown = false;
+        DoDynamicJumpHold = false;
+        DynamicJumpHoldTicks = 0f;
+        DynamicJumpHoldStartTicks = 0f;
+        DynamicJumpReady = true;
+        DynamicJumpCooldown = 5f;
+        if (DynamicJumpCooldownTimer != null) DynamicJumpCooldownTimer.Kill();
+        DynamicJumpCooldownTimer = null;
+        
+        return isHale;
+    }
     
     /// <summary>
     /// 플레이어를 헤일에서 제거합니다.
     /// </summary>
     /// <param name="clientSlot">플레이어 슬롯</param>
     /// <param name="gameStatus">게임 상태 (매개변수로 넘기지 않을 시 GameStatus.None 으로 판별)</param>
-    public void Clear(int clientSlot, GameStatus? gameStatus = GameStatus.None)
-    {
-        if (IsHuman())
-            return;
-
+    public void Remove(int clientSlot, GameStatus? gameStatus = GameStatus.None)
+    { 
         var player = Utilities.GetPlayerFromSlot(clientSlot);
-        
-        _baseHale = null;
-        _haleFlags = HaleFlags.None;
-        
-        if (player is not null && player.IsValid)
+
+        //  제거 대상의 플레이어가 헤일이었고 진행중인 게임이 있을 경우, 라운드를 강제로 종료시킨다.
+        if (Remove() && player is not null && player.IsValid)
         {
-            player.CommitSuicide(false, true);
-            if (gameStatus is GameStatus.Start && 
-                player.Team is CsTeam.CounterTerrorist && 
+            if (player.PawnIsAlive)
+                player.CommitSuicide(false, true);
+            
+            if (gameStatus == GameStatus.Start && 
+                player.Team == CsTeam.CounterTerrorist && 
                 PlayerUtils.GetTeamAlivePlayers(player.Team) <= 0)
             {
                 CommonUtils.GetGameRules()
