@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using FreakStrike2.Models;
+using FreakStrike2.Utils;
 
 namespace FreakStrike2;
 public partial class FreakStrike2
@@ -16,6 +17,8 @@ public partial class FreakStrike2
         RegisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
         RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
+        RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
+        RegisterEventHandler<EventWeaponFire>(OnWeaponFirePre, HookMode.Pre);
         
         RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
@@ -33,6 +36,8 @@ public partial class FreakStrike2
         DeregisterEventHandler<EventRoundFreezeEnd>(OnRoundFreezeEnd);
         DeregisterEventHandler<EventRoundEnd>(OnRoundEnd);
         DeregisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
+        DeregisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
+        DeregisterEventHandler<EventWeaponFire>(OnWeaponFirePre, HookMode.Pre);
 
         RemoveListener(OnServerPrecacheResources);
         RemoveListener(OnMapStart);
@@ -97,11 +102,11 @@ public partial class FreakStrike2
     /// </summary>
     /// <param name="event">이벤트</param>
     /// <param name="eventInfo">이벤트 정보</param>
-    /// <returns>이벤트 훅</returns>
+    /// <returns>훅 결과</returns>
     private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo eventInfo)
     {
         RemoveEntities();           //  맵에 불필요한 엔티티 제거
-        RemoveAllHalePlayers();     //  헤일 플레이어 초기화
+        RemoveAllHalePlayerOnRoundStart();     //  헤일 플레이어 초기화
         CreateGameTimer(false);     //  게임 타이머 생성
         
         return HookResult.Continue;
@@ -112,7 +117,7 @@ public partial class FreakStrike2
     /// </summary>
     /// <param name="event">이벤트</param>
     /// <param name="eventInfo">이벤트 정보</param>
-    /// <returns>이벤트 훅</returns>
+    /// <returns>훅 결과</returns>
     private HookResult OnRoundFreezeEnd(EventRoundFreezeEnd @event, GameEventInfo eventInfo)
     {
         CreateGameTimer();
@@ -125,7 +130,7 @@ public partial class FreakStrike2
     /// </summary>
     /// <param name="event">이벤트</param>
     /// <param name="eventInfo">이벤트 정보</param>
-    /// <returns>이벤트 훅</returns>
+    /// <returns>훅 결과</returns>
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo eventInfo)
     {
         if (InGameStatus is GameStatus.PlayerWaiting)
@@ -144,7 +149,7 @@ public partial class FreakStrike2
     /// </summary>
     /// <param name="event">이벤트</param>
     /// <param name="eventInfo">이벤트 정보</param>
-    /// <returns>이벤트 훅</returns>
+    /// <returns>훅 결과</returns>
     private HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo eventInfo)
     {
         var victim = @event.Userid;
@@ -152,14 +157,64 @@ public partial class FreakStrike2
         var damage = @event.DmgHealth;
         var weapon = @event.Weapon;
         var hitgroup = @event.Hitgroup;
+
+        if (victim != null && victim.IsValid && attacker != null && attacker.IsValid)
+        {
+            //  피해량 추가
+            AddDamageOnPlayerHurt(victim, attacker, damage);
+            KnockbackOnPlayerHurt(victim, attacker, damage, weapon, hitgroup);    //  넉백 계산
+        }
         
-        if (attacker is not null && attacker.IsValid)
-            BaseGamePlayers[attacker.Slot].AddPlayerDamage(victim, attacker, BaseHalePlayers, InGameStatus, damage);
+        //  TODO :: TakeDamage
+        // if (GameNotStartDamageIgnoreOnPlayerHurt(victim, attacker))
+        //     return HookResult.Handled;
         
-        if (GameNotStartDamageIgnoreOnPlayerHurt(victim, attacker))
-            return HookResult.Handled;
+        return HookResult.Continue;
+    }
+
+    /// <summary>
+    /// 플레이어 스폰
+    /// </summary>
+    /// <param name="event">이벤트</param>
+    /// <param name="eventInfo">이벤트 정보</param>
+    /// <returns>훅 결과</returns>
+    private HookResult OnPlayerSpawn(EventPlayerSpawn @event, GameEventInfo eventInfo)
+    {
+        var player = @event.Userid;
+
+        if (player != null && player.IsValid)
+        {
+            BaseGamePlayers[player.Slot].Damages = 0; //  피해량 초기화
+        }
+
+        return HookResult.Continue;
+    }
+
+    /// <summary>
+    /// 무기 발사
+    /// </summary>
+    /// <param name="event">이벤트</param>
+    /// <param name="eventInfo">이벤트 정보</param>
+    /// <returns>훅 결과</returns>
+    private HookResult OnWeaponFirePre(EventWeaponFire @event, GameEventInfo eventInfo)
+    {
+        var player = @event.Userid;
         
-        KnockbackOnPlayerTakeDamage(victim, attacker, damage, weapon, hitgroup);
+        //  TODO :: 테스트 후 삭제
+        if (player != null && player.IsValid)
+        {
+            var playerPawn = player.PlayerPawn.Value;
+            if (playerPawn != null && playerPawn.IsValid)
+            {
+                var activeWeapon = playerPawn.WeaponServices!.ActiveWeapon.Value;
+                if (activeWeapon != null)
+                {
+                    activeWeapon.As<CCSWeaponBase>().FlRecoilIndex = 0;
+                    activeWeapon.As<CCSWeaponBase>().AccuracyPenalty = 0;
+                }
+            }
+        }
+
         return HookResult.Continue;
     }
 }
