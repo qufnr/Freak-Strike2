@@ -191,9 +191,9 @@ public class BaseHale
     /// <returns>텔레포트하는데 성공했다면 true, 아니면 false 반환</returns>
     public bool TeleportToHaleSpawn(CCSPlayerController player)
     {
-        var infoPlayerCounterterrorists = Utilities.FindAllEntitiesByDesignerName<CInfoPlayerCounterterrorist>("info_player_counterterrorist");
+        var infoPlayerCounterterrorists = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_counterterrorist");
         
-        var entities = new List<CInfoPlayerCounterterrorist>();
+        var entities = new List<SpawnPoint>();
         foreach (var infoPlayerCounterterrorist in infoPlayerCounterterrorists)
             if (infoPlayerCounterterrorist.IsValid)
                 entities.Add(infoPlayerCounterterrorist);
