@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Text.RegularExpressions;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
@@ -140,5 +141,27 @@ public class PlayerUtils
             return;
         playerPawn.CBodyComponent!.SceneNode!.Scale = scale;
         Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_CBodyComponent");
+    }
+
+    /// <summary>
+    /// #UserId 혹은 플레이어 이름으로 플레이어 객체를 찾습니다.
+    /// </summary>
+    /// <param name="val">#UserId 또는 플레이어 이름</param>
+    /// <param name="containsName">플레이어 이름으로 찾을 때 일부 일치로 할지 전부 일치로 할지 여부</param>
+    /// <returns>플레이어 객체 또는 Null</returns>
+    public static CCSPlayerController? FindPlayerByNameOrUserId(string val, bool containsName = true)
+    {
+        var matchUserId = Regex.Match(val, @"^#\d+$"); 
+        if (matchUserId.Success)
+        {
+            int userId;
+            if (int.TryParse(matchUserId.Groups[1].Value, out userId))
+                return Utilities.GetPlayerFromUserid(userId);
+        }
+
+        return Utilities.GetPlayers().Where(player => containsName 
+                ? player.PlayerName.Contains(val) 
+                : player.PlayerName.Equals(val))
+            .FirstOrDefault();
     }
 }
