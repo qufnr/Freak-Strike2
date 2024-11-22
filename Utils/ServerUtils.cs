@@ -54,10 +54,11 @@ public class ServerUtils
     /// 모두에게 PrintToCenterHtml
     /// </summary>
     /// <param name="message">메시지</param>
-    public static void PrintToCenterHtmlAll(string message) =>
+    /// <param name="duration">유지 시간</param>
+    public static void PrintToCenterHtmlAll(string message, int duration = 5) =>
         Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
             .ToList()
-            .ForEach(player => player.PrintToCenterHtml(message));
+            .ForEach(player => player.PrintToCenterHtml(message, duration));
     
     /// <summary>
     /// 모두에게 PrintToCenterAlert
