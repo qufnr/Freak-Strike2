@@ -127,7 +127,7 @@ public partial class FreakStrike2
                     BaseHalePlayers[slot].DynamicJumpHoldTicks = Server.CurrentTime;
                 
                 if (BaseGamePlayers[slot].DebugMode)
-                    player.PrintToCenterAlert($"Dynamic Jump Hold Time: {(BaseHalePlayers[slot].DynamicJumpHoldTicks - BaseHalePlayers[slot].DynamicJumpHoldStartTicks):F1} Tick(s)");
+                    player.PrintToCenterAlert($"Dynamic Jump Hold Time: {(BaseHalePlayers[slot].DynamicJumpHoldTicks - BaseHalePlayers[slot].DynamicJumpHoldStartTicks):F2} Tick(s)");
             }
             //  헤일이 높이 점프 대기상태가 아니고, DoDynamicJumpHold(점프 홀드 여부)가 true 일 때
             else if (BaseHalePlayers[slot].DoDynamicJumpHold)
@@ -177,7 +177,7 @@ public partial class FreakStrike2
         if (BaseGamePlayers[slot].DebugMode)
             player.PrintToChat($"[FS2 Debugger] Dynamic Jump Velocity: {velocity}");
         
-        player.Teleport(null, null, velocity);
+        playerPawn.Teleport(null, null, velocity);
 
         BaseHalePlayers[slot].MyHale!.EmitJumpSound();
         
