@@ -81,7 +81,7 @@ public class BaseHalePlayer
         }
         
         if (debug)
-            player.PrintToCenterAlert($"Dynamic Jump Cooldown: {DynamicJumpCooldown}");
+            player.PrintToCenterAlert($"Dynamic Jump Cooldown: {DynamicJumpCooldown:F1}");
         
         DynamicJumpCooldown -= 0.1f;
 
