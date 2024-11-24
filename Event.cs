@@ -105,9 +105,11 @@ public partial class FreakStrike2
     /// <returns>훅 결과</returns>
     private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo eventInfo)
     {
-        RemoveEntities();           //  맵에 불필요한 엔티티 제거
-        RemoveAllHalePlayerOnRoundStart();     //  헤일 플레이어 초기화
-        CreateGameTimer(false);     //  게임 타이머 생성
+        RemoveEntities();                       //  맵에 불필요한 엔티티 제거
+        CreateGameTimer();                      //  게임 타이머 생성
+        
+        RemoveAllHalePlayerOnRoundStart();      //  헤일 플레이어 초기화
+        CreateHalePlayerOnRoundStart();         //  헤일 플레이어 선정
         
         return HookResult.Continue;
     }

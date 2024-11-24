@@ -4,7 +4,6 @@ using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Models;
 using FreakStrike2.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace FreakStrike2;
 public partial class FreakStrike2
@@ -40,21 +39,17 @@ public partial class FreakStrike2
     }
 
     /// <summary>
-    /// 게임 타이머를 생성합니다. (OnRoundFreezeEnd, OnRoundStart)
+    /// 게임 타이머를 생성합니다. (OnRoundStart)
     /// </summary>
-    private void CreateGameTimer(bool isFreezeEnd = true)
+    private void CreateGameTimer()
     {
-        if (!isFreezeEnd && ConVarUtils.GetFreezeTime() > 0)
-        {
-            InGameStatus = GameStatus.FreezeTime;
+        var gameRule = CommonUtils.GetGameRules();
+        if (gameRule.FreezePeriod)
             return;
-        }
-        
-        CreateHalePlayerOnCreateGameTimer();
         
         FindInterval = Config.FindInterval;
 
-        if (CommonUtils.GetGameRules().WarmupPeriod) InGameStatus = GameStatus.Warmup;
+        if (gameRule.WarmupPeriod) InGameStatus = GameStatus.Warmup;
         else if (Utilities.GetPlayers().Count <= 1) InGameStatus = GameStatus.PlayerWaiting;
         else InGameStatus = GameStatus.Ready;
         

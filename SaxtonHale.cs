@@ -66,10 +66,13 @@ public partial class FreakStrike2
             .ForEach(player => BaseHalePlayers[player.Slot].Remove());
 
     /// <summary>
-    /// 타이머가 종료되는 시점에서 무작위 플레이어(또는 큐포인트가 높은 플레이어)를 헤일로 선택
+    /// 라운드가 시작되는 시점에서 무작위 플레이어(또는 큐포인트가 높은 플레이어)를 헤일로 선택
     /// </summary>
-    private void CreateHalePlayerOnCreateGameTimer()
+    private void CreateHalePlayerOnRoundStart()
     {
+        if (CommonUtils.GetGameRules().WarmupPeriod)
+            return;
+        
         var player = BaseQueuePoint.GetPlayerWithMostQueuepoints(PlayerQueuePoints) ?? PlayerUtils.GetRandomAlivePlayer();
         if (player == null)
         {
@@ -136,7 +139,7 @@ public partial class FreakStrike2
         var playerPawn = player.PlayerPawn.Value;
         if (playerPawn is not null &&
             player.PawnIsAlive &&
-            InGameStatus == GameStatus.Start &&
+            (InGameStatus == GameStatus.Start || InGameStatus == GameStatus.End) &&
             BaseHalePlayers[slot].IsHale &&
             BaseHalePlayers[slot].MyHale!.CanUseDynamicJump &&
             BaseHalePlayers[slot].DynamicJumpReady)
@@ -159,7 +162,7 @@ public partial class FreakStrike2
                     BaseHalePlayers[slot].DynamicJumpHoldStartTicks = Server.CurrentTime;
                     
                     //  프로그래스바 생성
-                    playerPawn.ProgressBarStartTime = (int) BaseHale.DynamicJumpMaximumHoldTime;
+                    PlayerUtils.SetPlayerProgressBar(playerPawn, (int) BaseHale.DynamicJumpMaximumHoldTime);
                 }
 
                 if (BaseHalePlayers[slot].DynamicJumpHoldTicks - BaseHalePlayers[slot].DynamicJumpHoldStartTicks < BaseHale.DynamicJumpMaximumHoldTime)
@@ -174,7 +177,7 @@ public partial class FreakStrike2
                 BaseHalePlayers[slot].DoDynamicJumpHold = false;
                 
                 //  프로그래스바 삭제
-                playerPawn.ProgressBarStartTime = 0;
+                PlayerUtils.RemovePlayerProgressBar(playerPawn);
 
                 var holdTime = BaseHalePlayers[slot].DynamicJumpHoldTicks - BaseHalePlayers[slot].DynamicJumpHoldStartTicks;
                 
