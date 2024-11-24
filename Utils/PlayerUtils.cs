@@ -143,6 +143,13 @@ public class PlayerUtils
         Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_CBodyComponent");
     }
 
+    public static void SetPlayerMoveType(CCSPlayerPawn player, MoveType_t moveType)
+    {
+        player.MoveType = moveType;
+        player.ActualMoveType = moveType;
+        Utilities.SetStateChanged(player, "CBaseEntity", "m_MoveType");
+    }
+
     /// <summary>
     /// #UserId 혹은 플레이어 이름으로 플레이어 객체를 찾습니다.
     /// </summary>
