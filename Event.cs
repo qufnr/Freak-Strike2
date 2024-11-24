@@ -165,10 +165,6 @@ public partial class FreakStrike2
             KnockbackOnPlayerHurt(victim, attacker, damage, weapon, hitgroup);    //  넉백 계산
         }
         
-        //  TODO :: TakeDamage
-        // if (GameNotStartDamageIgnoreOnPlayerHurt(victim, attacker))
-        //     return HookResult.Handled;
-        
         return HookResult.Continue;
     }
 

@@ -20,7 +20,7 @@ public partial class FreakStrike2
             switch (InGameStatus)
             {
                 case GameStatus.PlayerWaiting:
-                case GameStatus.PlayerFinding:
+                case GameStatus.Ready:
                     player.ChangeTeam(CsTeam.Terrorist);
                     Server.NextFrame(() =>
                     {

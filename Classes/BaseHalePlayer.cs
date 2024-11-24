@@ -40,7 +40,7 @@ public class BaseHalePlayer
     /// <param name="hale">헤일</param>
     /// <param name="spawnTeleport">스폰 이동 여부</param>
     /// <exception cref="PlayerNotFoundException">플레이어가 유효하지 않으면 던집니다.</exception>
-    public BaseHalePlayer(CCSPlayerController player, BaseHale hale, bool spawnTeleport = true)
+    public BaseHalePlayer(CCSPlayerController player, BaseHale hale)
     {
         var playerPawn = player.PlayerPawn.Value;
         
@@ -57,7 +57,7 @@ public class BaseHalePlayer
         Type = HaleType.Hale;
         IsHale = true;
 
-        if (spawnTeleport && !MyHale.TeleportToHaleSpawn(player))
+        if (!MyHale.TeleportToHaleSpawn(player))
             Console.WriteLine("[FreakStrike2] The player failed to teleport to the spawn.");
         
         MyHale.SetPlayerHaleState(player);

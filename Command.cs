@@ -85,7 +85,7 @@ public partial class FreakStrike2
                             {
                                 cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 을(를) 헤일 {hale.Name} (으)로 설정했습니다.");
                                 Server.PrintToChatAll($"[FS2] 관리자에 의해 {target.PlayerName} 이(가) 헤일 {hale.Name} (으)로 설정되었습니다.");
-                                BaseHalePlayers[target.Slot] = new BaseHalePlayer(target, hale, Config.HaleTeleportToSpawn);
+                                BaseHalePlayers[target.Slot] = new BaseHalePlayer(target, hale);
                             }
                         }
                     }

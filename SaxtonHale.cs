@@ -68,24 +68,62 @@ public partial class FreakStrike2
     /// <summary>
     /// 타이머가 종료되는 시점에서 무작위 플레이어(또는 큐포인트가 높은 플레이어)를 헤일로 선택
     /// </summary>
-    private void SetHalePlayerOnTimerEnd()
+    private void CreateHalePlayerOnCreateGameTimer()
     {
-        InGameStatus = GameStatus.Start;
-        
         var player = BaseQueuePoint.GetPlayerWithMostQueuepoints(PlayerQueuePoints) ?? PlayerUtils.GetRandomAlivePlayer();
-
-        if (player is null)
+        if (player == null)
         {
             Logger.LogError("[FreakStrike2] No player has been selected.");
             return;
         }
 
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+        {
+            Logger.LogError("[FreakStrike2] Player \"CCSPlayerPawn\" is null!");
+            return;
+        }
+
         var hale = CommonUtils.GetRandomInList(Hales);
-        BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale, Config.HaleTeleportToSpawn);
+        BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale);
+        PlayerUtils.SetPlayerMoveType(playerPawn, MoveType_t.MOVETYPE_NONE);
+        playerPawn.AbsVelocity.X = 0;
+        playerPawn.AbsVelocity.Y = 0;
+        playerPawn.AbsVelocity.Z = 0;
         PlayerQueuePoints[player.Slot].Points = 0;
         
-        ServerUtils.PrintToCenterAlertAll($"플레이어 {player.PlayerName} 이(가) 헤일 {hale.Name} (으)로 선택 되었습니다!");
+        player.PrintToCenterAlert($"귀하가 이번 라운드의 헤일 {BaseHalePlayers[player.Slot].MyHale!.Name} (으)로 선정되었습니다!");
         Logger.LogInformation($"[FreakStrike2] {player.PlayerName}({player.AuthorizedSteamID!.SteamId64}) has been chosen as the Hale for {hale.Name}!");
+    }
+
+    /// <summary>
+    /// 타이머가 종료되면 헤일의 활동 상태를 변경합니다.
+    /// </summary>
+    private void HalePlayerAllActiveOnTimerEnd()
+    {
+
+        if (FindHalePlayers().Count > 0)
+        {
+            InGameStatus = GameStatus.Start;
+            
+            var players = Utilities.GetPlayers();
+            foreach (var player in players)
+            {
+                if(player.IsValid)
+                {
+                    if (BaseHalePlayers[player.Slot].IsHale)
+                    {
+                        var playerPawn = player.PlayerPawn.Value;
+                        if (playerPawn != null && playerPawn.IsValid)
+                            PlayerUtils.SetPlayerMoveType(playerPawn, MoveType_t.MOVETYPE_WALK);
+                        player.PrintToCenter("라운드가 시작했습니다. 모든 인간 진영을 처치하세요!");
+                    }
+                    else
+                        player.PrintToCenter("헤일이 활동하기 시작했습니다. 헤일을 처치하거나 라운드 시간동안 생존하세요!");
+                }
+            }
+        }
+
     }
 
     /// <summary>
@@ -98,6 +136,7 @@ public partial class FreakStrike2
         var playerPawn = player.PlayerPawn.Value;
         if (playerPawn is not null &&
             player.PawnIsAlive &&
+            InGameStatus == GameStatus.Start &&
             BaseHalePlayers[slot].IsHale &&
             BaseHalePlayers[slot].MyHale!.CanUseDynamicJump &&
             BaseHalePlayers[slot].DynamicJumpReady)
@@ -189,7 +228,29 @@ public partial class FreakStrike2
             TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
 
+    /// <summary>
+    /// 헤일 이름으로 헤일을 찾습니다.
+    /// </summary>
+    /// <param name="name">헤일 이름</param>
+    /// <returns>헤일</returns>
     private BaseHale? FindHaleByDesignerName(string name) =>
         Hales.Where(hale => hale.DesignerName == name)
             .FirstOrDefault();
+
+    /// <summary>
+    /// 헤일 플레이어를 찾습니다.
+    /// </summary>
+    /// <returns>헤일 플레이어 (없으면 빈 List 반환)</returns>
+    private List<CCSPlayerController> FindHalePlayers()
+    {
+        var players = new List<CCSPlayerController>();
+        foreach (var baseHalePlayer in BaseHalePlayers)
+        {
+            var player = Utilities.GetPlayerFromSlot(baseHalePlayer.Key);
+            if(player != null && player.IsValid && player.PawnIsAlive && baseHalePlayer.Value.IsHale)
+                players.Add(player);
+        }
+
+        return players;
+    }
 }

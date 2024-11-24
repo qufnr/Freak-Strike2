@@ -45,15 +45,20 @@ public partial class FreakStrike2
     private void CreateGameTimer(bool isFreezeEnd = true)
     {
         if (!isFreezeEnd && ConVarUtils.GetFreezeTime() > 0)
+        {
+            InGameStatus = GameStatus.FreezeTime;
             return;
+        }
+        
+        CreateHalePlayerOnCreateGameTimer();
         
         FindInterval = Config.FindInterval;
 
         if (CommonUtils.GetGameRules().WarmupPeriod) InGameStatus = GameStatus.Warmup;
         else if (Utilities.GetPlayers().Count <= 1) InGameStatus = GameStatus.PlayerWaiting;
-        else InGameStatus = GameStatus.PlayerFinding;
+        else InGameStatus = GameStatus.Ready;
         
-        if (InGameTimer is null)
+        if (InGameTimer == null)
             InGameTimer = AddTimer(1.0f, OnGameTimerInterval, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
 
@@ -80,31 +85,37 @@ public partial class FreakStrike2
         if (players.Count <= 1)
             InGameStatus = GameStatus.PlayerWaiting;
 
-        if (FindInterval < 0)
+        if (FindInterval <= 0)
         {
-            SetHalePlayerOnTimerEnd();
+            HalePlayerAllActiveOnTimerEnd();    //  헤일 활동 시작!!!
             KillGameTimer();
             return;
         }
 
-        var message = string.Empty;
         switch (InGameStatus)
         {
             case GameStatus.PlayerWaiting:
-                message = "다른 플레이어를 기다리고 있습니다.";
+                ServerUtils.PrintToCenterAll("다른 플레이어를 기다리고 있습니다.");
                 break;
             case GameStatus.Warmup:
-                message = "준비 시간이 종료되면 게임이 시작됩니다.";
+                ServerUtils.PrintToCenterAll("준비 시간이 종료되면 게임이 시작됩니다.");
                 break;
-            case GameStatus.PlayerFinding:
-                message = $"{FindInterval}초 후 헤일 플레이어가 선택됩니다!";
+            case GameStatus.Ready:
+                Utilities.GetPlayers()
+                        .ForEach(player =>
+                        {
+                            if (player.IsValid && !player.IsBot)
+                            {
+                                if (BaseHalePlayers[player.Slot].IsHale)
+                                    player.PrintToCenter($"{FindInterval}초 후 {BaseHalePlayers[player.Slot].MyHale!.Name} 헤일로 플레이하게 될 것입니다!");
+                                else
+                                    player.PrintToCenter($"헤일이 활동할 때 까지 {FindInterval}초 남았습니다.");
+                            }
+                        });
                 DebugPrintGameConditionCountdown();
                 FindInterval--;
                 break;
         }
-        
-        if (!string.IsNullOrEmpty(message))
-            ServerUtils.PrintToCenterAll(message);
     }
 
     /// <summary>

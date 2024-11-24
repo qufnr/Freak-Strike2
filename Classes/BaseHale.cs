@@ -191,6 +191,10 @@ public class BaseHale
     /// <returns>텔레포트하는데 성공했다면 true, 아니면 false 반환</returns>
     public bool TeleportToHaleSpawn(CCSPlayerController player)
     {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+            return false;
+        
         var infoPlayerCounterterrorists = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_counterterrorist");
         
         var entities = new List<SpawnPoint>();
@@ -210,7 +214,7 @@ public class BaseHale
                     Z = candidate.AbsOrigin.Z
                 };
                 
-                player.Teleport(origin);
+                playerPawn.Teleport(origin);
                 
                 return true;
             }
