@@ -47,7 +47,7 @@ public partial class FreakStrike2
     /// <param name="hitgroup">히트 그룹</param>
     private void KnockbackOnPlayerHurt(CCSPlayerController victim, CCSPlayerController attacker, int damage, string weapon, int hitgroup)
     {
-        if (!BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale)
+        if (victim == attacker || BaseHalePlayers[victim.Slot].IsHale && !BaseHalePlayers[attacker.Slot].IsHale)
             return;
 
         var victimPawn = victim.PlayerPawn.Value;
@@ -69,7 +69,7 @@ public partial class FreakStrike2
 
     private void AddDamageOnPlayerHurt(CCSPlayerController victim, CCSPlayerController attacker, int damage)
     {
-        if (!victim.PawnIsAlive || !BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale)
+        if (!victim.PawnIsAlive || victim == attacker || !BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale)
             return;
 
         BaseGamePlayers[attacker.Slot].Damages += damage;
