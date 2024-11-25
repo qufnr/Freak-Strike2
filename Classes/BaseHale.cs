@@ -157,14 +157,7 @@ public class BaseHale
             playerPawn.Health = playerPawn.MaxHealth;
             playerPawn.VelocityModifier *= Laggedmovement;
             playerPawn.GravityScale = playerPawn.GravityScale;
-
-            var itemServices = playerPawn.ItemServices;
-            if (itemServices is not null)
-            {
-                CCSPlayer_ItemServices services = new(itemServices.Handle);
-                services.HasHelmet = true;
-                Utilities.SetStateChanged(playerPawn, "CBasePlayerPawn", "m_pItemServices");
-            }
+            PlayerUtils.SetPlayerHelmet(playerPawn);
             
             player.RemoveWeapons();
             Weapons.ForEach(namedItem => player.GiveNamedItem(namedItem));

@@ -179,6 +179,21 @@ public class PlayerUtils
         Utilities.SetStateChanged(player, "CCSPlayerPawnBase", "m_iProgressBarDuration");
         Utilities.SetStateChanged(player, "CCSPlayerPawnBase", "m_flProgressBarStartTime");
     }
+
+    /// <summary>
+    /// 플레이어에게 헬멧을 장착합니다.
+    /// </summary>
+    /// <param name="player">플레이어 Pawn 객체</param>
+    public static void SetPlayerHelmet(CCSPlayerPawn player)
+    {
+        var itemServices = player.ItemServices;
+        if (itemServices != null)
+        {
+            CCSPlayer_ItemServices services = new(itemServices.Handle);
+            services.HasHelmet = true;
+            Utilities.SetStateChanged(player, "CBasePlayerPawn", "m_pItemServices");
+        }
+    }
     
     /// <summary>
     /// #UserId 혹은 플레이어 이름으로 플레이어 객체를 찾습니다.
