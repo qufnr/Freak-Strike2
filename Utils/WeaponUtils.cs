@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -124,6 +125,17 @@ public class WeaponUtils
                     weapon.Value.Remove();
             }
         }
+    }
+
+    /// <summary>
+    /// 무기 보조 공격 다음 틱을 설정합니다.
+    /// </summary>
+    /// <param name="weapon">무기 객체</param>
+    /// <param name="nextTick">틱</param>
+    public static void SetWeaponNextSecondaryAttackTick(CBasePlayerWeapon weapon, int nextTick)
+    {
+        weapon.NextSecondaryAttackTick = nextTick;
+        Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_nNextSecondaryAttackTick");
     }
     
     /// <summary>
