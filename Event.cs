@@ -108,7 +108,15 @@ public partial class FreakStrike2
         RemoveEntities();                       //  맵에 불필요한 엔티티 제거
         CreateGameTimer();                      //  게임 타이머 생성
         
-        RemoveAllHalePlayerOnRoundStart();      //  헤일 플레이어 초기화
+        Utilities.GetPlayers()
+            .Where(player => player.IsValid)
+            .ToList()
+            .ForEach(player =>
+            {
+                BaseGamePlayers[player.Slot].Reset(player); //  게임 플레이어 초기화
+                BaseHalePlayers[player.Slot].Remove();      //  헤일 플레이어 초기화
+            });
+        
         CreateHalePlayerOnRoundStart();         //  헤일 플레이어 선정
         
         return HookResult.Continue;
