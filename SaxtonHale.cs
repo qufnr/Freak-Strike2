@@ -141,7 +141,7 @@ public partial class FreakStrike2
             player.PawnIsAlive &&
             (InGameStatus == GameStatus.Start || InGameStatus == GameStatus.End) &&
             BaseHalePlayers[slot].IsHale &&
-            BaseHalePlayers[slot].MyHale!.CanUseDynamicJump &&
+            BaseHalePlayers[slot].MyHale!.CanUseSuperJump &&
             BaseHalePlayers[slot].SuperJumpReady)
         {
             var angles = playerPawn.EyeAngles;

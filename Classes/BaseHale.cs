@@ -25,7 +25,7 @@ public class BaseHale
     [JsonPropertyName("Laggedmovement")] public float Laggedmovement { get; set; } = 1f;    //  이동 속도
     [JsonPropertyName("Gravity")] public float Gravity { get; set; } = 1f;                  //  중력
     [JsonPropertyName("CanUseRage")] public bool CanUseRage { get; set; } = true;           //  분노 사용 가능 여부
-    [JsonPropertyName("CanUseDynamicJump")] public bool CanUseDynamicJump { get; set; } = true; //  높이 점프 사용 가능 여부
+    [JsonPropertyName("CanUseSuperJump")] public bool CanUseSuperJump { get; set; } = true; //  높이 점프 사용 가능 여부
     [JsonPropertyName("CanUseWeightDown")] public bool CanUseWeightDown { get; set; } = true;   //  내려찍기 사용 가능 여부
     [JsonPropertyName("DynamicJumpVectorScale")] public float DynamicJumpVectorScale { get; set; } = 1f;    //  높이 점프 백터 값
     [JsonPropertyName("DynamicJumpCooldown")] public float DynamicJumpCooldown { get; set; } = 5f;          //  높이 점프 쿨다운 시간
