@@ -8,9 +8,9 @@ using FreakStrike2.Utils;
 namespace FreakStrike2.Classes;
 public class BaseHale
 {
-    public static float DynamicJumpMaximumHoldTime = 1f;        //  높이 점프 홀드 최대치
-    public static float DynamicJumpMinimumHoldTime = .3f;       //  높이 점프 홀드 최소치 (이 때(Tick) 부터 점프 가능)
-    public static float DynamicJumpAngleXRange = -45f;          //  높이 점프 시전 시 시점 X 각도 범위
+    public static float SuperJumpMaximumHoldTime = 1f;        //  높이 점프 홀드 최대치
+    public static float SuperJumpMinimumHoldTime = .3f;       //  높이 점프 홀드 최소치 (이 때(Tick) 부터 점프 가능)
+    public static float SuperJumpAngleXRange = -45f;          //  높이 점프 시전 시 시점 X 각도 범위
     
     [JsonPropertyName("Name")] public required string Name { get; set; }                    //  헤일 이름
     [JsonPropertyName("DesignerName")] public required string DesignerName { get; set; }    //  헤일 클래스명

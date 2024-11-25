@@ -141,7 +141,7 @@ public partial class FreakStrike2
         //  TODO :: PostThinkFunc 에서 플레이어 찾는 방법 없을까?
         foreach (var player in Utilities.GetPlayers().Where(player => player.IsValid))
         {
-            DynamicJumpOnPostThinkPost(player);
+            SuperJumpOnPostThinkPost(player);
         }
         
         return HookResult.Continue;

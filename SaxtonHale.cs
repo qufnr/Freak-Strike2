@@ -133,7 +133,7 @@ public partial class FreakStrike2
     /// 헤일 플레이어가 높이 점프 하기 전에 행동과 상태를 체크합니다.
     /// </summary>
     /// <param name="player">플레이어 객체</param>
-    private void DynamicJumpOnPostThinkPost(CCSPlayerController player)
+    private void SuperJumpOnPostThinkPost(CCSPlayerController player)
     {
         var slot = player.Slot;
         var playerPawn = player.PlayerPawn.Value;
@@ -142,50 +142,50 @@ public partial class FreakStrike2
             (InGameStatus == GameStatus.Start || InGameStatus == GameStatus.End) &&
             BaseHalePlayers[slot].IsHale &&
             BaseHalePlayers[slot].MyHale!.CanUseDynamicJump &&
-            BaseHalePlayers[slot].DynamicJumpReady)
+            BaseHalePlayers[slot].SuperJumpReady)
         {
             var angles = playerPawn.EyeAngles;
 
             //  위를 올려다 보고 앉기를 누르고 있거나, 우클릭(2번째 공격)을 하고 있을 때 (헤일 높이 점프 대기)
-            if (((PlayerButtons.Duck & player.Buttons) != 0 && angles.X < BaseHale.DynamicJumpAngleXRange) || 
+            if (((PlayerButtons.Duck & player.Buttons) != 0 && angles.X < BaseHale.SuperJumpAngleXRange) || 
                 (PlayerButtons.Attack2 & player.Buttons) != 0)
             {
                 //  스턴 상태일 경우 무시
                 if (BaseHalePlayers[slot].IsStun)
                     return;
 
-                if (!BaseHalePlayers[slot].DoDynamicJumpHold)
+                if (!BaseHalePlayers[slot].DoSuperJumpHold)
                 {
-                    BaseHalePlayers[slot].DoDynamicJumpHold = true;
+                    BaseHalePlayers[slot].DoSuperJumpHold = true;
 
-                    BaseHalePlayers[slot].DynamicJumpHoldTicks = Server.CurrentTime;
-                    BaseHalePlayers[slot].DynamicJumpHoldStartTicks = Server.CurrentTime;
+                    BaseHalePlayers[slot].SuperJumpHoldTicks = Server.CurrentTime;
+                    BaseHalePlayers[slot].SuperJumpHoldStartTicks = Server.CurrentTime;
                     
                     //  프로그래스바 생성
-                    PlayerUtils.SetPlayerProgressBar(playerPawn, (int) BaseHale.DynamicJumpMaximumHoldTime);
+                    PlayerUtils.SetPlayerProgressBar(playerPawn, (int) BaseHale.SuperJumpMaximumHoldTime);
                 }
 
-                if (BaseHalePlayers[slot].DynamicJumpHoldTicks - BaseHalePlayers[slot].DynamicJumpHoldStartTicks < BaseHale.DynamicJumpMaximumHoldTime)
-                    BaseHalePlayers[slot].DynamicJumpHoldTicks = Server.CurrentTime;
+                if (BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks < BaseHale.SuperJumpMaximumHoldTime)
+                    BaseHalePlayers[slot].SuperJumpHoldTicks = Server.CurrentTime;
                 
                 if (BaseGamePlayers[slot].DebugMode)
-                    player.PrintToCenterAlert($"Dynamic Jump Hold Time: {(BaseHalePlayers[slot].DynamicJumpHoldTicks - BaseHalePlayers[slot].DynamicJumpHoldStartTicks):F2} Tick(s)");
+                    player.PrintToCenterAlert($"Dynamic Jump Hold Time: {(BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks):F2} Tick(s)");
             }
             //  헤일이 높이 점프 대기상태가 아니고, DoDynamicJumpHold(점프 홀드 여부)가 true 일 때
-            else if (BaseHalePlayers[slot].DoDynamicJumpHold)
+            else if (BaseHalePlayers[slot].DoSuperJumpHold)
             {
-                BaseHalePlayers[slot].DoDynamicJumpHold = false;
+                BaseHalePlayers[slot].DoSuperJumpHold = false;
                 
                 //  프로그래스바 삭제
                 PlayerUtils.RemovePlayerProgressBar(playerPawn);
 
-                var holdTime = BaseHalePlayers[slot].DynamicJumpHoldTicks - BaseHalePlayers[slot].DynamicJumpHoldStartTicks;
+                var holdTime = BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks;
                 
-                if (angles.X < BaseHale.DynamicJumpAngleXRange && 
-                    holdTime > BaseHale.DynamicJumpMinimumHoldTime)
+                if (angles.X < BaseHale.SuperJumpAngleXRange && 
+                    holdTime > BaseHale.SuperJumpMinimumHoldTime)
                 {
-                    BaseHalePlayers[slot].DynamicJumpReady = false;
-                    OnHalePlayerDynamicJump(player, holdTime, BaseHalePlayers[slot].MyHale!.DynamicJumpVectorScale);
+                    BaseHalePlayers[slot].SuperJumpReady = false;
+                    OnHalePlayerSuperJump(player, holdTime, BaseHalePlayers[slot].MyHale!.DynamicJumpVectorScale);
                 }
             }
         }
@@ -197,7 +197,7 @@ public partial class FreakStrike2
     /// <param name="player">플레이어 객체</param>
     /// <param name="holdTime">점프 홀드 시간</param>
     /// <param name="vectorScale">점프 벡터 크기</param>
-    private void OnHalePlayerDynamicJump(CCSPlayerController player, float holdTime, float vectorScale)
+    private void OnHalePlayerSuperJump(CCSPlayerController player, float holdTime, float vectorScale)
     {
         var playerPawn = player.PlayerPawn.Value;
         var slot = player.Slot;
@@ -224,10 +224,10 @@ public partial class FreakStrike2
         BaseHalePlayers[slot].MyHale!.EmitJumpSound();
         
         //  쿨타임 생성
-        BaseHalePlayers[slot].DynamicJumpCooldown = hale.DynamicJumpCooldown;
-        BaseHalePlayers[slot].DynamicJumpCooldownTimer = AddTimer(
+        BaseHalePlayers[slot].SuperJumpCooldown = hale.DynamicJumpCooldown;
+        BaseHalePlayers[slot].SuperJumpCooldownTimer = AddTimer(
             0.1f, 
-            BaseHalePlayers[slot].DynamicJumpCooldownCallback(player, InGameStatus, BaseGamePlayers[slot].DebugMode), 
+            BaseHalePlayers[slot].SuperJumpCooldownCallback(player, InGameStatus, BaseGamePlayers[slot].DebugMode), 
             TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
 

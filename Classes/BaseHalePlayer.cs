@@ -15,12 +15,12 @@ public class BaseHalePlayer
 {
     public bool DoWeightDown { get; set; } = false;             //  내려찍기 준비
     
-    public bool DynamicJumpReady { get; set; } = true;          //  높이 점프 준비
-    public bool DoDynamicJumpHold { get; set; } = false;        //  높이 점프 홀드
-    public float DynamicJumpHoldTicks { get; set; } = 0f;      //  높이 점프 홀드 틱
-    public float DynamicJumpHoldStartTicks { get; set; } = 0f; //  높이 점프 홀드 시작 틱
-    public float DynamicJumpCooldown { get; set; } = 5f;
-    public Timer? DynamicJumpCooldownTimer { get; set; } = null;
+    public bool SuperJumpReady { get; set; } = true;          //  높이 점프 준비
+    public bool DoSuperJumpHold { get; set; } = false;        //  높이 점프 홀드
+    public float SuperJumpHoldTicks { get; set; } = 0f;      //  높이 점프 홀드 틱
+    public float SuperJumpHoldStartTicks { get; set; } = 0f; //  높이 점프 홀드 시작 틱
+    public float SuperJumpCooldown { get; set; } = 5f;
+    public Timer? SuperJumpCooldownTimer { get; set; } = null;
     
     public bool IsHale { get; private set; } = false;
     public bool IsStun { get; private set; } = false;
@@ -70,7 +70,7 @@ public class BaseHalePlayer
     /// <param name="gameStatus">게임 상태</param>
     /// <param name="debug">디버깅 여부</param>
     /// <returns>타이머 콜백</returns>
-    public Action DynamicJumpCooldownCallback(CCSPlayerController player, GameStatus gameStatus = GameStatus.None, bool debug = false) => () =>
+    public Action SuperJumpCooldownCallback(CCSPlayerController player, GameStatus gameStatus = GameStatus.None, bool debug = false) => () =>
     {
         var slot = player.Slot;
         
@@ -81,17 +81,17 @@ public class BaseHalePlayer
         }
         
         if (debug)
-            player.PrintToCenterAlert($"Dynamic Jump Cooldown: {DynamicJumpCooldown:F1}");
+            player.PrintToCenterAlert($"Dynamic Jump Cooldown: {SuperJumpCooldown:F1}");
         
-        DynamicJumpCooldown -= 0.1f;
+        SuperJumpCooldown -= 0.1f;
 
-        if (DynamicJumpCooldown <= 0.0f)
+        if (SuperJumpCooldown <= 0.0f)
         {
             if (debug)
                 player.PrintToChat("[FS2 Debugger] Dynamic Jump is Ready!");
-            DynamicJumpCooldown = 0.0f;
-            DynamicJumpReady = true;
-            DynamicJumpCooldownTimer!.Kill();
+            SuperJumpCooldown = 0.0f;
+            SuperJumpReady = true;
+            SuperJumpCooldownTimer!.Kill();
         }
     };
 
@@ -108,13 +108,13 @@ public class BaseHalePlayer
         IsHale = false;
         IsStun = false;
         DoWeightDown = false;
-        DoDynamicJumpHold = false;
-        DynamicJumpHoldTicks = 0f;
-        DynamicJumpHoldStartTicks = 0f;
-        DynamicJumpReady = true;
-        DynamicJumpCooldown = 5f;
-        if (DynamicJumpCooldownTimer != null) DynamicJumpCooldownTimer.Kill();
-        DynamicJumpCooldownTimer = null;
+        DoSuperJumpHold = false;
+        SuperJumpHoldTicks = 0f;
+        SuperJumpHoldStartTicks = 0f;
+        SuperJumpReady = true;
+        SuperJumpCooldown = 5f;
+        if (SuperJumpCooldownTimer != null) SuperJumpCooldownTimer.Kill();
+        SuperJumpCooldownTimer = null;
         
         return isHale;
     }
