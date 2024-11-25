@@ -142,6 +142,7 @@ public partial class FreakStrike2
         foreach (var player in Utilities.GetPlayers().Where(player => player.IsValid))
         {
             SuperJumpOnPostThinkPost(player);
+            HalePlayerSecondaryAttackBlockOnPostThinkPost(player);
         }
         
         return HookResult.Continue;

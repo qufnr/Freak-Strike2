@@ -58,14 +58,6 @@ public partial class FreakStrike2
     }
 
     /// <summary>
-    /// 라운드 시작 시 모든 플레이어의 헤일 정보를 제거합니다.
-    /// </summary>
-    private void RemoveAllHalePlayerOnRoundStart() =>
-        Utilities.GetPlayers().Where(player => player.IsValid)
-            .ToList()
-            .ForEach(player => BaseHalePlayers[player.Slot].Remove());
-
-    /// <summary>
     /// 라운드가 시작되는 시점에서 무작위 플레이어(또는 큐포인트가 높은 플레이어)를 헤일로 선택
     /// </summary>
     private void CreateHalePlayerOnRoundStart()
@@ -122,7 +114,7 @@ public partial class FreakStrike2
                         player.PrintToCenter("라운드가 시작했습니다. 모든 인간 진영을 처치하세요!");
                     }
                     else
-                        player.PrintToCenter("헤일이 활동하기 시작했습니다. 헤일을 처치하거나 라운드 시간동안 생존하세요!");
+                        player.PrintToCenter("헤일이 활동하기 시작했습니다. 헤일을 처치하거나 라운드 시간 동안 생존하세요!");
                 }
             }
         }
@@ -229,6 +221,29 @@ public partial class FreakStrike2
             0.1f, 
             BaseHalePlayers[slot].SuperJumpCooldownCallback(player, InGameStatus, BaseGamePlayers[slot].DebugMode), 
             TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+    }
+
+    /// <summary>
+    /// 헤일 플레이어 보조 공격 차단
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    private void HalePlayerSecondaryAttackBlockOnPostThinkPost(CCSPlayerController player)
+    {
+        if (player.PawnIsAlive && 
+            BaseHalePlayers[player.Slot].IsHale && 
+            (PlayerButtons.Attack2 & player.Buttons) != 0)
+        {
+            var playerPawn = player.PlayerPawn.Value;
+            if (playerPawn != null && playerPawn.IsValid)
+            {
+                if (playerPawn.WeaponServices != null)
+                {
+                    var activeWeapon = playerPawn.WeaponServices.ActiveWeapon.Value;
+                    if (activeWeapon != null && WeaponUtils.GetDesignerName(activeWeapon).Contains("knife"))
+                        WeaponUtils.SetWeaponNextSecondaryAttackTick(activeWeapon, (int) Server.CurrentTime + 99999);
+                }
+            }
+        }
     }
 
     /// <summary>
