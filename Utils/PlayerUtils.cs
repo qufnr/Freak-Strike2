@@ -28,7 +28,7 @@ public class PlayerUtils
     /// 살아있는 플레이어들을 반환합니다.
     /// </summary>
     /// <returns>살아있는 플레이어들</returns>
-    public static List<CCSPlayerController> GetValidPawnAlivePlayers() => 
+    public static List<CCSPlayerController> FindValidAndPawnAlivePlayers() => 
         Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive).ToList();
 
     /// <summary>
@@ -41,7 +41,7 @@ public class PlayerUtils
     public static CCSPlayerController? GetRandomAlivePlayer()
     {
         var pawnAlivePlayers = new List<CCSPlayerController>();
-        GetValidPawnAlivePlayers().ForEach(player =>
+        FindValidAndPawnAlivePlayers().ForEach(player =>
         {
             if(player.IsValid && player.PawnIsAlive)
                 pawnAlivePlayers.Add(player);
@@ -67,7 +67,7 @@ public class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <returns>시점 위치 벡터</returns>
-    public static Vector? GetEyePosition(CCSPlayerController player)
+    public static Vector? GetPlayerEyePosition(CCSPlayerController player)
     {
         var playerPawn = player.PlayerPawn.Value;
         if (playerPawn is null)
@@ -89,7 +89,7 @@ public class PlayerUtils
     /// <remarks>
     /// 참고 자료: https://discord.com/channels/1160907911501991946/1175947333880524962/1230542480903110716
     /// </remarks>
-    public static CCSPlayerController? GetTargetPlayer(CCSPlayerController player)
+    public static CCSPlayerController? GetPlayerTarget(CCSPlayerController player)
     {
         var gameRules = CommonUtils.GetGameRules();
         VirtualFunctionWithReturn<IntPtr, IntPtr, IntPtr> findPickerEntity = new(gameRules.Handle, 28);
@@ -169,7 +169,7 @@ public class PlayerUtils
     }
 
     /// <summary>
-    /// 플레이어의 프로그래바를 제거합니다.
+    /// 플레이어의 프로그래스바를 제거합니다.
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
     public static void RemovePlayerProgressBar(CCSPlayerPawn player)
