@@ -55,9 +55,27 @@ public class BaseHalePlayer
         MyHale = hale;
         Type = HaleType.Hale;
         IsHale = true;
+        
+        //  스폰으로 텔레포트
+        var spawnpoints = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_counterterrorist");
+        var spawnpointEntities = new List<SpawnPoint>();
+        foreach (var spawnpoint in spawnpoints)
+        {
+            if (spawnpoint.IsValid)
+                spawnpointEntities.Add(spawnpoint);
+        }
 
-        if (!MyHale.TeleportToHaleSpawn(player))
-            Console.WriteLine("[FreakStrike2] The player failed to teleport to the spawn.");
+        if (spawnpointEntities.Count > 0)
+        {
+            var candidate = CommonUtils.GetRandomInList(spawnpointEntities);
+            if (candidate.IsValid && candidate.AbsOrigin != null)
+                playerPawn.Teleport(new Vector()
+                {
+                    X = candidate.AbsOrigin.X,
+                    Y = candidate.AbsOrigin.Y + 1f,
+                    Z = candidate.AbsOrigin.Z
+                });
+        }
         
         MyHale.SetPlayerHaleState(player);
     }

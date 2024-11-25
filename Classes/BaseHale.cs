@@ -176,43 +176,4 @@ public class BaseHale
             });
         }
     }
-
-    /// <summary>
-    /// 플레이어를 헤일 스폰 지점으로 텔레포트를 시도합니다.
-    /// </summary>
-    /// <param name="player">플레이어 객체</param>
-    /// <returns>텔레포트하는데 성공했다면 true, 아니면 false 반환</returns>
-    public bool TeleportToHaleSpawn(CCSPlayerController player)
-    {
-        var playerPawn = player.PlayerPawn.Value;
-        if (playerPawn == null)
-            return false;
-        
-        var infoPlayerCounterterrorists = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_counterterrorist");
-        
-        var entities = new List<SpawnPoint>();
-        foreach (var infoPlayerCounterterrorist in infoPlayerCounterterrorists)
-            if (infoPlayerCounterterrorist.IsValid)
-                entities.Add(infoPlayerCounterterrorist);
-        
-        if (entities.Count() > 0)
-        {
-            var candidate = CommonUtils.GetRandomInList(entities);
-            if (candidate.IsValid && candidate.AbsOrigin is not null)
-            {
-                var origin = new Vector()
-                {
-                    X = candidate.AbsOrigin.X,
-                    Y = candidate.AbsOrigin.Y + 1f,
-                    Z = candidate.AbsOrigin.Z
-                };
-                
-                playerPawn.Teleport(origin);
-                
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
