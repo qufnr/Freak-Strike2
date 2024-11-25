@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Classes;
 using FreakStrike2.Models;
 using FreakStrike2.Utils;
@@ -122,7 +123,8 @@ public partial class FreakStrike2
                                     BaseGamePlayers[target.Slot].ActivateStun(targetPawn, 
                                         AddTimer(0.1f, 
                                             BaseGamePlayers[target.Slot]
-                                                .StunTimerCallback(target, InGameStatus, BaseGamePlayers[target.Slot].DebugMode)),
+                                                .StunTimerCallback(target, InGameStatus, BaseGamePlayers[target.Slot].DebugMode), 
+                                            TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE),
                                         stunTime);
                                     cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 을(를) 스턴 상태({stunTime}초)로 변경했습니다.");
                                     Server.PrintToChatAll($"[FS2] 관리자에 의해 플레이어 {target.PlayerName} 이(가) 스턴 상태({stunTime}초)로 변경되었습니다.");
