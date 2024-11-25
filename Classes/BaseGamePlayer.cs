@@ -86,7 +86,7 @@ public class BaseGamePlayer
         }
         
         if (debug && player.IsValid)
-            player.PrintToCenter($"Stun Time: {StunTime - Server.CurrentTime:F2}");
+            player.PrintToCenterAlert($"Stun Time: {StunTime - Server.CurrentTime:F2}");
     };
 
     public void Reset(CCSPlayerController player)
