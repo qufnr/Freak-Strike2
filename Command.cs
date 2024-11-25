@@ -32,6 +32,7 @@ public partial class FreakStrike2
             {
                 cmdInfo.ReplyToCommand("[FS2] -- css_qp set <#userid|name> <value> - 플레이어의 큐포인트를 설정합니다. (Root Client / Console)");
                 cmdInfo.ReplyToCommand("[FS2] -- css_fs2 sethale <#userid|name> [hale] - 플레이어를 헤일로 설정합니다. (Root Client / Console)");
+                cmdInfo.ReplyToCommand("[FS2] -- css_fs2 setstun <#userid|name> <stuntime> - 플레이어를 스턴 상태로 설정합니다. (Root Client / Console)");
                 cmdInfo.ReplyToCommand("[FS2] -- css_fs2 debug - FS2 디버그 모드를 활성화 또는 비활성화 합니다. (Root Client)");
             }
 
@@ -64,34 +65,74 @@ public partial class FreakStrike2
                 else
                 {
                     var target = PlayerUtils.FindPlayerByNameOrUserId(playerNameOrUserId);
-                    if (target != null && target.IsValid)
+                    if (target == null || !target.IsValid)
+                        cmdInfo.ReplyToCommand("[FS2] 상대 플레이어가 유효하지 않습니다.");
+                    else if (InGameStatus != GameStatus.Start)
+                        cmdInfo.ReplyToCommand("[FS2] 게임이 시작된 상태가 아닙니다.");
+                    else if (!target.PawnIsAlive)
+                        cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 이(가) 살아있지 않습니다.");
+                    else if (BaseHalePlayers[target.Slot].IsHale)
+                        cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 은(는) 이미 헤일 {BaseHalePlayers[target.Slot].MyHale!.Name} (으)로 플레이하고 있습니다.");
+                    else
                     {
-                        if (InGameStatus != GameStatus.Start)
-                            cmdInfo.ReplyToCommand("[FS2] 게임이 시작된 상태가 아닙니다.");
-                        else if (!target.PawnIsAlive)
-                            cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 이(가) 살아있지 않습니다.");
-                        else if (BaseHalePlayers[target.Slot].IsHale)
-                            cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 은(는) 이미 헤일 {BaseHalePlayers[target.Slot].MyHale!.Name} (으)로 플레이하고 있습니다.");
+                        var haleName = cmdInfo.GetArg(3);
+                        var hale = string.IsNullOrEmpty(haleName)
+                            ? CommonUtils.GetRandomInList(Hales)
+                            : FindHaleByDesignerName(haleName);
+                        
+                        if (hale == null)
+                            cmdInfo.ReplyToCommand("[FS2] 존재하지 않은 헤일입니다.");
                         else
                         {
-                            var haleName = cmdInfo.GetArg(3);
-                            var hale = string.IsNullOrEmpty(haleName)
-                                ? CommonUtils.GetRandomInList(Hales)
-                                : FindHaleByDesignerName(haleName);
-                            
-                            if (hale == null)
-                                cmdInfo.ReplyToCommand("[FS2] 존재하지 않은 헤일입니다.");
-                            else
-                            {
-                                cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 을(를) 헤일 {hale.Name} (으)로 설정했습니다.");
-                                Server.PrintToChatAll($"[FS2] 관리자에 의해 {target.PlayerName} 이(가) 헤일 {hale.Name} (으)로 설정되었습니다.");
-                                BaseHalePlayers[target.Slot] = new BaseHalePlayer(target, hale);
-                            }
+                            cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 을(를) 헤일 {hale.Name} (으)로 설정했습니다.");
+                            Server.PrintToChatAll($"[FS2] 관리자에 의해 {target.PlayerName} 이(가) 헤일 {hale.Name} (으)로 설정되었습니다.");
+                            BaseHalePlayers[target.Slot] = new BaseHalePlayer(target, hale);
                         }
                     }
-                }
+            }
 
                 return;
+            }
+            
+            //  플레이어 스턴 상태 설정
+            if (string.Equals(arg, "setstun", StringComparison.OrdinalIgnoreCase))
+            {
+                var playerNameOrUserId = cmdInfo.GetArg(2);
+                if (string.IsNullOrEmpty(playerNameOrUserId))
+                    cmdInfo.ReplyToCommand("[FS2] Usage: css_fs2 setstun <#userid|name> <stuntime>");
+                else
+                {
+                    var target = PlayerUtils.FindPlayerByNameOrUserId(playerNameOrUserId);
+                    if (target == null || !target.IsValid)
+                        cmdInfo.ReplyToCommand("[FS2] 상대 플레이어가 유효하지 않습니다.");
+                    else if(!target.PawnIsAlive)
+                        cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 이(가) 살아있지 않습니다.");
+                    else
+                    {
+                        var stringStunTime = cmdInfo.GetArg(3);
+                        if (int.TryParse(stringStunTime, out var stunTime))
+                        {
+                            if (stunTime <= 0)
+                                cmdInfo.ReplyToCommand("[FS2] 스턴 시간은 0 이상이어야 합니다.");
+                            else
+                            {
+                                var targetPawn = target.PlayerPawn.Value;
+                                if (targetPawn != null && targetPawn.IsValid)
+                                {
+                                    BaseGamePlayers[target.Slot].ActivateStun(targetPawn, 
+                                        AddTimer(0.1f, 
+                                            BaseGamePlayers[target.Slot]
+                                                .StunTimerCallback(target, InGameStatus, BaseGamePlayers[target.Slot].DebugMode)),
+                                        stunTime);
+                                    cmdInfo.ReplyToCommand($"[FS2] 플레이어 {target.PlayerName} 을(를) 스턴 상태({stunTime}초)로 변경했습니다.");
+                                    Server.PrintToChatAll($"[FS2] 관리자에 의해 플레이어 {target.PlayerName} 이(가) 스턴 상태({stunTime}초)로 변경되었습니다.");
+                                }
+                            }
+                        }
+                        else
+                            cmdInfo.ReplyToCommand($"[FS2] Usage: css_fs2 setstun {playerNameOrUserId} <stuntime>");
+                    }
+                }
             }
         }
     }
@@ -114,7 +155,6 @@ public partial class FreakStrike2
             case "reset":
                 if (!Config.CanResetQueuepoints)
                     cmdInfo.ReplyToCommand("[FS2] 서버측에서 큐포인트 초기화가 비활성화 되어있습니다.");
-
                 else if (player is null || !player.IsValid)
                     cmdInfo.ReplyToCommand("[FS2] 클라이언트 측 명령어입니다.");
                 else

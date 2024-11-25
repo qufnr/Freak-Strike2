@@ -23,7 +23,6 @@ public class BaseHalePlayer
     public Timer? SuperJumpCooldownTimer { get; set; } = null;
     
     public bool IsHale { get; private set; } = false;
-    public bool IsStun { get; private set; } = false;
 
     public BaseHale? MyHale { get; private set; } = null;
     public HaleType Type { get; private set; } = HaleType.None;
@@ -106,7 +105,6 @@ public class BaseHalePlayer
         MyHale = null;
         Type = HaleType.None;
         IsHale = false;
-        IsStun = false;
         DoWeightDown = false;
         DoSuperJumpHold = false;
         SuperJumpHoldTicks = 0f;

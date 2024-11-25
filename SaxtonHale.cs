@@ -132,6 +132,7 @@ public partial class FreakStrike2
         if (playerPawn is not null &&
             player.PawnIsAlive &&
             (InGameStatus == GameStatus.Start || InGameStatus == GameStatus.End) &&
+            !BaseGamePlayers[slot].IsStunned() &&
             BaseHalePlayers[slot].IsHale &&
             BaseHalePlayers[slot].MyHale!.CanUseSuperJump &&
             BaseHalePlayers[slot].SuperJumpReady)
@@ -142,10 +143,6 @@ public partial class FreakStrike2
             if (((PlayerButtons.Duck & player.Buttons) != 0 && angles.X < BaseHale.SuperJumpAngleXRange) || 
                 (PlayerButtons.Attack2 & player.Buttons) != 0)
             {
-                //  스턴 상태일 경우 무시
-                if (BaseHalePlayers[slot].IsStun)
-                    return;
-
                 if (!BaseHalePlayers[slot].DoSuperJumpHold)
                 {
                     BaseHalePlayers[slot].DoSuperJumpHold = true;
