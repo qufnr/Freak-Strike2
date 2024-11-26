@@ -82,7 +82,7 @@ public class BaseHalePlayer
                 });
         }
         
-        MyHale.SetPlayerHaleState(player);
+        MyHale.SetPlayer(player);
     }
 
     /// <summary>

@@ -152,7 +152,7 @@ public class BaseHale
     /// 플레이어 상태를 헤일로 업데이트
     /// </summary>
     /// <param name="player">플레이어 객체</param>
-    public void SetPlayerHaleState(CCSPlayerController player)
+    public void SetPlayer(CCSPlayerController player)
     {
         var playerPawn = player.PlayerPawn.Value;
         if (playerPawn is not null)

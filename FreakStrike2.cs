@@ -13,10 +13,15 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
     public override string ModuleAuthor => "byeoruk";
     public override string ModuleDescription => "Freak Fortress 2 in Counter-Strike 2.";
 
+    public static string PluginConfigDirectory = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
+    public static string HaleConfigFilename = "playable_hales.json";
+    public static string HumanConfigFilename = "playable_humans.json";
+    
     public required GameConfig Config { get; set; }              //  플러그인 콘피그
     
     public List<BaseHale> Hales = new();            //  서버에서 설정한 헤일 List 객체
-    
+    public List<BaseHuman> Humans = new();          //  서버에서 설정한 인간 List 객체
+        
     public GameStatus InGameStatus = GameStatus.None;   //  게임 상태
     public Timer? InGameTimer = null;                   //  게임 타이머
     public int FindInterval = 0;                        //  헤일을 찾는 시간
@@ -30,13 +35,13 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
         Console.WriteLine($"[FreakStrike2] Freak-Strike 2 ({ModuleVersion}) loaded!");
         
         if (hotReload)
-        {
             Unload(hotReload);
-        }
         
         GameEventRegister();
         HookVirtualFunctions();
-        GetHaleJsonOnLoad(hotReload);
+        
+        ReadHaleJsonOnLoad(hotReload);
+        ReadHumanJsonOnLoad(hotReload);
         // ServerCommandInitialize();
     }
 

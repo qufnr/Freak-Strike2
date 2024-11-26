@@ -49,6 +49,7 @@ public partial class FreakStrike2
     private void OnServerPrecacheResources(ResourceManifest manifest)
     {
         PrecacheHaleModels(manifest);
+        PrecacheHumanModels(manifest);
     }
 
     /// <summary>

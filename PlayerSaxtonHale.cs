@@ -10,14 +10,11 @@ using Microsoft.Extensions.Logging;
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
-    public static string PluginConfigDirectory = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
-    public static string HaleConfigFilename = "playable_hales.json";
-    
     /// <summary>
     /// 헤일 설정 파일을 읽어옵니다.
     /// </summary>
     /// <param name="hotReload">핫리로드 유무</param>
-    private void GetHaleJsonOnLoad(bool hotReload)
+    private void ReadHaleJsonOnLoad(bool hotReload)
     {
         var directory = Path.Combine(Server.GameDirectory, PluginConfigDirectory);
         if (!Directory.Exists(directory))
