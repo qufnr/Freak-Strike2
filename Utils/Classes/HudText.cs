@@ -126,7 +126,6 @@ public class HudText
             Entity.ReorientMode = attribute.PeorientMode;
             if (attribute.Duration > 0.0)
             {
-                //  TODO :: HOW?????? `SetVariantString("OnUser1 !self:kill::1.0:1");` in CSSharp?!
                 Entity.AddEntityIOEvent("Kill", Entity, null, "", attribute.Duration);
                 // Entity.AcceptInput("FireUser1");
             }
