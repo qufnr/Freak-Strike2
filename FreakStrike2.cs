@@ -29,6 +29,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
 
     public required Dictionary<int, BaseGamePlayer> BaseGamePlayers;    //  서버 내 플레이어 정보
     public required Dictionary<int, BaseHalePlayer> BaseHalePlayers;    //  서버 내 플레이어 헤일 정보
+    public required Dictionary<int, BaseHumanPlayer> BaseHumanPlayers;  //  서버 내 플레이어 인간 클래스 정보
     public required Dictionary<int, BaseQueuePoint> PlayerQueuePoints;  //  서버 내 플레이어 큐포인트 정보
     
     public override void Load(bool hotReload)

@@ -60,12 +60,13 @@ public partial class FreakStrike2
     /// <param name="mapName">맵 이름</param>
     private void OnMapStart(string mapName)
     {
-        KillInGameTimer();
-        CreateInGameGlobalTimer();
-        
         BaseGamePlayers = new Dictionary<int, BaseGamePlayer>(Server.MaxPlayers);
+        BaseHumanPlayers = new Dictionary<int, BaseHumanPlayer>(Server.MaxPlayers);
         BaseHalePlayers = new Dictionary<int, BaseHalePlayer>(Server.MaxPlayers);
         PlayerQueuePoints = new Dictionary<int, BaseQueuePoint>(Server.MaxPlayers);
+        
+        KillInGameTimer();
+        CreateInGameGlobalTimer();
     }
 
     private void OnMapEnd()
@@ -80,8 +81,10 @@ public partial class FreakStrike2
     private void OnClientPutInServer(int client)
     {
         BaseGamePlayers[client] = new BaseGamePlayer();
+        BaseHumanPlayers[client] = new BaseHumanPlayer(client);
         BaseHalePlayers[client] = new BaseHalePlayer();
         PlayerQueuePoints[client] = new BaseQueuePoint();
+        
         GameStartOnClientPutInServer();                 //  게임 시작 처리
         TeamChangeOnClientPutInServer(client);          //  접속 시 팀 변경 처리
     }
