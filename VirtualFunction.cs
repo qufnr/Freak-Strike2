@@ -146,7 +146,7 @@ public partial class FreakStrike2
         {
             SuperJumpOnPostThinkPost(player);
             WeightDownOnPostThinkPost(player);
-            // HalePlayerSecondaryAttackBlockOnPostThinkPost(player);
+            HalePlayerSecondaryAttackBlockOnPostThinkPost(player);
         }
         
         return HookResult.Continue;

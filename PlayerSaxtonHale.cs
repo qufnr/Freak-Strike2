@@ -137,8 +137,7 @@ public partial class FreakStrike2
             var angles = playerPawn.EyeAngles;
 
             //  위를 올려다 보고 앉기를 누르고 있거나, 우클릭(2번째 공격)을 하고 있을 때 (헤일 높이 점프 대기)
-            if (((PlayerButtons.Duck & player.Buttons) != 0 && angles.X < BaseHale.SuperJumpAngleXRange) || 
-                (PlayerButtons.Attack2 & player.Buttons) != 0)
+            if (((PlayerButtons.Duck & player.Buttons) != 0 && angles.X < BaseHale.SuperJumpAngleXRange) || (PlayerButtons.Attack2 & player.Buttons) != 0)
             {
                 if (!BaseHalePlayers[slot].DoSuperJumpHold)
                 {
@@ -236,7 +235,7 @@ public partial class FreakStrike2
             if (playerPawn == null || !playerPawn.IsValid)
                 return;
             
-            if ((player.Flags & (1 << 0)) == 0)
+            if ((playerPawn.Flags & (1 << 0)) != 0)
             {
                 var eyeAngles = playerPawn.EyeAngles;
 
@@ -245,7 +244,8 @@ public partial class FreakStrike2
                     if (BaseHalePlayers[slot].WeightDownReady)
                     {
                         BaseHalePlayers[slot].WeightDownReady = false;
-                        
+
+                        BaseHalePlayers[slot].WeightDownCooldown = BaseHalePlayers[slot].MyHale!.WeightDownCooldown;
                         BaseHalePlayers[slot].WeightDownCooldownTimer = AddTimer(0.1f,
                             BaseHalePlayers[slot].WeightDownCooldownCallback(player, playerPawn.GravityScale, InGameStatus,
                                 BaseGamePlayers[slot].DebugMode), TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
@@ -265,11 +265,9 @@ public partial class FreakStrike2
     /// 헤일 플레이어 보조 공격 차단
     /// </summary>
     /// <param name="player">플레이어 객체</param>
-    private void HalePlayerSecondaryAttackBlockOnWeaponFire(CCSPlayerController player)
+    private void HalePlayerSecondaryAttackBlockOnPostThinkPost(CCSPlayerController player)
     {
-        if (player.PawnIsAlive && 
-            BaseHalePlayers[player.Slot].IsHale && 
-            (PlayerButtons.Attack2 & player.Buttons) != 0)
+        if (player.PawnIsAlive && BaseHalePlayers[player.Slot].IsHale)
         {
             var playerPawn = player.PlayerPawn.Value;
             if (playerPawn != null && playerPawn.IsValid)
