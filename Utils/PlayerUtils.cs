@@ -159,23 +159,11 @@ public class PlayerUtils
     /// 플레이어에게 프로그래스바를 생성합니다. (대테러부대일 경우 해체 UI, 테러리스트일 경우 폭탄설치 UI로 표시됩니다.)
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
-    /// <param name="duration">시간</param>
-    public static void SetPlayerProgressBar(CCSPlayerPawn player, int duration)
+    /// <param name="duration">시간 (0으로 설정 시 프로그래스바 삭제)</param>
+    public static void SetPlayerProgressBar(CCSPlayerPawn player, int duration = 0)
     {
-        player.ProgressBarDuration = duration;
-        player.ProgressBarStartTime = Server.CurrentTime;
-        Utilities.SetStateChanged(player, "CCSPlayerPawnBase", "m_iProgressBarDuration");
-        Utilities.SetStateChanged(player, "CCSPlayerPawnBase", "m_flProgressBarStartTime");
-    }
-
-    /// <summary>
-    /// 플레이어의 프로그래스바를 제거합니다.
-    /// </summary>
-    /// <param name="player">플레이어 Pawn 객체</param>
-    public static void RemovePlayerProgressBar(CCSPlayerPawn player)
-    {
-        player.ProgressBarDuration = 0;
-        player.ProgressBarStartTime = 0;
+        player.ProgressBarDuration = duration > 0 ? duration : 0;
+        player.ProgressBarStartTime = duration > 0 ? Server.CurrentTime : 0;
         Utilities.SetStateChanged(player, "CCSPlayerPawnBase", "m_iProgressBarDuration");
         Utilities.SetStateChanged(player, "CCSPlayerPawnBase", "m_flProgressBarStartTime");
     }
