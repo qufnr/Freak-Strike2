@@ -265,7 +265,7 @@ public partial class FreakStrike2
     /// 헤일 플레이어 보조 공격 차단
     /// </summary>
     /// <param name="player">플레이어 객체</param>
-    private void HalePlayerSecondaryAttackBlockOnPostThinkPost(CCSPlayerController player)
+    private void HalePlayerSecondaryAttackBlockOnWeaponFire(CCSPlayerController player)
     {
         if (player.PawnIsAlive && 
             BaseHalePlayers[player.Slot].IsHale && 

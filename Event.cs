@@ -211,7 +211,7 @@ public partial class FreakStrike2
         
         if (player != null && player.IsValid)
         {
-            // HalePlayerSecondaryAttackBlockOnWeaponFire(player);
+            HalePlayerSecondaryAttackBlockOnWeaponFire(player);
             
             //  TODO :: 테스트 후 삭제
             var playerPawn = player.PlayerPawn.Value;
