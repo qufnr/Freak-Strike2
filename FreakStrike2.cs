@@ -24,6 +24,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
         
     public GameStatus InGameStatus = GameStatus.None;   //  게임 상태
     public Timer? InGameTimer = null;                   //  게임 타이머
+    public Timer? InGameGlobalTimer = null;             //  전역 타이머 (.1초 마다 계속 실행)
     public int FindInterval = 0;                        //  헤일을 찾는 시간
 
     public required Dictionary<int, BaseGamePlayer> BaseGamePlayers;    //  서버 내 플레이어 정보
@@ -33,9 +34,12 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
     public override void Load(bool hotReload)
     {
         Console.WriteLine($"[FreakStrike2] Freak-Strike 2 ({ModuleVersion}) loaded!");
-        
+
         if (hotReload)
+        {
             Unload(hotReload);
+            CreateInGameGlobalTimer();
+        }
         
         GameEventRegister();
         HookVirtualFunctions();
@@ -47,6 +51,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
 
     public override void Unload(bool hotReload)
     {
+        KillInGameGlobalTimer();
         IgnoreRoundWinConditions();
         GameResetOnHotReload();
         GameEventDeregister();

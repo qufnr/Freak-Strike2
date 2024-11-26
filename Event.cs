@@ -22,6 +22,7 @@ public partial class FreakStrike2
         
         RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
+        RegisterListener<Listeners.OnMapEnd>(OnMapEnd);
         RegisterListener<Listeners.OnClientPutInServer>(OnClientPutInServer);
         RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnect);
         RegisterListener<Listeners.OnTick>(OnTick);
@@ -41,6 +42,7 @@ public partial class FreakStrike2
 
         RemoveListener(OnServerPrecacheResources);
         RemoveListener(OnMapStart);
+        RemoveListener(OnMapEnd);
         RemoveListener(OnClientPutInServer);
         RemoveListener(OnClientDisconnect);
         RemoveListener(OnTick);
@@ -58,11 +60,17 @@ public partial class FreakStrike2
     /// <param name="mapName">맵 이름</param>
     private void OnMapStart(string mapName)
     {
-        KillGameTimer();
+        KillInGameTimer();
+        CreateInGameGlobalTimer();
         
         BaseGamePlayers = new Dictionary<int, BaseGamePlayer>(Server.MaxPlayers);
         BaseHalePlayers = new Dictionary<int, BaseHalePlayer>(Server.MaxPlayers);
         PlayerQueuePoints = new Dictionary<int, BaseQueuePoint>(Server.MaxPlayers);
+    }
+
+    private void OnMapEnd()
+    {
+        KillInGameGlobalTimer();
     }
 
     /// <summary>
@@ -95,7 +103,6 @@ public partial class FreakStrike2
     /// </summary>
     private void OnTick()
     {
-        DebugPrintGameCondition();  //  디버그 모드 출력
     }
 
     /// <summary>
@@ -107,7 +114,7 @@ public partial class FreakStrike2
     private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo eventInfo)
     {
         RemoveEntities();                       //  맵에 불필요한 엔티티 제거
-        CreateGameTimer();                      //  게임 타이머 생성
+        CreateInGameTimer();                      //  게임 타이머 생성
         
         Utilities.GetPlayers()
             .Where(player => player.IsValid)
@@ -131,7 +138,7 @@ public partial class FreakStrike2
     /// <returns>훅 결과</returns>
     private HookResult OnRoundFreezeEnd(EventRoundFreezeEnd @event, GameEventInfo eventInfo)
     {
-        CreateGameTimer();
+        CreateInGameTimer();
 
         return HookResult.Continue;
     }
@@ -202,9 +209,11 @@ public partial class FreakStrike2
     {
         var player = @event.Userid;
         
-        //  TODO :: 테스트 후 삭제
         if (player != null && player.IsValid)
         {
+            // HalePlayerSecondaryAttackBlockOnWeaponFire(player);
+            
+            //  TODO :: 테스트 후 삭제
             var playerPawn = player.PlayerPawn.Value;
             if (playerPawn != null && playerPawn.IsValid)
             {

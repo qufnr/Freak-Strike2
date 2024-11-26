@@ -10,7 +10,7 @@ public partial class FreakStrike2
 {
     private void GameResetOnHotReload()
     {
-        KillGameTimer();
+        KillInGameTimer();
         
         Server.ExecuteCommand("mp_restartgame 1");
     }
@@ -29,7 +29,7 @@ public partial class FreakStrike2
     /// <summary>
     /// 게임 타이머를 죽입니다. (OnMapStart, OnRoundEnd)
     /// </summary>
-    private void KillGameTimer()
+    private void KillInGameTimer()
     {
         if (InGameTimer is not null)
         {
@@ -38,10 +38,30 @@ public partial class FreakStrike2
         }
     }
 
+    private void KillInGameGlobalTimer()
+    {
+        if (InGameGlobalTimer != null)
+        {
+            InGameGlobalTimer.Kill();
+            InGameGlobalTimer = null;
+        }
+    }
+
+    private void CreateInGameGlobalTimer()
+    {
+        if (InGameGlobalTimer == null)
+            InGameGlobalTimer = AddTimer(0.1f, OnTickGlobalGameTimer, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+    }
+
+    private void OnTickGlobalGameTimer()
+    {
+        DebugPrintGameCondition();  //  디버그 :: 게임 상태 출력
+    }
+
     /// <summary>
     /// 게임 타이머를 생성합니다. (OnRoundStart)
     /// </summary>
-    private void CreateGameTimer()
+    private void CreateInGameTimer()
     {
         var gameRule = CommonUtils.GetGameRules();
         if (gameRule.FreezePeriod)
@@ -64,7 +84,7 @@ public partial class FreakStrike2
     {
         if (InGameStatus == GameStatus.End)
         {
-            KillGameTimer();
+            KillInGameTimer();
             return;
         }
 
@@ -83,7 +103,7 @@ public partial class FreakStrike2
         if (FindInterval <= 0)
         {
             HalePlayerAllActiveOnTimerEnd();    //  헤일 활동 시작!!!
-            KillGameTimer();
+            KillInGameTimer();
             return;
         }
 
