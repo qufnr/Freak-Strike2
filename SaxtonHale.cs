@@ -166,7 +166,7 @@ public partial class FreakStrike2
                 BaseHalePlayers[slot].DoSuperJumpHold = false;
                 
                 //  프로그래스바 삭제
-                PlayerUtils.RemovePlayerProgressBar(playerPawn);
+                PlayerUtils.SetPlayerProgressBar(playerPawn);
 
                 var holdTime = BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks;
                 
@@ -174,7 +174,7 @@ public partial class FreakStrike2
                     holdTime > BaseHale.SuperJumpMinimumHoldTime)
                 {
                     BaseHalePlayers[slot].SuperJumpReady = false;
-                    OnHalePlayerSuperJump(player, holdTime, BaseHalePlayers[slot].MyHale!.DynamicJumpVectorScale);
+                    OnHalePlayerSuperJump(player, holdTime, BaseHalePlayers[slot].MyHale!.SuperJumpVectorScale);
                 }
             }
         }
@@ -213,11 +213,55 @@ public partial class FreakStrike2
         BaseHalePlayers[slot].MyHale!.EmitJumpSound();
         
         //  쿨타임 생성
-        BaseHalePlayers[slot].SuperJumpCooldown = hale.DynamicJumpCooldown;
+        BaseHalePlayers[slot].SuperJumpCooldown = hale.SuperJumpCooldown;
         BaseHalePlayers[slot].SuperJumpCooldownTimer = AddTimer(
             0.1f, 
             BaseHalePlayers[slot].SuperJumpCooldownCallback(player, InGameStatus, BaseGamePlayers[slot].DebugMode), 
             TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+    }
+
+    /// <summary>
+    /// 헤일 내려찍기
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    private void WeightDownOnPostThinkPost(CCSPlayerController player)
+    {
+        var slot = player.Slot;
+        if (player.IsValid && 
+            player.PawnIsAlive && 
+            !player.IsBot && 
+            (InGameStatus == GameStatus.Start || InGameStatus == GameStatus.End) &&
+            BaseHalePlayers[slot].IsHale &&
+            BaseHalePlayers[slot].MyHale!.CanUseWeightDown &&
+            !BaseGamePlayers[slot].IsStunned())
+        {
+            var playerPawn = player.PlayerPawn.Value;
+            if (playerPawn == null || !playerPawn.IsValid)
+                return;
+            
+            if ((player.Flags & (1 << 0)) == 0)
+            {
+                var eyeAngles = playerPawn.EyeAngles;
+
+                if ((PlayerButtons.Duck & player.Buttons) != 0 && eyeAngles.X > BaseHale.WeightDownAngleXRange)
+                {
+                    if (BaseHalePlayers[slot].WeightDownReady)
+                    {
+                        BaseHalePlayers[slot].WeightDownReady = false;
+                        
+                        BaseHalePlayers[slot].WeightDownCooldownTimer = AddTimer(0.1f,
+                            BaseHalePlayers[slot].WeightDownCooldownCallback(player, playerPawn.GravityScale, InGameStatus,
+                                BaseGamePlayers[slot].DebugMode), TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+
+                        var velocity = playerPawn.AbsVelocity;
+                        velocity.Z = BaseHale.WeightDownZVelocity;
+                        playerPawn.Teleport(null, null, velocity);
+
+                        playerPawn.GravityScale = BaseHale.WeightDownGravityScale;
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>

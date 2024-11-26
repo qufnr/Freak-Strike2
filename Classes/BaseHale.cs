@@ -11,6 +11,10 @@ public class BaseHale
     public static float SuperJumpMaximumHoldTime = 1f;        //  높이 점프 홀드 최대치
     public static float SuperJumpMinimumHoldTime = .3f;       //  높이 점프 홀드 최소치 (이 때(Tick) 부터 점프 가능)
     public static float SuperJumpAngleXRange = -45f;          //  높이 점프 시전 시 시점 X 각도 범위
+
+    public static float WeightDownAngleXRange = 60f;            //  내려찍기 시 시점 X 각도 범위
+    public static float WeightDownZVelocity = -1000f;           //  내려찍기 Z 축 속력
+    public static float WeightDownGravityScale = 6f;            //  내려찍기 중력
     
     [JsonPropertyName("Name")] public required string Name { get; set; }                    //  헤일 이름
     [JsonPropertyName("DesignerName")] public required string DesignerName { get; set; }    //  헤일 클래스명
@@ -27,8 +31,9 @@ public class BaseHale
     [JsonPropertyName("CanUseRage")] public bool CanUseRage { get; set; } = true;           //  분노 사용 가능 여부
     [JsonPropertyName("CanUseSuperJump")] public bool CanUseSuperJump { get; set; } = true; //  높이 점프 사용 가능 여부
     [JsonPropertyName("CanUseWeightDown")] public bool CanUseWeightDown { get; set; } = true;   //  내려찍기 사용 가능 여부
-    [JsonPropertyName("DynamicJumpVectorScale")] public float DynamicJumpVectorScale { get; set; } = 1f;    //  높이 점프 백터 값
-    [JsonPropertyName("DynamicJumpCooldown")] public float DynamicJumpCooldown { get; set; } = 5f;          //  높이 점프 쿨다운 시간
+    [JsonPropertyName("SuperJumpVectorScale")] public float SuperJumpVectorScale { get; set; } = 1f;        //  높이 점프 백터 값
+    [JsonPropertyName("SuperJumpCooldown")] public float SuperJumpCooldown { get; set; } = 5f;              //  높이 점프 쿨다운 시간
+    [JsonPropertyName("WeightDownCooldown")] public float WeightDownCooldown { get; set; } = 5f;            //  내려찍기 쿨다운 시간
     [JsonPropertyName("TaggingImmunityScale")] public float TaggingImmunityScale { get; set; } = 1f;    //  테깅 면역 (1.0 - 기본, 0.1 - 많음, 1.5 - 적음)
     [JsonPropertyName("KnockbackImmunityScale")] public float KnockbackImmunityScale { get; set; } = 1f;//  넉백 면역 (1.0 - 기본, 0.1 - 많음, 1.5 - 적음)
     [JsonPropertyName("AttackSpeed")] public float AttackSpeed { get; set; } = 1f;          //  공격 속도
@@ -146,7 +151,7 @@ public class BaseHale
     /// <summary>
     /// 플레이어 상태를 헤일로 업데이트
     /// </summary>
-    /// <param name="player"></param>
+    /// <param name="player">플레이어 객체</param>
     public void SetPlayerHaleState(CCSPlayerController player)
     {
         var playerPawn = player.PlayerPawn.Value;
