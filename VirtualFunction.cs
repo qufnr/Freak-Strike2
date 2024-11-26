@@ -18,7 +18,6 @@ public partial class FreakStrike2
         VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Hook(OnEntityTakeDamage, HookMode.Pre);
         VirtualFunctions.CCSPlayerPawnBase_PostThinkFunc.Hook(OnPostThinkPost, HookMode.Post);
         VirtualFunctions.CBaseTrigger_StartTouchFunc.Hook(OnEntityStartTouch, HookMode.Post);
-        VirtualFunctions.TerminateRoundFunc.Hook(OnCSTerminateRound, HookMode.Pre);
     }
 
     private void UnhookVirtualFunctions()
@@ -27,7 +26,6 @@ public partial class FreakStrike2
         VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Unhook(OnEntityTakeDamage, HookMode.Pre);
         VirtualFunctions.CCSPlayerPawnBase_PostThinkFunc.Unhook(OnPostThinkPost, HookMode.Post);
         VirtualFunctions.CBaseTrigger_StartTouchFunc.Unhook(OnEntityStartTouch, HookMode.Post);
-        VirtualFunctions.TerminateRoundFunc.Unhook(OnCSTerminateRound, HookMode.Pre);
     }
 
     /// <summary>
@@ -148,6 +146,7 @@ public partial class FreakStrike2
         {
             SuperJumpOnPostThinkPost(player);
             WeightDownOnPostThinkPost(player);
+            // HalePlayerSecondaryAttackBlockOnPostThinkPost(player);
         }
         
         return HookResult.Continue;
@@ -162,37 +161,21 @@ public partial class FreakStrike2
     {
         var trigger = hook.GetParam<CBaseTrigger>(0);
         var entity = hook.GetParam<CBaseEntity>(1);
+        
+        Console.WriteLine($"[FreakStrike2] trigger {trigger} entity {entity}");
 
-        if (trigger.DesignerName == "player" && entity.DesignerName == "player")
-        {
-            var targetPawn = trigger.As<CCSPlayerPawn>();
-            var playerPawn = trigger.As<CCSPlayerPawn>();
-
-            if (targetPawn.IsValid && playerPawn.IsValid)
-            {
-                //  TODO :: 터치 테스트
-                Logger.LogInformation($"[FreakStrike2] Touch :: target {targetPawn} | player {playerPawn}");
-            }
-        }
+        // if (trigger.DesignerName == "player" && entity.DesignerName == "player")
+        // {
+        //     var targetPawn = trigger.As<CCSPlayerPawn>();
+        //     var playerPawn = trigger.As<CCSPlayerPawn>();
+        //
+        //     if (targetPawn.IsValid && playerPawn.IsValid)
+        //     {
+        //         //  TODO :: 터치 테스트
+        //         Logger.LogInformation($"[FreakStrike2] Touch :: target {targetPawn} | player {playerPawn}");
+        //     }
+        // }
 
         return HookResult.Continue;
-    }
-
-    /// <summary>
-    /// CS2 라운드 종료 관리
-    /// </summary>
-    /// <param name="hook">동적 훅</param>
-    /// <returns>훅 결과</returns>
-    private HookResult OnCSTerminateRound(DynamicHook hook)
-    {
-        //  TODO :: 작동 테스트
-        
-        if (InGameStatus == GameStatus.PlayerWaiting)
-            return HookResult.Stop;
-
-        var terrorists = PlayerUtils.GetTeamAlivePlayers(CsTeam.Terrorist);
-        hook.SetParam(2, (uint) terrorists > 0 ? RoundEndReason.TerroristsWin : RoundEndReason.CTsWin);
-        
-        return HookResult.Changed;
     }
 }
