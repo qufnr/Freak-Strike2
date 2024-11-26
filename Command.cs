@@ -169,36 +169,7 @@ public partial class FreakStrike2
             
             //  순위
             case "rank":
-                var ranks = PlayerQueuePoints.Where(pqp =>
-                    {
-                        var p = Utilities.GetPlayerFromSlot(pqp.Key);
-                        return p != null && p.IsValid && !p.IsBot;
-                    })
-                    .OrderByDescending(pqp => pqp.Value.Points)
-                    .ToDictionary(
-                        pqp => Utilities.GetPlayerFromSlot(pqp.Key)!.PlayerName,
-                        pqp => pqp.Value.Points
-                    );
-                
-                if (ranks.Count > 0)
-                {
-                    cmdInfo.ReplyToCommand(player is null ? 
-                        "[FS2] -- [#순위]\t[플레이어]\t\t[큐포인트]" : 
-                        "[FS2] -- 큐포인트 소지 순위");
-
-                    var index = 1;
-                    foreach (var rank in ranks)
-                    {
-                        cmdInfo.ReplyToCommand(player is null ? 
-                            $"[FS2] -- [#{index}]\t[{rank.Key}]\t\t[{rank.Value} QP]" : 
-                            $"[FS2] -- #{index} | ${rank.Key} | {rank.Value} 큐포인트");
-                        
-                        index++;
-                    }
-                }
-                else
-                    cmdInfo.ReplyToCommand("[FS2] 서버 내에서 큐포인트를 가지고 있는 플레이어가 없습니다.");
-
+                PrintRankOfQueuePoints(player);
                 return;
             
             //  플레이어 큐포인트 설정
