@@ -50,6 +50,14 @@ public partial class FreakStrike2
             !BaseHalePlayers[player.Slot].MyHale!.Weapons.Contains(weaponVData.Name))
             return HookResult.Stop;
         
+        if (!BaseHalePlayers[player.Slot].IsHale)
+        {
+            //  인간 클래스 전용 무기 외 못 줍게 하기
+            var humanClass = BaseHumanPlayers[player.Slot].MyClass;
+            if (humanClass != null && humanClass.ExclusiveWeapons.Contains(weaponVData.Name))
+                return HookResult.Stop;
+        }
+        
         return HookResult.Continue;
     }
 
