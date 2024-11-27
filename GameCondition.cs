@@ -8,9 +8,13 @@ using FreakStrike2.Utils;
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
+    /// <summary>
+    /// 핫리로드 시 게임 재설정
+    /// </summary>
     private void GameResetOnHotReload()
     {
         KillInGameTimer();
+        KillInGameGlobalTimer();
         
         Server.ExecuteCommand("mp_restartgame 1");
     }
@@ -38,6 +42,9 @@ public partial class FreakStrike2
         }
     }
 
+    /// <summary>
+    /// 전역 타이머를 죽입니다. (OnMapEnd, Unload, HotReload)
+    /// </summary>
     private void KillInGameGlobalTimer()
     {
         if (InGameGlobalTimer != null)
@@ -47,15 +54,13 @@ public partial class FreakStrike2
         }
     }
 
+    /// <summary>
+    /// 전역 타이머를 생성합니다.
+    /// </summary>
     private void CreateInGameGlobalTimer()
     {
         if (InGameGlobalTimer == null)
             InGameGlobalTimer = AddTimer(0.1f, OnTickGlobalGameTimer, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
-    }
-
-    private void OnTickGlobalGameTimer()
-    {
-        DebugPrintGameCondition();  //  디버그 :: 게임 상태 출력
     }
 
     /// <summary>
@@ -132,16 +137,13 @@ public partial class FreakStrike2
                 break;
         }
     }
-
+    
     /// <summary>
-    /// 게임 시작이 아니고, 플레이어(victim)가 얻어 맞았을 때 피해 무효 처리
+    /// 전역 타이머 콜백
     /// </summary>
-    /// <param name="victim">피해자 플레이어</param>
-    /// <param name="attacker">가해자 플레이어</param>
-    /// <returns>기능 설명에 대한 조건이 참인지 거짓인지 반환. (true 반환 시 EventPlayerHurt 에서 Hook 을 Handled 처리합니다.)</returns>
-    private bool GameNotStartDamageIgnoreOnPlayerHurt(CCSPlayerController? victim, CCSPlayerController? attacker) => 
-        InGameStatus is not GameStatus.Start && 
-        victim is not null && victim.IsValid && 
-        attacker is not null && attacker.IsValid;
+    private void OnTickGlobalGameTimer()
+    {
+        DebugPrintGameCondition();  //  디버그 :: 게임 상태 출력
+    }
 }
 
