@@ -19,6 +19,7 @@ public partial class FreakStrike2
         RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
         RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
         RegisterEventHandler<EventWeaponFire>(OnWeaponFirePre, HookMode.Pre);
+        RegisterEventHandler<EventPlayerTeam>(OnPlayerTeam, HookMode.Pre);
         
         RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
@@ -39,6 +40,7 @@ public partial class FreakStrike2
         DeregisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
         DeregisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
         DeregisterEventHandler<EventWeaponFire>(OnWeaponFirePre, HookMode.Pre);
+        RegisterEventHandler<EventPlayerTeam>(OnPlayerTeam, HookMode.Pre);
 
         RemoveListener(OnServerPrecacheResources);
         RemoveListener(OnMapStart);
@@ -80,13 +82,13 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientPutInServer(int client)
     {
-        BaseGamePlayers[client] = new BaseGamePlayer();
-        BaseHumanPlayers[client] = new BaseHumanPlayer(client);
-        BaseHalePlayers[client] = new BaseHalePlayer();
-        PlayerQueuePoints[client] = new BaseQueuePoint();
+        BaseGamePlayers[client] = new BaseGamePlayer();     //  플레이어 데이터 초기 설정
+        BaseHalePlayers[client] = new BaseHalePlayer();     //  헤일 데이터 초기 설정
+        PlayerQueuePoints[client] = new BaseQueuePoint();   //  큐포인트 초기 설정
+        InitializeHumanClassOnClientPutInServer(client);    //  인간 진영 클래스 초기 설정
         
-        GameStartOnClientPutInServer();                 //  게임 시작 처리
-        TeamChangeOnClientPutInServer(client);          //  접속 시 팀 변경 처리
+        GameStartOnClientPutInServer();                     //  게임 시작 처리
+        TeamChangeOnClientPutInServer(client);              //  접속 시 팀 변경 처리
     }
 
     /// <summary>
@@ -96,9 +98,9 @@ public partial class FreakStrike2
     private void OnClientDisconnect(int client)
     {
         PlayerQueuePoints.Remove(client);
-        BaseGamePlayers.Remove(client);
+        BaseGamePlayers[client].Reset(client);
+        BaseHumanPlayers[client].Reset();
         BaseHalePlayers[client].Remove(client, InGameStatus);
-        BaseHalePlayers.Remove(client);
     }
 
     /// <summary>
@@ -198,7 +200,9 @@ public partial class FreakStrike2
 
         if (player != null && player.IsValid)
         {
-            InitalizeHumanClassOnPlayerSpawn(player);   //  인간 클래스 설정
+            PlayerUtils.SetPlayerMoney(player, 0);
+            
+            UpdateHumanClassStateOnPlayerSpawn(player);   //  인간 클래스 설정
         }
 
         return HookResult.Continue;
@@ -230,5 +234,18 @@ public partial class FreakStrike2
         }
 
         return HookResult.Continue;
+    }
+
+    /// <summary>
+    /// 플레이어 팀 선택
+    /// </summary>
+    /// <param name="event">이벤트</param>
+    /// <param name="eventInfo">이벤트 정보</param>
+    /// <returns>훅 결과</returns>
+    private HookResult OnPlayerTeam(EventPlayerTeam @event, GameEventInfo eventInfo)
+    {
+        // @event.Silent = true;
+        eventInfo.DontBroadcast = true;
+        return HookResult.Changed;
     }
 }
