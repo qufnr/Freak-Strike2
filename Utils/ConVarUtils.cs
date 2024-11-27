@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Modules.Cvars;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Modules.Cvars;
 
 namespace FreakStrike2.Utils;
 
@@ -22,5 +23,21 @@ public class ConVarUtils
     {
         var cvar = ConVar.Find("mp_freezetime");
         return cvar != null ? cvar.GetPrimitiveValue<int>() : 0;
+    }
+
+    /// <summary>
+    /// Convar "mp_roundtime*" 값을 float 형태로 반환합니다.
+    /// </summary>
+    /// <returns>mp_roundtime, mp_roundtime_defuse, mp_roundtime_hostage</returns>
+    public static float GetRoundTime()
+    {
+        var mapName = Server.MapName;
+        ConVar? cvar;
+        
+        if (mapName.StartsWith("de_")) cvar = ConVar.Find("mp_roundtime_defuse");
+        else if (mapName.StartsWith("cs_")) cvar = ConVar.Find("mp_roundtime_hostage");
+        else cvar = ConVar.Find("mp_roundtime");
+
+        return cvar != null ? cvar.GetPrimitiveValue<float>() : 0;
     }
 }
