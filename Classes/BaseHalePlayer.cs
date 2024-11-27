@@ -61,25 +61,7 @@ public class BaseHalePlayer
         WeightDownCooldown = hale.WeightDownCooldown;
         
         //  스폰으로 텔레포트
-        var spawnpoints = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>("info_player_counterterrorist");
-        var spawnpointEntities = new List<SpawnPoint>();
-        foreach (var spawnpoint in spawnpoints)
-        {
-            if (spawnpoint.IsValid)
-                spawnpointEntities.Add(spawnpoint);
-        }
-
-        if (spawnpointEntities.Count > 0)
-        {
-            var candidate = CommonUtils.GetRandomInList(spawnpointEntities);
-            if (candidate.IsValid && candidate.AbsOrigin != null)
-                playerPawn.Teleport(new Vector()
-                {
-                    X = candidate.AbsOrigin.X,
-                    Y = candidate.AbsOrigin.Y + 1f,
-                    Z = candidate.AbsOrigin.Z
-                });
-        }
+        PlayerUtils.TeleportToSpawnPoint(player, CsTeam.CounterTerrorist);
         
         MyHale.SetPlayer(player);
     }

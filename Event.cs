@@ -121,15 +121,12 @@ public partial class FreakStrike2
         RemoveEntities();                       //  맵에 불필요한 엔티티 제거
         CreateInGameTimer();                    //  게임 타이머 생성
         CreateRoundTimerOnRoundStart();         //  라운드 타이머 생성
-        
-        Utilities.GetPlayers()
-            .Where(player => player.IsValid)
-            .ToList()
-            .ForEach(player =>
-            {
-                BaseGamePlayers[player.Slot].Reset(player); //  게임 플레이어 초기화
-                BaseHalePlayers[player.Slot].Remove();      //  헤일 플레이어 초기화
-            });
+
+        foreach (var player in Utilities.GetPlayers().Where(p => p.IsValid))
+        {
+            BaseGamePlayers[player.Slot].Reset(player); //  게임 플레이어 초기화
+            BaseHalePlayers[player.Slot].Remove();      //  헤일 플레이어 초기화
+        }
         
         CreateHalePlayerOnRoundStart();         //  헤일 플레이어 선정
         
@@ -157,7 +154,10 @@ public partial class FreakStrike2
     /// <returns>훅 결과</returns>
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo eventInfo)
     {
+        KillInGameRoundTimer();
         DistributeQueuePointsOnRoundEnd();
+        
+        PrintRankOfDamagesToAll();
         
         InGameStatus = GameStatus.End;
         
@@ -201,8 +201,6 @@ public partial class FreakStrike2
         if (player != null && player.IsValid)
         {
             PlayerUtils.SetPlayerMoney(player, 0);
-            
-            UpdateHumanClassStateOnPlayerSpawn(player);   //  인간 클래스 설정
         }
 
         return HookResult.Continue;

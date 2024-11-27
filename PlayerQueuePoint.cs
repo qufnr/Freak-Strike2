@@ -19,7 +19,7 @@ public partial class FreakStrike2
         
         foreach (var player in Utilities.GetPlayers().Where(pl => pl.IsValid))
         {
-            if (player.IsBot || BaseHalePlayers[player.Slot].IsHale)
+            if (BaseHalePlayers[player.Slot].IsHale)
                 PlayerQueuePoints[player.Slot].Points = 0;
             else if(player.Team == CsTeam.Terrorist)
                 PlayerQueuePoints[player.Slot].Points += 10;
@@ -36,44 +36,28 @@ public partial class FreakStrike2
         if (top > 10)
             top = 10;
         
-        int rank = 0, prevPoints = int.MinValue, count = 0;
-
         var rankedPlayers = PlayerQueuePoints.Where(pair =>
-            //  유효한 플레이어만 필터
+                //  유효한 플레이어만 필터
             {
                 var pl = Utilities.GetPlayerFromSlot(pair.Key);
-                return pl != null && pl.IsValid && !pl.IsBot;
+                return pl != null && pl.IsValid;
             })
-            //  Points 내림차순
-            .OrderByDescending(pair => pair.Value.Points)
-            .Select(pair => new
-                { Name = Utilities.GetPlayerFromSlot(pair.Key)!.PlayerName, Points = pair.Value.Points })
-            .Select(pair =>
-            {
-                count++;
-                if (pair.Points != prevPoints)
-                {
-                    rank = count;
-                    prevPoints = pair.Points;
-                }
-
-                return new { Rank = rank, pair.Name, pair.Points };
-            })
+            .Select(pair => new { Name = Utilities.GetPlayerFromSlot(pair.Key)!.PlayerName, Points = pair.Value.Points })
+            .OrderByDescending(pair => pair.Points)
+            .ThenBy(pair => pair.Name)
+            .Select((pair, index) => new { Rank = index + 1, Name = pair.Name, Points = pair.Points })
             .ToList();
         
         if (player == null || !player.IsValid) Server.PrintToConsole($"[FS2] -- Queue Points Rank TOP {top}!");
         else player.PrintToChat($"[FS2] -- 큐포인트 순위 TOP {top}!");
         
-        for (var i = 1; i <= top; i++)
+        for (var i = 0; i < top; i++)
         {
-            var playersAtRank = rankedPlayers.Where(p => p.Rank == i).ToList();
-            if (playersAtRank.Any())
+            if (i < rankedPlayers.Count)
             {
-                foreach (var p in playersAtRank)
-                {
-                    if (player == null || !player.IsValid) Server.PrintToConsole($"[FS2] -- #{p.Rank} | {p.Name} | {p.Points} QP");
-                    else player.PrintToChat($"[FS2] -- #{p.Rank} | {p.Name} | {p.Points} QP");
-                }
+                var data = rankedPlayers[i];
+                if (player == null || !player.IsValid) Server.PrintToConsole($"[FS2] -- #{data.Rank} | {data.Name} | {data.Points} QP");
+                else player.PrintToChat($"[FS2] -- #{data.Rank} | {data.Name} | {data.Points} QP");
             }
             else
             {

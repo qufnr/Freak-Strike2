@@ -294,13 +294,19 @@ public partial class FreakStrike2
                 
                 if (myHuman == null)
                     cmdInfo.ReplyToCommand($"{MessagePrefix}유효하지 않은 인간 진영 클래스입니다. Type \"css_hclass\" 명령어로 인간 진영 클래스 목록을 확인 해주세요.");
+                else if (myHuman == BaseHumanPlayers[player.Slot].MyClass)
+                    cmdInfo.ReplyToCommand($"{MessagePrefix}이미 선택된 클래스입니다.");
                 else
                 {
                     BaseHumanPlayers[player.Slot].SetClass(player, myHuman);
-                    if (InGameStatus != GameStatus.Start)
+                    if (InGameStatus != GameStatus.Start && !BaseHalePlayers[player.Slot].IsHale)
                     {
                         player.SwitchTeam(CsTeam.Terrorist);
-                        player.Respawn();
+                        if (!player.PawnIsAlive)
+                        {
+                            player.Respawn();
+                            BaseHumanPlayers[player.Slot].SetHumanClassState(player);
+                        }
                     }
                 }
             }

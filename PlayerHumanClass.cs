@@ -77,20 +77,16 @@ public partial class FreakStrike2
                     player.Respawn();
             }
             else
+            {
                 player.PrintToChat($"{MessagePrefix}명령어 \"css_hclass\" 로 인간 진영 클래스를 선택해주세요.");
+                Server.NextFrame(() =>
+                {
+                    if (CommonUtils.GetGameRules().WarmupPeriod || InGameStatus == GameStatus.Warmup)
+                        player.ChangeTeam(CsTeam.Spectator);
+                    else if (player.PawnIsAlive)
+                        player.CommitSuicide(false, true);
+                });
+            }
         }
-    }
-
-    /// <summary>
-    /// 플레이어 스폰 시 인간 클래스로 업데이트합니다. (OnPlayerSpawn)
-    /// </summary>
-    /// <param name="player">플레이어 객체</param>
-    private void UpdateHumanClassStateOnPlayerSpawn(CCSPlayerController player)
-    {
-        var slot = player.Slot;
-        if (BaseHalePlayers[slot].IsHale)
-            return;
-        
-        BaseHumanPlayers[slot].SetHumanClassState(player);
     }
 }

@@ -86,48 +86,41 @@ public partial class FreakStrike2
     /// </summary>
     /// <param name="duration">표시 시간</param>
     /// <param name="top">표시 순위권</param>
-    private void PrintRankOfDamagesToAll(int duration, int top = 3)
+    private void PrintRankOfDamagesToAll(int duration = 10, int top = 3)
     {
         if (top > 5)
             top = 5;
-
-        int rank = 0, prevDamages = int.MinValue, count = 0;
 
         var rankedPlayers = BaseGamePlayers.Where(pair =>
             {
                 var pl = Utilities.GetPlayerFromSlot(pair.Key);
                 return pl != null && pl.IsValid;
             })
-            .OrderByDescending(pair => pair.Value.Damages)
-            .Select(pair => new
-                { Name = Utilities.GetPlayerFromSlot(pair.Key)!.PlayerName, Damages = pair.Value.Damages })
-            .Select(pair =>
-            {
-                count++;
-                if (pair.Damages != prevDamages)
-                {
-                    rank = count;
-                    prevDamages = pair.Damages;
-                }
-
-                return new { Rank = rank, pair.Name, pair.Damages };
-            })
+            .Select(pair => new { Name = Utilities.GetPlayerFromSlot(pair.Key)!.PlayerName, Damages = pair.Value.Damages })
+            .OrderByDescending(pair => pair.Damages)
+            .ThenBy(pair => pair.Name)
+            .Select((pair, index) => new { Rank = index + 1, Name = pair.Name, Damages = pair.Damages })
             .ToList();
 
         var text = $"가장 피해를 많이 입힌 플레이어 TOP {top}!";
 
-        for (var i = 1; i <= top; i++)
+        for (var i = 0; i < top; i++)
         {
-            var playersAtRank = rankedPlayers.Where(p => p.Rank == i).ToList();
-            if (playersAtRank.Any())
-                foreach (var p in playersAtRank)
-                    text += $"<br />#{p.Rank} | {p.Name} | {p.Damages} DMG";
+            if (i < rankedPlayers.Count)
+            {
+                var data = rankedPlayers[i];
+                text += $"<br />#{data.Rank} | {data.Name} | {data.Damages} DMG";
+            }
             else
                 text += $"<br />#-- | -- | -- DMG";
         }
         
-        foreach(var player in Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot))
-            player.PrintToCenterHtml(text, duration);
+        Server.NextFrame(() =>
+        {
+            foreach(var player in Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot))
+                player.PrintToCenterHtml(text, duration);
+        });
+        
     }
 
     /// <summary>

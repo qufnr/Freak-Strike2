@@ -24,12 +24,12 @@ public partial class FreakStrike2
             if (freezeTime > 0)
                 roundTime += freezeTime - 1f;
 
-            InGameRoundTimer = AddTimer(roundTime - .5f, () =>
+            Console.WriteLine($"ROUND TIME {roundTime}");
+            
+            InGameRoundTimer = AddTimer((roundTime - .5f) * 60f, () =>
             {
                 var humanCount = PlayerUtils.GetTeamAlivePlayers(CsTeam.Terrorist);
                 gameRules.TerminateRound(freezeTime, humanCount > 0 ? RoundEndReason.TerroristsWin : RoundEndReason.CTsWin);
-
-                PrintRankOfDamagesToAll((int) ConVarUtils.GetRoundRestartDelay());
 
                 KillInGameTimer();
             });

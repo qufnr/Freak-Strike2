@@ -36,10 +36,8 @@ public partial class FreakStrike2
     private void KillInGameTimer()
     {
         if (InGameTimer is not null)
-        {
             InGameTimer.Kill();
-            InGameTimer = null;
-        }
+        InGameTimer = null;
     }
 
     /// <summary>
@@ -48,10 +46,8 @@ public partial class FreakStrike2
     private void KillInGameGlobalTimer()
     {
         if (InGameGlobalTimer != null)
-        {
             InGameGlobalTimer.Kill();
-            InGameGlobalTimer = null;
-        }
+        InGameGlobalTimer = null;
     }
 
     /// <summary>

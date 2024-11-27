@@ -17,13 +17,13 @@ public class BaseHumanPlayer
 
     public void SetClass(CCSPlayerController player, BaseHuman human)
     {
-        MyClass = human;
-        
         if (player.PawnIsAlive)
             player.CommitSuicide(false, true);
         
         if (!player.IsBot)
             Server.PrintToChatAll($"{FreakStrike2.MessagePrefix}{player.PlayerName} 이(가) " + (MyClass != null ? $"클래스를 {human.Name} (으)로 변경했습니다." : $"{human.Name} 클래스를 선택했습니다."));
+        
+        MyClass = human;
     }
     
     /// <summary>
@@ -39,7 +39,7 @@ public class BaseHumanPlayer
                 player.ChangeTeam(CsTeam.Spectator);
             return;
         }
-        
+
         MyClass.SetPlayer(player);
     }
     

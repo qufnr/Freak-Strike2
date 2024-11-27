@@ -204,6 +204,39 @@ public class PlayerUtils
             Utilities.SetStateChanged(player, "CCSPlayerController", "m_pInGameMoneyServices");
         }
     }
+
+    /// <summary>
+    /// 플레이어를 스폰지점으로 텔레포트합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="team">팀</param>
+    /// <exception cref="Exception">팀이 유효하지 않습니다.</exception>
+    public static void TeleportToSpawnPoint(CCSPlayerController player, CsTeam team)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        
+        if (playerPawn == null)
+            return;
+
+        var entityName = team == CsTeam.CounterTerrorist
+            ? "info_player_counterterrorist"
+            : team == CsTeam.Terrorist 
+                ? "info_player_terrorist" 
+                : throw new Exception("Team is invalid!");
+        
+        var spawnpoints = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>(entityName);
+        var spawnpointEntities = new List<SpawnPoint>();
+        foreach (var spawnpoint in spawnpoints)
+            if (spawnpoint.IsValid)
+                spawnpointEntities.Add(spawnpoint);
+
+        if (spawnpointEntities.Count > 0)
+        {
+            var candidate = CommonUtils.GetRandomInList(spawnpointEntities);
+            if (candidate.IsValid && candidate.AbsOrigin != null)
+                playerPawn.Teleport(new Vector() { X = candidate.AbsOrigin.X, Y = candidate.AbsOrigin.Y + 1f, Z = candidate.AbsOrigin.Z });
+        }
+    }
     
     /// <summary>
     /// #UserId 혹은 플레이어 이름으로 플레이어 객체를 찾습니다.

@@ -86,6 +86,14 @@ public partial class FreakStrike2
         
         player.PrintToCenterAlert($"귀하가 이번 라운드의 헤일 {BaseHalePlayers[player.Slot].MyHale!.Name} (으)로 선정되었습니다!");
         Logger.LogInformation($"[FreakStrike2] {player.PlayerName}({player.AuthorizedSteamID!.SteamId64}) has been chosen as the Hale for {hale.Name}!");
+        
+        //  헤일 외 다른 플레이어는 인간 진영으로 이동
+        foreach (var other in Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive && !BaseHalePlayers[p.Slot].IsHale))
+        {
+            BaseHumanPlayers[other.Slot].SetHumanClassState(other);     //  플레이어 클래스 설정
+            other.SwitchTeam(CsTeam.Terrorist);                         //  팀 변경
+            PlayerUtils.TeleportToSpawnPoint(other, CsTeam.Terrorist);  //  스폰으로 텔레포트
+        }
     }
 
     /// <summary>

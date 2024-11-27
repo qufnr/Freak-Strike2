@@ -66,7 +66,7 @@ public class BaseHuman
 
         playerPawn.MaxHealth = MaxHealth;
         playerPawn.Health = MaxHealth;
-        playerPawn.VelocityModifier *= Laggedmovement;
+        playerPawn.VelocityModifier = 1.0f * Laggedmovement;
         playerPawn.GravityScale = Gravity;
         PlayerUtils.SetPlayerHelmet(playerPawn);
         
