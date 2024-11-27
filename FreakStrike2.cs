@@ -16,6 +16,9 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
     public static string PluginConfigDirectory = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
     public static string HaleConfigFilename = "playable_hales.json";
     public static string HumanConfigFilename = "playable_humans.json";
+
+    public static string MessagePrefix = "[FS2] ";
+    public static string LogMessagePrefix = "[FreakStrike2] ";
     
     public required GameConfig Config { get; set; }              //  플러그인 콘피그
     
