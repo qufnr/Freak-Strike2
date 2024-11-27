@@ -117,7 +117,8 @@ public partial class FreakStrike2
     private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo eventInfo)
     {
         RemoveEntities();                       //  맵에 불필요한 엔티티 제거
-        CreateInGameTimer();                      //  게임 타이머 생성
+        CreateInGameTimer();                    //  게임 타이머 생성
+        CreateRoundTimerOnRoundStart();         //  라운드 타이머 생성
         
         Utilities.GetPlayers()
             .Where(player => player.IsValid)
