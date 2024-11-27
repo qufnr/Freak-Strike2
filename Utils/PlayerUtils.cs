@@ -189,6 +189,21 @@ public class PlayerUtils
             Utilities.SetStateChanged(player, "CBasePlayerPawn", "m_pItemServices");
         }
     }
+
+    /// <summary>
+    /// 플레이어의 인-게임 자금을 설정합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="amount">자금</param>
+    public static void SetPlayerMoney(CCSPlayerController player, int amount)
+    {
+        var inGameMoneyServices = player.InGameMoneyServices;
+        if (inGameMoneyServices != null)
+        {
+            inGameMoneyServices.Account = amount;
+            Utilities.SetStateChanged(player, "CCSPlayerController", "m_pInGameMoneyServices");
+        }
+    }
     
     /// <summary>
     /// #UserId 혹은 플레이어 이름으로 플레이어 객체를 찾습니다.
