@@ -67,6 +67,12 @@ public partial class FreakStrike2
         victimPawn.Teleport(null, null, direction * damage);
     }
 
+    /// <summary>
+    /// 헤일에게 피해를 입힐 시 피해량을 추가합니다.
+    /// </summary>
+    /// <param name="victim">피해자 (헤일)</param>
+    /// <param name="attacker">가해자 (인간)</param>
+    /// <param name="damage">피해량</param>
     private void AddDamageOnPlayerHurt(CCSPlayerController victim, CCSPlayerController attacker, int damage)
     {
         if (!victim.PawnIsAlive || victim == attacker || !BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale)
