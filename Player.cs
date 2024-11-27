@@ -74,4 +74,67 @@ public partial class FreakStrike2
 
         BaseGamePlayers[attacker.Slot].Damages += damage;
     }
+
+    /// <summary>
+    /// 플레이어에게 피해량 순위를 출력합니다.
+    /// </summary>
+    /// <param name="duration">표시 시간</param>
+    /// <param name="top">표시 순위권</param>
+    private void PrintRankOfDamagesToAll(int duration, int top = 3)
+    {
+        if (top > 5)
+            top = 5;
+
+        int rank = 0, prevDamages = int.MinValue, count = 0;
+
+        var rankedPlayers = BaseGamePlayers.Where(pair =>
+            {
+                var pl = Utilities.GetPlayerFromSlot(pair.Key);
+                return pl != null && pl.IsValid;
+            })
+            .OrderByDescending(pair => pair.Value.Damages)
+            .Select(pair => new
+                { Name = Utilities.GetPlayerFromSlot(pair.Key)!.PlayerName, Damages = pair.Value.Damages })
+            .Select(pair =>
+            {
+                count++;
+                if (pair.Damages != prevDamages)
+                {
+                    rank = count;
+                    prevDamages = pair.Damages;
+                }
+
+                return new { Rank = rank, pair.Name, pair.Damages };
+            })
+            .ToList();
+
+        var text = $"가장 피해를 많이 입힌 플레이어 TOP {top}!";
+
+        for (var i = 1; i <= top; i++)
+        {
+            var playersAtRank = rankedPlayers.Where(p => p.Rank == i).ToList();
+            if (playersAtRank.Any())
+                foreach (var p in playersAtRank)
+                    text += $"<br />#{p.Rank} | {p.Name} | {p.Damages} DMG";
+            else
+                text += $"<br />#-- | -- | -- DMG";
+        }
+        
+        foreach(var player in Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot))
+            player.PrintToCenterHtml(text, duration);
+    }
+
+    /// <summary>
+    /// 가장 피해를 많이 입힌 플레이어 순서대로 딕셔너리 자료형으로 반환합니다.
+    /// </summary>
+    /// <returns>피해량 순서 플레이어 딕셔너리</returns>
+    private Dictionary<string, int> GetPlayersDamageRank()
+    {
+        var ranking = new Dictionary<string, int>();
+        foreach(var player in Utilities.GetPlayers().Where(player => player.IsValid))
+            ranking.Add(player.PlayerName, BaseGamePlayers[player.Slot].Damages);
+        
+        return ranking.OrderByDescending(pair => pair.Value)
+            .ToDictionary();
+    }
 }
