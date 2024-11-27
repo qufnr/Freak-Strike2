@@ -103,6 +103,13 @@ public class BaseGamePlayer
         }
     }
 
+    public void Reset(int slot)
+    {
+        var player = Utilities.GetPlayerFromSlot(slot);
+        if(player != null)
+            Reset(player);
+    }
+
     /// <summary>
     /// 플레이어의 디버그 모드를 토글합니다.
     /// </summary>
