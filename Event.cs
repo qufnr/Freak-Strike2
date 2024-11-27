@@ -198,7 +198,7 @@ public partial class FreakStrike2
 
         if (player != null && player.IsValid)
         {
-            BaseGamePlayers[player.Slot].Damages = 0; //  피해량 초기화
+            InitalizeHumanClassOnPlayerSpawn(player);   //  인간 클래스 설정
         }
 
         return HookResult.Continue;

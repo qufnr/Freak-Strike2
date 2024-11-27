@@ -1,4 +1,5 @@
 ﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using Microsoft.Extensions.Logging;
@@ -55,5 +56,18 @@ public partial class FreakStrike2
                 Log.Information($"[FreakStrike2] Precaching {human.Name} Weapon models...");
             }
         }
+    }
+
+    /// <summary>
+    /// 플레이어 스폰 시 인간 클래스로 설정합니다. (OnPlayerSpawn)
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    private void InitalizeHumanClassOnPlayerSpawn(CCSPlayerController player)
+    {
+        var slot = player.Slot;
+        if (BaseHalePlayers[slot].IsHale)
+            return;
+        
+        BaseHumanPlayers[slot].SetHumanClassState(player);
     }
 }
