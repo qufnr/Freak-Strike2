@@ -23,6 +23,13 @@ public class PlayerUtils
     /// <param name="player">플레이어 객체</param>
     /// <returns>콘솔이면 true, 아니면 false 반환</returns>
     public static bool PlayerIsConsole(CCSPlayerController? player) => player is null || player.Slot <= 0;
+
+    /// <summary>
+    /// 유효한 플레이어들을 반환합니다.
+    /// </summary>
+    /// <returns>유효한 플레이어들</returns>
+    public static List<CCSPlayerController> FindValidPlayers() =>
+        Utilities.GetPlayers().Where(p => p.IsValid).ToList();
     
     /// <summary>
     /// 살아있는 플레이어들을 반환합니다.
