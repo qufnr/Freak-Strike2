@@ -154,7 +154,8 @@ public partial class FreakStrike2
     /// <returns>훅 결과</returns>
     private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo eventInfo)
     {
-        BaseQueuePoint.Calculate(PlayerQueuePoints, BaseHalePlayers, InGameStatus);   //  게임 종료 시 Queuepoint 계산 
+        DistributeQueuePointsOnRoundEnd();
+        
         InGameStatus = GameStatus.End;
         
         return HookResult.Continue;

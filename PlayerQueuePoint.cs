@@ -1,10 +1,31 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Classes;
+using FreakStrike2.Models;
 
 namespace FreakStrike2;
 
 public partial class FreakStrike2
 {
+    /// <summary>
+    /// 큐포인트를 배분합니다.
+    /// </summary>
+    private void DistributeQueuePointsOnRoundEnd()
+    {
+        //  라운드 종료 시 게임 상태를 End 로 바꾸기 전이라서 Start 가 아닐 경우 큐포인트 배분하지 않음
+        if (InGameStatus != GameStatus.Start)
+            return;
+        
+        foreach (var player in Utilities.GetPlayers().Where(pl => pl.IsValid))
+        {
+            if (player.IsBot || BaseHalePlayers[player.Slot].IsHale)
+                PlayerQueuePoints[player.Slot].Points = 0;
+            else if(player.Team == CsTeam.Terrorist)
+                PlayerQueuePoints[player.Slot].Points += 10;
+        }
+    }
+    
     /// <summary>
     /// 플레이어 큐포인트 순위를 표시합니다.
     /// </summary>

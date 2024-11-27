@@ -24,8 +24,8 @@ public class BaseHalePlayer
     public float SuperJumpHoldStartTicks { get; set; } = 0f;    //  높이 점프 홀드 시작 틱
     public float SuperJumpCooldown { get; set; } = 5f;
     public Timer? SuperJumpCooldownTimer { get; set; } = null;
-    
-    public bool IsHale { get; private set; } = false;
+
+    public bool IsHale => MyHale != null;
 
     public BaseHale? MyHale { get; private set; } = null;
     public HaleType Type { get; private set; } = HaleType.None;
@@ -56,7 +56,6 @@ public class BaseHalePlayer
 
         MyHale = hale;
         Type = HaleType.Hale;
-        IsHale = true;
 
         SuperJumpCooldown = hale.SuperJumpCooldown;
         WeightDownCooldown = hale.WeightDownCooldown;
@@ -173,7 +172,6 @@ public class BaseHalePlayer
         
         MyHale = null;
         Type = HaleType.None;
-        IsHale = false;
         
         WeightDownReady = true;
         WeightDownAction = WeightDownAction.None;
