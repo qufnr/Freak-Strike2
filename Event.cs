@@ -200,7 +200,7 @@ public partial class FreakStrike2
 
         if (player != null && player.IsValid)
         {
-            PlayerUtils.SetPlayerMoney(player, 0);
+            player.SetMoney(0);
         }
 
         return HookResult.Continue;

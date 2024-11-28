@@ -78,7 +78,7 @@ public partial class FreakStrike2
 
         var hale = CommonUtils.GetRandomInList(Hales);
         BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale);
-        PlayerUtils.SetPlayerMoveType(playerPawn, MoveType_t.MOVETYPE_NONE);
+        playerPawn.SetMoveType(MoveType_t.MOVETYPE_NONE);
         playerPawn.AbsVelocity.X = 0;
         playerPawn.AbsVelocity.Y = 0;
         playerPawn.AbsVelocity.Z = 0;
@@ -92,7 +92,7 @@ public partial class FreakStrike2
         {
             BaseHumanPlayers[other.Slot].SetHumanClassState(other);     //  플레이어 클래스 설정
             other.SwitchTeam(CsTeam.Terrorist);                         //  팀 변경
-            PlayerUtils.TeleportToSpawnPoint(other, CsTeam.Terrorist);  //  스폰으로 텔레포트
+            other.TeleportToSpawnPoint(CsTeam.Terrorist);               //  스폰으로 텔레포트
         }
     }
 
@@ -115,7 +115,7 @@ public partial class FreakStrike2
                     {
                         var playerPawn = player.PlayerPawn.Value;
                         if (playerPawn != null && playerPawn.IsValid)
-                            PlayerUtils.SetPlayerMoveType(playerPawn, MoveType_t.MOVETYPE_WALK);
+                            playerPawn.SetMoveType(MoveType_t.MOVETYPE_WALK);
                         player.PrintToCenter("라운드가 시작했습니다. 모든 인간 진영을 처치하세요!");
                     }
                     else
@@ -155,7 +155,7 @@ public partial class FreakStrike2
                     BaseHalePlayers[slot].SuperJumpHoldStartTicks = Server.CurrentTime;
                     
                     //  프로그래스바 생성
-                    PlayerUtils.SetPlayerProgressBar(playerPawn, (int) BaseHale.SuperJumpMaximumHoldTime);
+                    playerPawn.SetProgressBar((int) BaseHale.SuperJumpMaximumHoldTime);
                 }
 
                 if (BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks < BaseHale.SuperJumpMaximumHoldTime)
@@ -170,7 +170,7 @@ public partial class FreakStrike2
                 BaseHalePlayers[slot].DoSuperJumpHold = false;
                 
                 //  프로그래스바 삭제
-                PlayerUtils.SetPlayerProgressBar(playerPawn);
+                playerPawn.SetProgressBar();
 
                 var holdTime = BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks;
                 
@@ -283,8 +283,8 @@ public partial class FreakStrike2
                 if (playerPawn.WeaponServices != null)
                 {
                     var activeWeapon = playerPawn.WeaponServices.ActiveWeapon.Value;
-                    if (activeWeapon != null && WeaponUtils.GetDesignerName(activeWeapon).Contains("knife"))
-                        WeaponUtils.SetWeaponNextSecondaryAttackTick(activeWeapon, (int) Server.CurrentTime + 99999);
+                    if (activeWeapon != null && activeWeapon.GetDesignerNameEx().Contains("knife"))
+                        activeWeapon.SetWeaponNextSecondaryAttackTick((int) Server.CurrentTime + 99999);
                 }
             }
         }

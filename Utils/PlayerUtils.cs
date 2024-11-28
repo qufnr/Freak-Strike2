@@ -8,7 +8,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 
 namespace FreakStrike2.Utils;
 
-public class PlayerUtils
+public static class PlayerUtils
 {
     public enum ScreenFadeFlags
     {
@@ -22,7 +22,7 @@ public class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <returns>콘솔이면 true, 아니면 false 반환</returns>
-    public static bool PlayerIsConsole(CCSPlayerController? player) => player is null || player.Slot <= 0;
+    public static bool IsConsole(this CCSPlayerController? player) => player is null || player.Slot <= 0;
 
     /// <summary>
     /// 유효한 플레이어들을 반환합니다.
@@ -74,7 +74,7 @@ public class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <returns>시점 위치 벡터</returns>
-    public static Vector? GetPlayerEyePosition(CCSPlayerController player)
+    public static Vector? GetEyePosition(this CCSPlayerController player)
     {
         var playerPawn = player.PlayerPawn.Value;
         if (playerPawn is null)
@@ -96,7 +96,7 @@ public class PlayerUtils
     /// <remarks>
     /// 참고 자료: https://discord.com/channels/1160907911501991946/1175947333880524962/1230542480903110716
     /// </remarks>
-    public static CCSPlayerController? GetPlayerTarget(CCSPlayerController player)
+    public static CCSPlayerController? GetTarget(this CCSPlayerController player)
     {
         var gameRules = CommonUtils.GetGameRules();
         VirtualFunctionWithReturn<IntPtr, IntPtr, IntPtr> findPickerEntity = new(gameRules.Handle, 28);
@@ -116,7 +116,7 @@ public class PlayerUtils
     /// <remarks>
     /// 참고 자료: https://discord.com/channels/1160907911501991946/1175947333880524962/1277984855384260762
     /// </remarks>
-    public static void SetColorScreen(CCSPlayerController player, Color color, float hold = .1f, float fade = .2f, ScreenFadeFlags screenFadeFlags = ScreenFadeFlags.FadeIn, bool withPurge = true)
+    public static void SetColorScreen(this CCSPlayerController player, Color color, float hold = .1f, float fade = .2f, ScreenFadeFlags screenFadeFlags = ScreenFadeFlags.FadeIn, bool withPurge = true)
     {
         var userMessage = UserMessage.FromId(106);
         userMessage.SetInt("hold_time", Convert.ToInt32(hold * 512));
@@ -141,7 +141,7 @@ public class PlayerUtils
     /// <remarks>
     /// 참고 자료: https://discord.com/channels/1160907911501991946/1175947333880524962/1237721748376518666
     /// </remarks>
-    public static void SetPlayerModelSize(CCSPlayerController player, float scale)
+    public static void SetModelSize(this CCSPlayerController player, float scale)
     {
         var playerPawn = player.PlayerPawn.Value;
         if (playerPawn is null)
@@ -155,7 +155,7 @@ public class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
     /// <param name="moveType">움직임 유형</param>
-    public static void SetPlayerMoveType(CCSPlayerPawn player, MoveType_t moveType)
+    public static void SetMoveType(this CCSPlayerPawn player, MoveType_t moveType)
     {
         player.MoveType = moveType;
         player.ActualMoveType = moveType;
@@ -167,7 +167,7 @@ public class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
     /// <param name="duration">시간 (0으로 설정 시 프로그래스바 삭제)</param>
-    public static void SetPlayerProgressBar(CCSPlayerPawn player, int duration = 0)
+    public static void SetProgressBar(this CCSPlayerPawn player, int duration = 0)
     {
         player.ProgressBarDuration = duration > 0 ? duration : 0;
         player.ProgressBarStartTime = duration > 0 ? Server.CurrentTime : 0;
@@ -179,13 +179,16 @@ public class PlayerUtils
     /// 플레이어에게 헬멧을 장착합니다.
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
-    public static void SetPlayerHelmet(CCSPlayerPawn player)
+    /// <param name="helmet">헬멧</param>
+    /// <param name="heavy">헤비 헬멧</param>
+    public static void SetHelmet(this CCSPlayerPawn player, bool helmet = false, bool heavy = false)
     {
         var itemServices = player.ItemServices;
         if (itemServices != null)
         {
             CCSPlayer_ItemServices services = new(itemServices.Handle);
-            services.HasHelmet = true;
+            services.HasHelmet = helmet;
+            services.HasHeavyArmor = heavy;
             Utilities.SetStateChanged(player, "CBasePlayerPawn", "m_pItemServices");
         }
     }
@@ -195,7 +198,7 @@ public class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <param name="amount">자금</param>
-    public static void SetPlayerMoney(CCSPlayerController player, int amount)
+    public static void SetMoney(this CCSPlayerController player, int amount)
     {
         var inGameMoneyServices = player.InGameMoneyServices;
         if (inGameMoneyServices != null)
@@ -211,7 +214,7 @@ public class PlayerUtils
     /// <param name="player">플레이어 객체</param>
     /// <param name="team">팀</param>
     /// <exception cref="Exception">팀이 유효하지 않습니다.</exception>
-    public static void TeleportToSpawnPoint(CCSPlayerController player, CsTeam team)
+    public static void TeleportToSpawnPoint(this CCSPlayerController player, CsTeam team)
     {
         var playerPawn = player.PlayerPawn.Value;
         

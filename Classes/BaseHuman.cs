@@ -68,7 +68,7 @@ public class BaseHuman
         playerPawn.Health = MaxHealth;
         playerPawn.VelocityModifier = 1.0f * Laggedmovement;
         playerPawn.GravityScale = Gravity;
-        PlayerUtils.SetPlayerHelmet(playerPawn);
+        playerPawn.SetHelmet(true);
         
         player.RemoveWeapons();
 
@@ -90,9 +90,9 @@ public class BaseHuman
             
             foreach (var modelWeapon in modelWeapons)
             {
-                var weapon = WeaponUtils.FindPlayerWeapon(player, modelWeapon[0]);
+                var weapon = player.FindWeapon(modelWeapon[0]);
                 if (weapon != null)
-                    WeaponUtils.UpdatePlayerWeaponModel(player, weapon, modelWeapon[1], true);
+                    player.UpdateWeaponModel(weapon, modelWeapon[1], true);
             }
         });
     }

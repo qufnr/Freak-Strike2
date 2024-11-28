@@ -162,7 +162,7 @@ public class BaseHale
             playerPawn.Health = playerPawn.MaxHealth;
             playerPawn.VelocityModifier *= Laggedmovement;
             playerPawn.GravityScale = playerPawn.GravityScale;
-            PlayerUtils.SetPlayerHelmet(playerPawn);
+            playerPawn.SetHelmet(true);
             
             player.RemoveWeapons();
             Weapons.ForEach(namedItem => player.GiveNamedItem(namedItem));
@@ -174,9 +174,9 @@ public class BaseHale
 
                 if (!string.IsNullOrEmpty(Viewmodel))
                 {
-                    var weapon = WeaponUtils.FindPlayerWeapon(player, "weapon_knife");
+                    var weapon = player.FindWeapon("weapon_knife");
                     if (weapon is not null)
-                        WeaponUtils.UpdatePlayerWeaponModel(player, weapon, Viewmodel, true);
+                        player.UpdateWeaponModel(weapon, Viewmodel, true);
                 }
             });
         }

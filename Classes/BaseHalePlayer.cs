@@ -14,7 +14,6 @@ namespace FreakStrike2.Classes;
 public class BaseHalePlayer
 {
     public bool WeightDownReady { get; set; } = true; //  내려찍기 준비
-    public WeightDownAction WeightDownAction { get; set; } = WeightDownAction.None; //  내려찍기 액션 값
     public float WeightDownCooldown { get; set; } = 0f;         //  내려찍기 쿨다운
     public Timer? WeightDownCooldownTimer { get; set; } = null; //  내려찍기 쿨다운 타이머
     
@@ -61,7 +60,7 @@ public class BaseHalePlayer
         WeightDownCooldown = hale.WeightDownCooldown;
         
         //  스폰으로 텔레포트
-        PlayerUtils.TeleportToSpawnPoint(player, CsTeam.CounterTerrorist);
+        player.TeleportToSpawnPoint(CsTeam.CounterTerrorist);
         
         MyHale.SetPlayer(player);
     }
@@ -156,7 +155,6 @@ public class BaseHalePlayer
         Type = HaleType.None;
         
         WeightDownReady = true;
-        WeightDownAction = WeightDownAction.None;
         WeightDownCooldown = 5f;
         if (WeightDownCooldownTimer != null) WeightDownCooldownTimer.Kill();
         WeightDownCooldownTimer = null;

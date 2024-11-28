@@ -37,7 +37,7 @@ public class BaseGamePlayer
     {
         StunTime = StunTime != 0 ? (Server.CurrentTime - StunTime) + stunTime : Server.CurrentTime + stunTime;
         
-        PlayerUtils.SetPlayerMoveType(player, MoveType_t.MOVETYPE_NONE);
+        player.SetMoveType(MoveType_t.MOVETYPE_NONE);
 
         KillStunTimer();
         StunTimer = stunTimer;
@@ -54,7 +54,7 @@ public class BaseGamePlayer
             StunTime = 0;
             KillStunTimer();
             if(player != null && player.IsValid && player.MoveType == MoveType_t.MOVETYPE_NONE)
-                PlayerUtils.SetPlayerMoveType(player, MoveType_t.MOVETYPE_WALK);
+                player.SetMoveType(MoveType_t.MOVETYPE_WALK);
         }
     }
 
@@ -82,7 +82,7 @@ public class BaseGamePlayer
         {
             //  땅을 밟고 있고, MoveType 이 NONE 이 아닐 경우 MoveType 을 NONE 으로 만든다.
             if ((playerPawn.Flags & (1 << 0)) != 0 && playerPawn.MoveType != MoveType_t.MOVETYPE_NONE)
-                PlayerUtils.SetPlayerMoveType(playerPawn, MoveType_t.MOVETYPE_NONE);
+                playerPawn.SetMoveType(MoveType_t.MOVETYPE_NONE);
         }
         
         if (debug && player.IsValid)

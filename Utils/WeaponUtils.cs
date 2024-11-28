@@ -6,14 +6,14 @@ using CounterStrikeSharp.API.Modules.Utils;
 
 namespace FreakStrike2.Utils;
 
-public class WeaponUtils
+public static class WeaponUtils
 {
     /// <summary>
     /// 조금 더 정확한 무기의 Designer 명을 반환합니다.
     /// </summary>
     /// <param name="weapon">무기 객체</param>
     /// <returns>Designer Name</returns>
-    public static string GetDesignerName(CBasePlayerWeapon weapon)
+    public static string GetDesignerNameEx(this CBasePlayerWeapon weapon)
     {
         var designerName = weapon.DesignerName;
         var index = weapon.AttributeManager.Item.ItemDefinitionIndex;
@@ -31,7 +31,7 @@ public class WeaponUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <returns>플레이어의 Viewmodel</returns>
-    public static CBaseViewModel? GetViewmodel(CCSPlayerController player)
+    public static CBaseViewModel? GetViewmodel(this CCSPlayerController player)
     {
         var handle = player.PlayerPawn.Value!.ViewModelServices!.Handle;
         if (handle == IntPtr.Zero)
@@ -48,9 +48,9 @@ public class WeaponUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <returns>Viewmodel 명 </returns>
-    public static string GetViewmodelName(CCSPlayerController player)
+    public static string GetViewmodelName(this CCSPlayerController player)
     {
-        return GetViewmodel(player)?.VMName ?? string.Empty;
+        return player.GetViewmodel()?.VMName ?? string.Empty;
     }
     
     /// <summary>
@@ -58,9 +58,9 @@ public class WeaponUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <param name="model">모델 경로</param>
-    public static void SetViewmodel(CCSPlayerController player, string model)
+    public static void SetViewmodel(this CCSPlayerController player, string model)
     {
-        GetViewmodel(player)?.SetModel(model);
+        player.GetViewmodel()?.SetModel(model);
     }
 
     /// <summary>
@@ -70,12 +70,12 @@ public class WeaponUtils
     /// <param name="weapon">플레이어 무기 객체</param>
     /// <param name="model">모델 </param>
     /// <param name="updateViewmodel">Viewmodel 업데이트 여부</param>
-    public static void UpdatePlayerWeaponModel(CCSPlayerController player, CBasePlayerWeapon weapon, string model, bool updateViewmodel)
+    public static void UpdateWeaponModel(this CCSPlayerController player, CBasePlayerWeapon weapon, string model, bool updateViewmodel)
     {
-        weapon.Globalname = $"{GetViewmodelName(player)}:{model}";
+        weapon.Globalname = $"{player.GetViewmodelName()}:{model}";
         weapon.SetModel(model);
         if(updateViewmodel)
-            SetViewmodel(player, model);
+            player.SetViewmodel(model);
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class WeaponUtils
     /// <param name="player">플레이어 객체</param>
     /// <param name="weapon">무기 객체</param>
     /// <param name="updateViewmodel">Viewmodel 업데이트 여부</param>
-    public static void RemovePlayerWeaponModel(CCSPlayerController player, CBasePlayerWeapon weapon, bool updateViewmodel)
+    public static void RemoveWeaponModel(this CCSPlayerController player, CBasePlayerWeapon weapon, bool updateViewmodel)
     {
         if (string.IsNullOrEmpty(weapon.Globalname))
             return;
@@ -92,7 +92,7 @@ public class WeaponUtils
         weapon.Globalname = string.Empty;
         weapon.SetModel(weaponModel);
         if(updateViewmodel)
-            SetViewmodel(player, weaponModel);
+            player.SetViewmodel(weaponModel);
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ public class WeaponUtils
     /// <param name="player">플레이어 객체</param>
     /// <param name="drop">무기 떨어뜨리기 여부 (삭제되는 무기를 땅에 떨어뜨립니다.)</param>
     /// <param name="ignoreKnife">삭제 무기 중 근접무기 제외 여부</param>
-    public static void ForceRemoveWeapons(CCSPlayerController player, bool drop = false, bool ignoreKnife = false)
+    public static void ForceRemoveWeapons(this CCSPlayerController player, bool drop = false, bool ignoreKnife = false)
     {
         //  TODO :: 크래시남 고치기
         var playerPawn = player.PlayerPawn.Value;
@@ -120,7 +120,7 @@ public class WeaponUtils
                 if (ignoreKnife && weaponVData!.GearSlot is gear_slot_t.GEAR_SLOT_KNIFE)
                     continue;
                 if (drop)
-                    ForceDropPlayerWeaponByDesignerName(player, weapon.Value.DesignerName);
+                    player.ForceDropWeaponByDesignerName(weapon.Value.DesignerName);
                 else
                     weapon.Value.Remove();
             }
@@ -132,7 +132,7 @@ public class WeaponUtils
     /// </summary>
     /// <param name="weapon">무기 객체</param>
     /// <param name="nextTick">틱</param>
-    public static void SetWeaponNextSecondaryAttackTick(CBasePlayerWeapon weapon, int nextTick)
+    public static void SetWeaponNextSecondaryAttackTick(this CBasePlayerWeapon weapon, int nextTick)
     {
         weapon.NextSecondaryAttackTick = nextTick;
         Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_nNextSecondaryAttackTick");
@@ -145,13 +145,13 @@ public class WeaponUtils
     /// <param name="designerName">무기 Designer 명</param>
     /// <param name="contains">찾을 때 일부 일치 여부</param>
     /// <returns>무기를 소지하고 있으면 true, 아니면 false 반환</returns>
-    public static bool HasWeaponByDesignerName(CCSPlayerController player, string designerName, bool contains = false)
+    public static bool HasWeaponByDesignerName(this CCSPlayerController player, string designerName, bool contains = false)
     {
         return player.PlayerPawn.Value!.WeaponServices!.MyWeapons
             .Where(w => 
                 contains ? 
-                    GetDesignerName(w.Value!).Contains(designerName) : 
-                    GetDesignerName(w.Value!) == designerName)
+                    w.Value!.GetDesignerNameEx().Contains(designerName) : 
+                    w.Value!.GetDesignerNameEx() == designerName)
             .Count() > 0;
     }
     
@@ -161,18 +161,18 @@ public class WeaponUtils
     /// <param name="player">플레이어 객체</param>
     /// <param name="weaponName">무기 이름 (Designer Name)</param>
     /// <returns>무기 객체</returns>
-    public static CBasePlayerWeapon? FindPlayerWeapon(CCSPlayerController player, string weaponName)
+    public static CBasePlayerWeapon? FindWeapon(this CCSPlayerController player, string weaponName)
     {
         var weaponServices = player.PlayerPawn.Value!.WeaponServices;
         if (weaponServices is null)
             return null;
 
         var activeWeapon = weaponServices.ActiveWeapon.Value;
-        if (activeWeapon is not null && GetDesignerName(activeWeapon) == weaponName)
+        if (activeWeapon is not null && activeWeapon.GetDesignerNameEx() == weaponName)
             return activeWeapon;
 
         return weaponServices.MyWeapons
-            .SingleOrDefault(mw => mw.Value != null && GetDesignerName(mw.Value) == weaponName)
+            .SingleOrDefault(mw => mw.Value != null && mw.Value!.GetDesignerNameEx() == weaponName)
             ?.Value;
     }
 
@@ -181,10 +181,10 @@ public class WeaponUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <param name="weaponName">무기 Designer 명</param>
-    public static void ForceDropPlayerWeaponByDesignerName(CCSPlayerController player, string weaponName)
+    public static void ForceDropWeaponByDesignerName(this CCSPlayerController player, string weaponName)
     {
         var weapon = player.PlayerPawn.Value!.WeaponServices!.MyWeapons
-            .Where(w => GetDesignerName(w.Value!) == weaponName)
+            .Where(w => w.Value!.GetDesignerNameEx() == weaponName)
             .FirstOrDefault();
         if (weapon is not null && weapon.IsValid)
         {
