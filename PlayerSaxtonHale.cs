@@ -155,7 +155,7 @@ public partial class FreakStrike2
                     BaseHalePlayers[slot].SuperJumpHoldStartTicks = Server.CurrentTime;
                     
                     //  프로그래스바 생성
-                    playerPawn.SetProgressBar((int) BaseHale.SuperJumpMaximumHoldTime);
+                    player.SetProgressBar((int) BaseHale.SuperJumpMaximumHoldTime);
                 }
 
                 if (BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks < BaseHale.SuperJumpMaximumHoldTime)
@@ -170,7 +170,7 @@ public partial class FreakStrike2
                 BaseHalePlayers[slot].DoSuperJumpHold = false;
                 
                 //  프로그래스바 삭제
-                playerPawn.SetProgressBar();
+                player.SetProgressBar();
 
                 var holdTime = BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks;
                 

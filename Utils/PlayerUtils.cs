@@ -171,12 +171,16 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
     /// <param name="duration">시간 (0으로 설정 시 프로그래스바 삭제)</param>
-    public static void SetProgressBar(this CCSPlayerPawn player, int duration = 0)
+    public static void SetProgressBar(this CCSPlayerController player, int duration = 0)
     {
-        player.ProgressBarDuration = duration > 0 ? duration : 0;
-        player.ProgressBarStartTime = duration > 0 ? Server.CurrentTime : 0;
-        Utilities.SetStateChanged(player, "CCSPlayerPawnBase", "m_iProgressBarDuration");
-        Utilities.SetStateChanged(player, "CCSPlayerPawnBase", "m_flProgressBarStartTime");
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null || !playerPawn.IsValid)
+            return;
+        
+        playerPawn.ProgressBarDuration = duration > 0 ? duration : 0;
+        playerPawn.ProgressBarStartTime = duration > 0 ? Server.CurrentTime : 0;
+        Utilities.SetStateChanged(playerPawn, "CCSPlayerPawnBase", "m_iProgressBarDuration");
+        Utilities.SetStateChanged(playerPawn, "CCSPlayerPawnBase", "m_flProgressBarStartTime");
     }
 
     /// <summary>
