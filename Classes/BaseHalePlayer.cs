@@ -189,7 +189,7 @@ public class BaseHalePlayer
                 player.Team == CsTeam.CounterTerrorist && 
                 PlayerUtils.GetTeamAlivePlayers(player.Team) <= 0)
             {
-                CommonUtils.GetGameRules()
+                ServerUtils.GameRules
                     .TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.TerroristsWin);
             }
         }

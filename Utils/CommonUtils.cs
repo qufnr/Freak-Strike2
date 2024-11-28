@@ -10,18 +10,6 @@ namespace FreakStrike2.Utils;
 public class CommonUtils
 {
     /// <summary>
-    /// GameRules 반환
-    /// </summary>
-    /// <returns>CCSGameRules</returns>
-    public static CCSGameRules GetGameRules()
-    {
-        return Utilities
-            .FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules")
-            .First()
-            .GameRules!;
-    }
-
-    /// <summary>
     /// 리스트 자료 안에서 무작위로 하나를 가져옵니다.
     /// </summary>
     /// <param name="list">리스트 객체</param>

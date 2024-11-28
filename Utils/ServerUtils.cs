@@ -8,9 +8,24 @@ public class ServerUtils
     /// <summary>
     /// cs_player_manager 찾기
     /// </summary>
-    /// <returns>CCSPlayerResource</returns>
-    public static CCSPlayerResource GetPlayerResource() =>
+    public static CCSPlayerResource PlayerResource =>
         Utilities.FindAllEntitiesByDesignerName<CCSPlayerResource>("cs_player_manager").First();
+
+    /// <summary>
+    /// cs_gamerules 찾기
+    /// </summary>
+    public static CCSGameRules GameRules =>
+        Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").First().GameRules!;
+
+    /// <summary>
+    /// 현재 라운드 남은 시간을 반환합니다.
+    /// </summary>
+    /// <returns>현재 라운드의 남은 시간</returns>
+    public static float GetRaminingRoundTime()
+    {
+        var gamerules = GameRules;
+        return gamerules.RoundStartTime + gamerules.RoundTime - Server.CurrentTime;
+    }
 
     /// <summary>
     /// 팀 점수를 설정합니다.

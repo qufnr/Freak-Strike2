@@ -98,7 +98,7 @@ public static class PlayerUtils
     /// </remarks>
     public static CCSPlayerController? GetTarget(this CCSPlayerController player)
     {
-        var gameRules = CommonUtils.GetGameRules();
+        var gameRules = ServerUtils.GameRules;
         VirtualFunctionWithReturn<IntPtr, IntPtr, IntPtr> findPickerEntity = new(gameRules.Handle, 28);
         var target = new CBaseEntity(findPickerEntity.Invoke(gameRules.Handle, player.Handle));
         return target.DesignerName is "player" ? target.As<CCSPlayerController>().OriginalControllerOfCurrentPawn.Value : null;

@@ -59,7 +59,7 @@ public partial class FreakStrike2
     /// </summary>
     private void CreateHalePlayerOnRoundStart()
     {
-        if (CommonUtils.GetGameRules().WarmupPeriod)
+        if (ServerUtils.GameRules.WarmupPeriod)
             return;
         
         var player = BaseQueuePoint.GetPlayerWithMostQueuepoints(PlayerQueuePoints) ?? PlayerUtils.GetRandomAlivePlayer();

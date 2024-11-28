@@ -26,7 +26,7 @@ public partial class FreakStrike2
     {
         var playerCount = Utilities.GetPlayers().Count;
         if (InGameStatus == GameStatus.PlayerWaiting && playerCount > 1)
-            CommonUtils.GetGameRules()
+            ServerUtils.GameRules
                 .TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.RoundDraw);
     }
     
@@ -64,7 +64,7 @@ public partial class FreakStrike2
     /// </summary>
     private void CreateInGameTimer()
     {
-        var gameRule = CommonUtils.GetGameRules();
+        var gameRule = ServerUtils.GameRules;
         if (gameRule.FreezePeriod)
             return;
         

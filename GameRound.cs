@@ -11,7 +11,7 @@ public partial class FreakStrike2
     {
         KillInGameRoundTimer();
         
-        var gameRules = CommonUtils.GetGameRules();
+        var gameRules = ServerUtils.GameRules;
 
         if (!gameRules.WarmupPeriod && InGameStatus != GameStatus.Warmup)
         {
