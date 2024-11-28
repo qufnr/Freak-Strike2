@@ -81,7 +81,7 @@ public partial class FreakStrike2
                 player.PrintToChat($"{MessagePrefix}명령어 \"css_hclass\" 로 인간 진영 클래스를 선택해주세요.");
                 Server.NextFrame(() =>
                 {
-                    if (CommonUtils.GetGameRules().WarmupPeriod || InGameStatus == GameStatus.Warmup)
+                    if (InGameStatus == GameStatus.Warmup)
                         player.ChangeTeam(CsTeam.Spectator);
                     else if (player.PawnIsAlive)
                         player.CommitSuicide(false, true);
