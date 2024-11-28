@@ -89,14 +89,14 @@ public class BaseHalePlayer
             if (playerPawn != null && playerPawn.IsValid && player.PawnIsAlive && (playerPawn.Flags & (1 << 0)) != 0)
                 playerPawn.GravityScale = originGravityScale;
 
-            if (instance.BaseGamePlayers[slot].DebugMode)
+            if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
                 player.PrintToCenterAlert($"Weight Down Cooldown: {WeightDownCooldown:F1}");
 
             WeightDownCooldown -= 0.1f;
 
             if (WeightDownCooldown <= 0.0f)
             {
-                if (instance.BaseGamePlayers[slot].DebugMode)
+                if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
                     player.PrintToChat("[FS2 Debugger] Weight Down is Ready!");
 
                 WeightDownCooldown = 0.0f;
@@ -125,14 +125,14 @@ public class BaseHalePlayer
                 return;
             }
     
-            if (instance.BaseGamePlayers[slot].DebugMode)
+            if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
                 player.PrintToCenterAlert($"Super Jump Cooldown: {SuperJumpCooldown:F1}");
     
             SuperJumpCooldown -= 0.1f;
 
             if (SuperJumpCooldown <= 0.0f)
             {
-                if (instance.BaseGamePlayers[slot].DebugMode)
+                if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
                     player.PrintToChat("[FS2 Debugger] Super Jump is Ready!");
         
                 SuperJumpCooldown = 0.0f;

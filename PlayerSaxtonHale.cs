@@ -161,7 +161,7 @@ public partial class FreakStrike2
                 if (BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks < BaseHale.SuperJumpMaximumHoldTime)
                     BaseHalePlayers[slot].SuperJumpHoldTicks = Server.CurrentTime;
                 
-                if (BaseGamePlayers[slot].DebugMode)
+                if (BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
                     player.PrintToCenterAlert($"Dynamic Jump Hold Time: {(BaseHalePlayers[slot].SuperJumpHoldTicks - BaseHalePlayers[slot].SuperJumpHoldStartTicks):F2} Tick(s)");
             }
             //  헤일이 높이 점프 대기상태가 아니고, DoDynamicJumpHold(점프 홀드 여부)가 true 일 때
@@ -209,7 +209,7 @@ public partial class FreakStrike2
         velocity.Y += MathF.Cos(float.DegreesToRadians(angles.X)) * MathF.Sin(float.DegreesToRadians(angles.Y)) * 500 * vectorScale;
         velocity.Z = (750f + 175f + charge / 70f) * vectorScale;
         
-        if (BaseGamePlayers[slot].DebugMode)
+        if (BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
             player.PrintToChat($"[FS2 Debugger] Dynamic Jump Velocity: {velocity}");
         
         playerPawn.Teleport(null, null, velocity);

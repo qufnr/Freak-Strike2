@@ -10,16 +10,13 @@ namespace FreakStrike2.Classes;
 
 public class BaseGamePlayer
 {
-    public int Damages { get; set; } = 0;                   //  플레이어가 입힌 피해량
-    public float StunTime { get; private set; } = 0f;       //  스턴 지속 시간
+    public int Damages { get; set; } = 0;                           //  플레이어가 입힌 피해량
+    public float StunTime { get; private set; } = 0f;               //  스턴 지속 시간
     public Timer? StunTimer { get; private set; } = null;           //  스턴 타이머
-    public bool DebugMode { get; set; } = false;            //  디버그 모드 활성화 여부
+    public DebugType DebugModeType { get; set; } = DebugType.None;  //  디버그 모드 활성화 여부
 
     public BaseGamePlayer()
     {
-        Damages = 0;
-        StunTime = 0;
-        DebugMode = false;
         KillStunTimer();
     }
 
@@ -62,7 +59,7 @@ public class BaseGamePlayer
             if (playerPawn.IsValid && (playerPawn.Flags & (1 << 0)) != 0 && playerPawn.MoveType != MoveType_t.MOVETYPE_NONE)
                 player.SetMoveType(MoveType_t.MOVETYPE_NONE);
         
-            if (instance.BaseGamePlayers[player.Slot].DebugMode && player.IsValid)
+            if (instance.BaseGamePlayers[player.Slot].DebugModeType == DebugType.HumanPlayer && player.IsValid)
                 player.PrintToCenterAlert($"Stun Time: {StunTime - Server.CurrentTime:F2}");
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
@@ -97,16 +94,6 @@ public class BaseGamePlayer
         var player = Utilities.GetPlayerFromSlot(slot);
         if(player != null)
             Reset(player);
-    }
-
-    /// <summary>
-    /// 플레이어의 디버그 모드를 토글합니다.
-    /// </summary>
-    /// <returns>디버그 모드 여부</returns>
-    public bool ToggleDebugMode()
-    {
-        DebugMode = !DebugMode;
-        return DebugMode;
     }
 
     /// <summary>

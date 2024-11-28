@@ -36,7 +36,7 @@ public partial class FreakStrike2
                 cmdInfo.ReplyToCommand($"{MessagePrefix}-- css_qp set <#userid|name> <value> - 플레이어의 큐포인트를 설정합니다. (Root Client / Console)");
                 cmdInfo.ReplyToCommand($"{MessagePrefix}-- css_fs2 sethale <#userid|name> [hale] - 플레이어를 헤일로 설정합니다. (Root Client / Console)");
                 cmdInfo.ReplyToCommand($"{MessagePrefix}-- css_fs2 setstun <#userid|name> <stuntime> - 플레이어를 스턴 상태로 설정합니다. (Root Client / Console)");
-                cmdInfo.ReplyToCommand($"{MessagePrefix}-- css_fs2 debug - FS2 디버그 모드를 활성화 또는 비활성화 합니다. (Root Client)");
+                cmdInfo.ReplyToCommand($"{MessagePrefix}-- css_fs2 debug <type> - FS2 디버그 모드를 활성화 또는 비활성화합니다. (Root Client)");
             }
 
             return;
@@ -50,10 +50,13 @@ public partial class FreakStrike2
             {
                 if (player != null && player.IsValid)
                 {
-                    var toggle = BaseGamePlayers[player.Slot].ToggleDebugMode();
-                    var text = toggle ? "활성화" : "비활성화";
-                    
-                    cmdInfo.ReplyToCommand($"{MessagePrefix}디버그 모드를 {text} 했습니다.");
+                    if (Enum.TryParse(cmdInfo.GetArg(2), true, out DebugType debugType))
+                    {
+                        BaseGamePlayers[player.Slot].DebugModeType = debugType;
+                        cmdInfo.ReplyToCommand($"{MessagePrefix}디버그 모드를 {debugType.ToString()}(으)로 설정했습니다.");
+                    }
+                    else
+                        cmdInfo.ReplyToCommand($"{MessagePrefix}Usage: css_fs2 debug <type>");
                 }
 
                 return;
