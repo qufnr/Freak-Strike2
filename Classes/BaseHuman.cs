@@ -66,7 +66,7 @@ public class BaseHuman
 
         player.SetHealth(MaxHealth, true);
         player.SetHelmet(true);
-        playerPawn.VelocityModifier = 1.0f * Laggedmovement;
+        player.SetMovementSpeed(1.0f * Laggedmovement);
         playerPawn.GravityScale = Gravity;
         
         player.RemoveWeapons();

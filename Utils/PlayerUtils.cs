@@ -233,6 +233,21 @@ public static class PlayerUtils
     }
 
     /// <summary>
+    /// 플레이어의 움직임 속도를 설정합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="velocity">속도 수치</param>
+    public static void SetMovementSpeed(this CCSPlayerController player, float velocity)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+            return;
+
+        playerPawn.VelocityModifier = velocity;
+        // Utilities.SetStateChanged(playerPawn, "CCSPlayerPawn", "m_flVelocityModifier");
+    }
+
+    /// <summary>
     /// 플레이어의 인-게임 자금을 설정합니다.
     /// </summary>
     /// <param name="player">플레이어 객체</param>

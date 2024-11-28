@@ -160,7 +160,7 @@ public class BaseHale
             player.SetHealth(GetTotalMaxHealth(), true);
             player.SetArmorValue(GetTotalArmor());
             player.SetHelmet(true);
-            playerPawn.VelocityModifier *= Laggedmovement;
+            player.SetMovementSpeed(playerPawn.VelocityModifier * Laggedmovement);
             playerPawn.GravityScale = playerPawn.GravityScale;
             
             player.RemoveWeapons();
