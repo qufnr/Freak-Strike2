@@ -94,16 +94,16 @@ public partial class FreakStrike2
                     //  플레이어가 인간 진영일 경우 낙하 피해 처리
                     else
                     {
-                        if (info.OriginalDamage > 3)
+                        if (info.Damage > 3)
                         {
-                            victimPawn.AimPunchAngle.X = info.OriginalDamage * 0.25f;
-                            victimPawn.AimPunchAngle.Y = info.OriginalDamage * 0.25f;
-                            victimPawn.AimPunchAngle.Z = info.OriginalDamage * 0.25f;
+                            victimPawn.AimPunchAngle.X = info.Damage * 0.25f;
+                            victimPawn.AimPunchAngle.Y = info.Damage * 0.25f;
+                            victimPawn.AimPunchAngle.Z = info.Damage * 0.25f;
                         }
                         
                         if (Config.UnrealityFallDamage)
                         {
-                            if (info.OriginalDamage <= 5)
+                            if (info.Damage <= 5)
                             {
                                 info.Damage = 0;
                                 info.OriginalDamage = 0;
@@ -112,7 +112,7 @@ public partial class FreakStrike2
                             else
                             {
                                 info.Damage = 10;
-                                info.OriginalDamage = info.Damage;
+                                info.OriginalDamage = 10;
                                 return HookResult.Changed;
                             }
                         }
