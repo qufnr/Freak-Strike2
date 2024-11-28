@@ -181,16 +181,55 @@ public static class PlayerUtils
     /// <param name="player">플레이어 Pawn 객체</param>
     /// <param name="helmet">헬멧</param>
     /// <param name="heavy">헤비 헬멧</param>
-    public static void SetHelmet(this CCSPlayerPawn player, bool helmet = false, bool heavy = false)
+    public static void SetHelmet(this CCSPlayerController player, bool helmet = false, bool heavy = false)
     {
-        var itemServices = player.ItemServices;
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+            return;
+        
+        var itemServices = playerPawn.ItemServices;
         if (itemServices != null)
         {
             CCSPlayer_ItemServices services = new(itemServices.Handle);
             services.HasHelmet = helmet;
             services.HasHeavyArmor = heavy;
-            Utilities.SetStateChanged(player, "CBasePlayerPawn", "m_pItemServices");
+            Utilities.SetStateChanged(playerPawn, "CBasePlayerPawn", "m_pItemServices");
         }
+    }
+
+    /// <summary>
+    /// 플레이어 방어 값을 설정합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="value">방어력</param>
+    public static void SetArmorValue(this CCSPlayerController player, int value)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+            return;
+
+        playerPawn.ArmorValue = value;
+        Utilities.SetStateChanged(playerPawn, "CCSPlayerPawn", "m_ArmorValue");
+    }
+
+    /// <summary>
+    /// 체력을 설정합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="health">체력</param>
+    /// <param name="withMaxHealth">최대 체력과 함께 변경</param>
+    public static void SetHealth(this CCSPlayerController player, int health, bool withMaxHealth = false)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+            return;
+
+        playerPawn.Health = health;
+
+        if (withMaxHealth && playerPawn.Health > playerPawn.MaxHealth)
+            playerPawn.MaxHealth = health;
+
+        Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_iHealth");
     }
 
     /// <summary>
@@ -239,6 +278,26 @@ public static class PlayerUtils
             if (candidate.IsValid && candidate.AbsOrigin != null)
                 playerPawn.Teleport(new Vector() { X = candidate.AbsOrigin.X, Y = candidate.AbsOrigin.Y + 1f, Z = candidate.AbsOrigin.Z });
         }
+    }
+
+    /// <summary>
+    /// 다음 프레임에 팀을 변경합니다.
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="team">변경할 팀</param>
+    /// <param name="task">팀 변경 후 일어날 일</param>
+    public static void ChangeTeamOnNextFrame(this CCSPlayerController player, CsTeam team, Action? task = null)
+    {
+        if (player.TeamNum == (byte)team)
+            return;
+        
+        Server.NextFrame(() =>
+        {
+            player.ChangeTeam(team);
+
+            if (task != null)
+                task.Invoke();
+        });
     }
     
     /// <summary>
