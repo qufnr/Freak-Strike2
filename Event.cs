@@ -100,7 +100,7 @@ public partial class FreakStrike2
         PlayerQueuePoints.Remove(client);
         BaseGamePlayers[client].Reset(client);
         BaseHumanPlayers[client].Reset();
-        BaseHalePlayers[client].Remove(client, InGameStatus);
+        BaseHalePlayers[client].Remove(client);
     }
 
     /// <summary>

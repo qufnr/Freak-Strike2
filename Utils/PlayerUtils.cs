@@ -155,11 +155,15 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
     /// <param name="moveType">움직임 유형</param>
-    public static void SetMoveType(this CCSPlayerPawn player, MoveType_t moveType)
+    public static void SetMoveType(this CCSPlayerController player, MoveType_t moveType)
     {
-        player.MoveType = moveType;
-        player.ActualMoveType = moveType;
-        Utilities.SetStateChanged(player, "CBaseEntity", "m_MoveType");
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null || !playerPawn.IsValid)
+            return;
+        
+        playerPawn.MoveType = moveType;
+        playerPawn.ActualMoveType = moveType;
+        Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_MoveType");
     }
 
     /// <summary>

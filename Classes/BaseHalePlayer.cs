@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
+using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Exceptions;
 using FreakStrike2.Models;
@@ -14,15 +15,15 @@ namespace FreakStrike2.Classes;
 public class BaseHalePlayer
 {
     public bool WeightDownReady { get; set; } = true; //  내려찍기 준비
-    public float WeightDownCooldown { get; set; } = 0f;         //  내려찍기 쿨다운
-    public Timer? WeightDownCooldownTimer { get; set; } = null; //  내려찍기 쿨다운 타이머
+    public float WeightDownCooldown { get; private set; } = 0f;         //  내려찍기 쿨다운
+    public Timer? WeightDownCooldownTimer { get; private set; } = null; //  내려찍기 쿨다운 타이머
     
     public bool SuperJumpReady { get; set; } = true;            //  높이 점프 준비
     public bool DoSuperJumpHold { get; set; } = false;          //  높이 점프 홀드
     public float SuperJumpHoldTicks { get; set; } = 0f;         //  높이 점프 홀드 틱
     public float SuperJumpHoldStartTicks { get; set; } = 0f;    //  높이 점프 홀드 시작 틱
-    public float SuperJumpCooldown { get; set; } = 5f;
-    public Timer? SuperJumpCooldownTimer { get; set; } = null;
+    public float SuperJumpCooldown { get; private set; } = 5f;
+    public Timer? SuperJumpCooldownTimer { get; private set; } = null;
 
     public bool IsHale => MyHale != null;
 
@@ -55,9 +56,8 @@ public class BaseHalePlayer
 
         MyHale = hale;
         Type = HaleType.Hale;
-
-        SuperJumpCooldown = hale.SuperJumpCooldown;
-        WeightDownCooldown = hale.WeightDownCooldown;
+        SuperJumpCooldown = 0f;
+        WeightDownCooldown = 0f;
         
         //  스폰으로 텔레포트
         player.TeleportToSpawnPoint(CsTeam.CounterTerrorist);
@@ -65,83 +65,82 @@ public class BaseHalePlayer
         MyHale.SetPlayer(player);
     }
 
-    /// <summary>
-    /// 높이 점프 쿨타임 타이머 콜백
-    /// </summary>
-    /// <remarks>
-    /// 이 타이머 콜백은 무조건 0.1초 동안 반복 타이머로 호출해야합니다.
-    /// </remarks>
-    /// <param name="player">플레이어 객체</param>
-    /// <param name="gameStatus">게임 상태</param>
-    /// <param name="debug">디버깅 여부</param>
-    /// <returns>타이머 콜백</returns>
-    public Action SuperJumpCooldownCallback(CCSPlayerController player, GameStatus gameStatus = GameStatus.None, bool debug = false) => () =>
+    public void CreateWeightDownCooldown(CCSPlayerController player, float originGravityScale = 1.0f)
     {
-        var slot = player.Slot;
-        
-        if (!player.IsValid || !IsHale)
-        {
-            Remove(slot, gameStatus);
-            return;
-        }
-        
-        if (debug)
-            player.PrintToCenterAlert($"Super Jump Cooldown: {SuperJumpCooldown:F1}");
-        
-        SuperJumpCooldown -= 0.1f;
-
-        if (SuperJumpCooldown <= 0.0f)
-        {
-            if (debug)
-                player.PrintToChat("[FS2 Debugger] Super Jump is Ready!");
-            
-            SuperJumpCooldown = 0.0f;
-            SuperJumpReady = true;
-            SuperJumpCooldownTimer!.Kill();
-        }
-    };
-
-    /// <summary>
-    /// 내려찍기 쿨타임 타이머 콜백
-    /// </summary>
-    /// <remarks>
-    /// 이 타이머 콜백은 무조건 0.1초 동안 반복 타이머로 호출해야합니다.
-    /// </remarks>
-    /// <param name="player">플레이어 객체</param>
-    /// <param name="originGravityScale">이전 플레이어 중력 크기</param>
-    /// <param name="gameStatus">게임 상태</param>
-    /// <param name="debug">디버그 여부</param>
-    /// <returns>타이머 콜백</returns>
-    public Action WeightDownCooldownCallback(CCSPlayerController player, float originGravityScale, GameStatus gameStatus = GameStatus.None, bool debug = false) => () =>
-    {
-        var slot = player.Slot;
-
-        if (!player.IsValid || !IsHale)
-        {
-            Remove(slot, gameStatus);
-            return;
-        }
-        
         var playerPawn = player.PlayerPawn.Value;
-        //  땅에 닿을 때 원래 중력 크기로 되돌리기
-        if (playerPawn != null && playerPawn.IsValid && player.PawnIsAlive && (playerPawn.Flags & (1 << 0)) != 0)
-            playerPawn.GravityScale = originGravityScale;
-
-        if (debug)
-            player.PrintToCenterAlert($"Weight Down Cooldown: {WeightDownCooldown:F1}");
-
-        WeightDownCooldown -= 0.1f;
-
-        if (WeightDownCooldown <= 0.0f)
+        if (playerPawn == null)
+            return;
+        
+        var instance = FreakStrike2.Instance;
+        
+        WeightDownCooldown = MyHale!.WeightDownCooldown;
+        WeightDownCooldownTimer = instance.AddTimer(0.1f, () =>
         {
-            if (debug)
-                player.PrintToChat("[FS2 Debugger] Weight Down is Ready!");
-            
-            WeightDownCooldown = 0.0f;
-            WeightDownReady = true;
-            WeightDownCooldownTimer!.Kill();
-        }
-    };
+            var slot = player.Slot;
+
+            if (!player.IsValid || !IsHale)
+            {
+                Remove(slot);
+                return;
+            }
+
+            var playerPawn = player.PlayerPawn.Value;
+            //  땅에 닿을 때 원래 중력 크기로 되돌리기
+            if (playerPawn != null && playerPawn.IsValid && player.PawnIsAlive && (playerPawn.Flags & (1 << 0)) != 0)
+                playerPawn.GravityScale = originGravityScale;
+
+            if (instance.BaseGamePlayers[slot].DebugMode)
+                player.PrintToCenterAlert($"Weight Down Cooldown: {WeightDownCooldown:F1}");
+
+            WeightDownCooldown -= 0.1f;
+
+            if (WeightDownCooldown <= 0.0f)
+            {
+                if (instance.BaseGamePlayers[slot].DebugMode)
+                    player.PrintToChat("[FS2 Debugger] Weight Down is Ready!");
+
+                WeightDownCooldown = 0.0f;
+                WeightDownReady = true;
+                WeightDownCooldownTimer!.Kill();
+            }
+        }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+    }
+
+    /// <summary>
+    /// 슈퍼 점프 쿨타임 생성
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    public void CreateSuperJumpCooldown(CCSPlayerController player)
+    {
+        var instance = FreakStrike2.Instance;
+        
+        SuperJumpCooldown = MyHale!.SuperJumpCooldown;
+        SuperJumpCooldownTimer = instance.AddTimer(0.1f, () =>
+        {
+            var slot = player.Slot;
+    
+            if (!player.IsValid || !IsHale)
+            {
+                Remove(slot);
+                return;
+            }
+    
+            if (instance.BaseGamePlayers[slot].DebugMode)
+                player.PrintToCenterAlert($"Super Jump Cooldown: {SuperJumpCooldown:F1}");
+    
+            SuperJumpCooldown -= 0.1f;
+
+            if (SuperJumpCooldown <= 0.0f)
+            {
+                if (instance.BaseGamePlayers[slot].DebugMode)
+                    player.PrintToChat("[FS2 Debugger] Super Jump is Ready!");
+        
+                SuperJumpCooldown = 0.0f;
+                SuperJumpReady = true;
+                SuperJumpCooldownTimer!.Kill();
+            }
+        }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+    }
 
     /// <summary>
     /// 멤버 변수 초기화
@@ -155,7 +154,7 @@ public class BaseHalePlayer
         Type = HaleType.None;
         
         WeightDownReady = true;
-        WeightDownCooldown = 5f;
+        WeightDownCooldown = 0f;
         if (WeightDownCooldownTimer != null) WeightDownCooldownTimer.Kill();
         WeightDownCooldownTimer = null;
         
@@ -163,7 +162,7 @@ public class BaseHalePlayer
         SuperJumpHoldTicks = 0f;
         SuperJumpHoldStartTicks = 0f;
         SuperJumpReady = true;
-        SuperJumpCooldown = 5f;
+        SuperJumpCooldown = 0f;
         if (SuperJumpCooldownTimer != null) SuperJumpCooldownTimer.Kill();
         SuperJumpCooldownTimer = null;
         
@@ -174,8 +173,7 @@ public class BaseHalePlayer
     /// 플레이어를 헤일에서 제거합니다.
     /// </summary>
     /// <param name="clientSlot">플레이어 슬롯</param>
-    /// <param name="gameStatus">게임 상태 (매개변수로 넘기지 않을 시 GameStatus.None 으로 판별)</param>
-    public void Remove(int clientSlot, GameStatus? gameStatus = GameStatus.None)
+    public void Remove(int clientSlot)
     { 
         var player = Utilities.GetPlayerFromSlot(clientSlot);
 
@@ -185,7 +183,7 @@ public class BaseHalePlayer
             if (player.PawnIsAlive)
                 player.CommitSuicide(false, true);
             
-            if (gameStatus == GameStatus.Start && 
+            if (FreakStrike2.Instance.InGameStatus == GameStatus.Start && 
                 player.Team == CsTeam.CounterTerrorist && 
                 PlayerUtils.GetTeamAlivePlayers(player.Team) <= 0)
             {

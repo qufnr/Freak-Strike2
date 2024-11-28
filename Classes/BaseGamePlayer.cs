@@ -1,5 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Models;
 using FreakStrike2.Utils;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
@@ -31,75 +33,62 @@ public class BaseGamePlayer
     /// 스턴 상태 활성화
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
-    /// <param name="stunTimer">스턴 타이머 (0.1 Repeat)</param>
     /// <param name="stunTime">스턴 시간</param>
-    public void ActivateStun(CCSPlayerPawn player, Timer stunTimer, float stunTime = 10f)
+    public void ActivateStun(CCSPlayerController player, float stunTime = 10f)
     {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null || !playerPawn.IsValid)
+            return;
+
+        var instance = FreakStrike2.Instance;
+        
         StunTime = StunTime != 0 ? (Server.CurrentTime - StunTime) + stunTime : Server.CurrentTime + stunTime;
         
         player.SetMoveType(MoveType_t.MOVETYPE_NONE);
 
         KillStunTimer();
-        StunTimer = stunTimer;
+        StunTimer = FreakStrike2.Instance.AddTimer(0.1f, () =>
+        {
+            //  스턴 비활성화 조건
+            if (instance.InGameStatus != GameStatus.Start || 
+                !player.PawnIsAlive || 
+                Server.CurrentTime > StunTime)
+            {
+                DeactivateStun(player);
+                return;
+            }
+
+            //  땅을 밟고 있고, MoveType 이 NONE 이 아닐 경우 MoveType 을 NONE 으로 만든다.
+            if (playerPawn.IsValid && (playerPawn.Flags & (1 << 0)) != 0 && playerPawn.MoveType != MoveType_t.MOVETYPE_NONE)
+                player.SetMoveType(MoveType_t.MOVETYPE_NONE);
+        
+            if (instance.BaseGamePlayers[player.Slot].DebugMode && player.IsValid)
+                player.PrintToCenterAlert($"Stun Time: {StunTime - Server.CurrentTime:F2}");
+        }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
 
     /// <summary>
     /// 스턴 상태 비활성화
     /// </summary>
     /// <param name="player">플레이어 Pawn 객체</param>
-    public void DeactivateStun(CCSPlayerPawn? player)
+    public void DeactivateStun(CCSPlayerController? player)
     {
-        if (StunTime > 0)
-        {
-            StunTime = 0;
-            KillStunTimer();
-            if(player != null && player.IsValid && player.MoveType == MoveType_t.MOVETYPE_NONE)
-                player.SetMoveType(MoveType_t.MOVETYPE_WALK);
-        }
-    }
-
-    /// <summary>
-    /// 스턴 타이머 콜백
-    /// </summary>
-    /// <param name="player">플레이어 객체</param>
-    /// <param name="gameStatus">현재 게임 상태</param>
-    /// <param name="debug">디버그 여부</param>
-    /// <returns>타이머 콜백</returns>
-    public Action StunTimerCallback(CCSPlayerController player, GameStatus gameStatus, bool debug = false) => () =>
-    {
-        var playerPawn = player.PlayerPawn.Value;
-        
-        //  스턴 비활성화 조건
-        if (gameStatus != GameStatus.Start || 
-            !player.PawnIsAlive || 
-            Server.CurrentTime > StunTime)
-        {
-            DeactivateStun(playerPawn);
+        if (!IsStunned())
             return;
-        }
-
-        if (playerPawn != null && playerPawn.IsValid)
-        {
-            //  땅을 밟고 있고, MoveType 이 NONE 이 아닐 경우 MoveType 을 NONE 으로 만든다.
-            if ((playerPawn.Flags & (1 << 0)) != 0 && playerPawn.MoveType != MoveType_t.MOVETYPE_NONE)
-                playerPawn.SetMoveType(MoveType_t.MOVETYPE_NONE);
-        }
         
-        if (debug && player.IsValid)
-            player.PrintToCenterAlert($"Stun Time: {StunTime - Server.CurrentTime:F2}");
-    };
+        StunTime = 0;
+        KillStunTimer();
+        if(player != null && player.IsValid && player.MoveType == MoveType_t.MOVETYPE_NONE)
+            player.SetMoveType(MoveType_t.MOVETYPE_WALK);
+    }
 
     public void Reset(CCSPlayerController player)
     {
         Damages = 0;
         
-        if (player.IsValid)
+        if (player.IsValid) 
         {
-            var playerPawn = player.PlayerPawn.Value;
-            if (playerPawn != null && playerPawn.IsValid)
-            {
-                DeactivateStun(playerPawn);
-            }
+            DeactivateStun(player);
         }
     }
 
@@ -126,9 +115,8 @@ public class BaseGamePlayer
     private void KillStunTimer()
     {
         if (StunTimer != null)
-        {
             StunTimer.Kill();
-            StunTimer = null;
-        }
+        
+        StunTimer = null;
     }
 }

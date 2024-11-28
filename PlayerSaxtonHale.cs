@@ -62,7 +62,7 @@ public partial class FreakStrike2
         if (ServerUtils.GameRules.WarmupPeriod)
             return;
         
-        var player = BaseQueuePoint.GetPlayerWithMostQueuepoints(PlayerQueuePoints) ?? PlayerUtils.GetRandomAlivePlayer();
+        var player = BaseQueuePoint.GetPlayerWithMostQueuePoints() ?? PlayerUtils.GetRandomAlivePlayer();
         if (player == null)
         {
             Logger.LogError("[FreakStrike2] No player has been selected.");
@@ -78,7 +78,7 @@ public partial class FreakStrike2
 
         var hale = CommonUtils.GetRandomInList(Hales);
         BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale);
-        playerPawn.SetMoveType(MoveType_t.MOVETYPE_NONE);
+        player.SetMoveType(MoveType_t.MOVETYPE_NONE);
         playerPawn.AbsVelocity.X = 0;
         playerPawn.AbsVelocity.Y = 0;
         playerPawn.AbsVelocity.Z = 0;
@@ -115,7 +115,7 @@ public partial class FreakStrike2
                     {
                         var playerPawn = player.PlayerPawn.Value;
                         if (playerPawn != null && playerPawn.IsValid)
-                            playerPawn.SetMoveType(MoveType_t.MOVETYPE_WALK);
+                            player.SetMoveType(MoveType_t.MOVETYPE_WALK);
                         player.PrintToCenter("라운드가 시작했습니다. 모든 인간 진영을 처치하세요!");
                     }
                     else
@@ -217,11 +217,7 @@ public partial class FreakStrike2
         BaseHalePlayers[slot].MyHale!.EmitJumpSound();
         
         //  쿨타임 생성
-        BaseHalePlayers[slot].SuperJumpCooldown = hale.SuperJumpCooldown;
-        BaseHalePlayers[slot].SuperJumpCooldownTimer = AddTimer(
-            0.1f, 
-            BaseHalePlayers[slot].SuperJumpCooldownCallback(player, InGameStatus, BaseGamePlayers[slot].DebugMode), 
-            TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+        BaseHalePlayers[slot].CreateSuperJumpCooldown(player);
     }
 
     /// <summary>
@@ -243,7 +239,7 @@ public partial class FreakStrike2
             if (playerPawn == null || !playerPawn.IsValid)
                 return;
             
-            if ((playerPawn.Flags & (1 << 0)) != 0)
+            if ((playerPawn.Flags & (1 << 0)) == 0)
             {
                 var eyeAngles = playerPawn.EyeAngles;
 
@@ -253,11 +249,8 @@ public partial class FreakStrike2
                     {
                         BaseHalePlayers[slot].WeightDownReady = false;
 
-                        BaseHalePlayers[slot].WeightDownCooldown = BaseHalePlayers[slot].MyHale!.WeightDownCooldown;
-                        BaseHalePlayers[slot].WeightDownCooldownTimer = AddTimer(0.1f,
-                            BaseHalePlayers[slot].WeightDownCooldownCallback(player, playerPawn.GravityScale, InGameStatus,
-                                BaseGamePlayers[slot].DebugMode), TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
-
+                        BaseHalePlayers[slot].CreateWeightDownCooldown(player, playerPawn.GravityScale);
+                        
                         var velocity = playerPawn.AbsVelocity;
                         velocity.Z = BaseHale.WeightDownZVelocity;
                         playerPawn.Teleport(null, null, velocity);
