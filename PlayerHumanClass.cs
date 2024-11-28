@@ -82,7 +82,7 @@ public partial class FreakStrike2
                 Server.NextFrame(() =>
                 {
                     if (InGameStatus == GameStatus.Warmup)
-                        player.ChangeTeam(CsTeam.Spectator);
+                        player.ChangeTeamOnNextFrame(CsTeam.Spectator);
                     else if (player.PawnIsAlive)
                         player.CommitSuicide(false, true);
                 });

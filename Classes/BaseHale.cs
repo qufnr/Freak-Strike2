@@ -157,12 +157,11 @@ public class BaseHale
         var playerPawn = player.PlayerPawn.Value;
         if (playerPawn is not null)
         {
-            playerPawn.MaxHealth = GetTotalMaxHealth();
-            playerPawn.ArmorValue = GetTotalArmor();
-            playerPawn.Health = playerPawn.MaxHealth;
+            player.SetHealth(GetTotalMaxHealth(), true);
+            player.SetArmorValue(GetTotalArmor());
+            player.SetHelmet(true);
             playerPawn.VelocityModifier *= Laggedmovement;
             playerPawn.GravityScale = playerPawn.GravityScale;
-            playerPawn.SetHelmet(true);
             
             player.RemoveWeapons();
             Weapons.ForEach(namedItem => player.GiveNamedItem(namedItem));

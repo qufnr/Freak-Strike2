@@ -301,12 +301,14 @@ public partial class FreakStrike2
                     BaseHumanPlayers[player.Slot].SetClass(player, myHuman);
                     if (InGameStatus != GameStatus.Start && !BaseHalePlayers[player.Slot].IsHale)
                     {
-                        player.ChangeTeam(CsTeam.Terrorist);
-                        if (!player.PawnIsAlive)
+                        player.ChangeTeamOnNextFrame(CsTeam.Terrorist, () =>
                         {
-                            player.Respawn();
-                            BaseHumanPlayers[player.Slot].SetHumanClassState(player);
-                        }
+                            if (!player.PawnIsAlive)
+                            {
+                                player.Respawn();
+                                BaseHumanPlayers[player.Slot].SetHumanClassState(player);
+                            }
+                        });
                     }
                 }
             }

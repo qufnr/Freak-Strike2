@@ -64,11 +64,10 @@ public class BaseHuman
         if (!player.PawnIsAlive || playerPawn == null || !playerPawn.IsValid)
             return;
 
-        playerPawn.MaxHealth = MaxHealth;
-        playerPawn.Health = MaxHealth;
+        player.SetHealth(MaxHealth, true);
+        player.SetHelmet(true);
         playerPawn.VelocityModifier = 1.0f * Laggedmovement;
         playerPawn.GravityScale = Gravity;
-        playerPawn.SetHelmet(true);
         
         player.RemoveWeapons();
 

@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Utils;
 
 namespace FreakStrike2.Classes;
 
@@ -36,7 +37,7 @@ public class BaseHumanPlayer
         {
             player.PrintToChat("[FS2] 인간 클래스를 선택하지 않았습니다!");
             if(player.PawnIsAlive)
-                player.ChangeTeam(CsTeam.Spectator);
+                player.ChangeTeamOnNextFrame(CsTeam.Spectator);
             return;
         }
 
@@ -55,7 +56,7 @@ public class BaseHumanPlayer
         {
             var player = Utilities.GetPlayerFromSlot(slot);
             if (player != null && player.IsValid && !player.IsBot)
-                player.ChangeTeam(CsTeam.Spectator);
+                player.ChangeTeamOnNextFrame(CsTeam.Spectator);
         }
     }
 }
