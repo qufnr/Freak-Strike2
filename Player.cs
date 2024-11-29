@@ -21,14 +21,14 @@ public partial class FreakStrike2
             {
                 case GameStatus.PlayerWaiting:
                 case GameStatus.Ready:
-                    player.ChangeTeamOnNextFrame(CsTeam.Terrorist, () =>
+                    player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human, () =>
                     {
                         if (!player.PawnIsAlive)
                             player.Respawn();
                     });
                     break;
                 default:
-                    player.ChangeTeamOnNextFrame(CsTeam.Terrorist);
+                    player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human);
                     break;
             }
         }

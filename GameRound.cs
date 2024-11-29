@@ -29,7 +29,7 @@ public partial class FreakStrike2
             
             InGameRoundTimer = AddTimer((roundTime - .5f) * 60f, () =>
             {
-                var humanCount = PlayerUtils.GetTeamAlivePlayers(CsTeam.Terrorist);
+                var humanCount = PlayerUtils.GetTeamAlivePlayers((CsTeam) Fs2Team.Human);
                 gameRules.TerminateRound(freezeTime, humanCount > 0 ? RoundEndReason.TerroristsWin : RoundEndReason.CTsWin);
 
                 KillInGameTimer();

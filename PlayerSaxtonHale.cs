@@ -92,8 +92,8 @@ public partial class FreakStrike2
         foreach (var other in Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive && !BaseHalePlayers[p.Slot].IsHale))
         {
             BaseHumanPlayers[other.Slot].SetHumanClassState(other);     //  플레이어 클래스 설정
-            other.SwitchTeam(CsTeam.Terrorist);                         //  팀 변경
-            other.TeleportToSpawnPoint(CsTeam.Terrorist);               //  스폰으로 텔레포트
+            other.SwitchTeam((CsTeam) Fs2Team.Human);                   //  팀 변경
+            other.TeleportToSpawnPoint((CsTeam) Fs2Team.Human);         //  스폰으로 텔레포트
         }
     }
 

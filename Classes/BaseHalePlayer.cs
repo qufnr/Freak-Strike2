@@ -50,8 +50,8 @@ public class BaseHalePlayer
         if (!player.PawnIsAlive)
             player.Respawn();
 
-        if (player.Team != CsTeam.CounterTerrorist)
-            player.SwitchTeam(CsTeam.CounterTerrorist);
+        if (player.Team != (CsTeam) Fs2Team.Hale)
+            player.SwitchTeam((CsTeam) Fs2Team.Hale);
 
         MyHale = hale;
         Type = HaleType.Hale;
@@ -59,7 +59,7 @@ public class BaseHalePlayer
         WeightDownCooldown = 0f;
         
         //  스폰으로 텔레포트
-        player.TeleportToSpawnPoint(CsTeam.CounterTerrorist);
+        player.TeleportToSpawnPoint((CsTeam) Fs2Team.Hale);
         
         MyHale.SetPlayer(player);
     }
@@ -83,7 +83,6 @@ public class BaseHalePlayer
                 return;
             }
 
-            var playerPawn = player.PlayerPawn.Value;
             //  땅에 닿을 때 원래 중력 크기로 되돌리기
             if (playerPawn != null && playerPawn.IsValid && player.PawnIsAlive && (playerPawn.Flags & (1 << 0)) != 0)
                 playerPawn.GravityScale = originGravityScale;
@@ -183,7 +182,7 @@ public class BaseHalePlayer
                 player.CommitSuicide(false, true);
             
             if (FreakStrike2.Instance.InGameStatus == GameStatus.Start && 
-                player.Team == CsTeam.CounterTerrorist && 
+                player.Team == (CsTeam) Fs2Team.Hale && 
                 PlayerUtils.GetTeamAlivePlayers(player.Team) <= 0)
             {
                 ServerUtils.GameRules

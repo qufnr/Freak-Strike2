@@ -21,7 +21,7 @@ public partial class FreakStrike2
         {
             if (BaseHalePlayers[player.Slot].IsHale)
                 PlayerQueuePoints[player.Slot].Points = 0;
-            else if(player.Team == CsTeam.Terrorist)
+            else if(player.Team == (CsTeam) Fs2Team.Human)
                 PlayerQueuePoints[player.Slot].Points += 10;
         }
     }

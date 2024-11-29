@@ -295,7 +295,7 @@ public partial class FreakStrike2
                     BaseHumanPlayers[player.Slot].SetClass(player, myHuman);
                     if (InGameStatus != GameStatus.Start && !BaseHalePlayers[player.Slot].IsHale)
                     {
-                        player.ChangeTeamOnNextFrame(CsTeam.Terrorist, () =>
+                        player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human, () =>
                         {
                             if (!player.PawnIsAlive)
                             {

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Models;
 using FreakStrike2.Utils.Helpers.Entity;
 
 namespace FreakStrike2.Classes;
@@ -71,7 +72,7 @@ public class BaseHale
     public int GetTotalMaxHealth()
     {
         var players = Utilities.GetPlayers()
-            .Where(player => player.IsValid && player.PawnIsAlive && player.Team is CsTeam.Terrorist)
+            .Where(player => player.IsValid && player.PawnIsAlive && player.Team == (CsTeam) Fs2Team.Human)
             .Count();
         return players > 1 
                 ? Convert.ToInt32(MaxHealth * (HealthMultiplier * (1.0f + (players / 10.0f)))) 
@@ -85,7 +86,7 @@ public class BaseHale
     public int GetTotalArmor()
     {
         var players = Utilities.GetPlayers()
-            .Where(player => player.IsValid && player.PawnIsAlive && player.Team is CsTeam.Terrorist)
+            .Where(player => player.IsValid && player.PawnIsAlive && player.Team == (CsTeam) Fs2Team.Human)
             .Count();
         return players > 1 
             ? Convert.ToInt32(Armor * (ArmorMultiplier * (1.0f + (players / 10.0f)))) 
