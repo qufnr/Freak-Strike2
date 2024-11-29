@@ -1,7 +1,6 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Modules.Cvars;
+﻿using CounterStrikeSharp.API.Modules.Cvars;
 
-namespace FreakStrike2.Utils;
+namespace FreakStrike2.Utils.Helpers.Server;
 
 public class ConVarUtils
 {
@@ -31,7 +30,7 @@ public class ConVarUtils
     /// <returns>mp_roundtime, mp_roundtime_defuse, mp_roundtime_hostage</returns>
     public static float GetRoundTime()
     {
-        var mapName = Server.MapName;
+        var mapName = CounterStrikeSharp.API.Server.MapName;
         ConVar? cvar;
         
         if (mapName.StartsWith("de_")) cvar = ConVar.Find("mp_roundtime_defuse");

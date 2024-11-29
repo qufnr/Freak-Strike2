@@ -1,11 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Cvars;
-using CounterStrikeSharp.API.Modules.Memory;
-using CounterStrikeSharp.API.Modules.Utils;
-
-namespace FreakStrike2.Utils;
+﻿namespace FreakStrike2.Utils.Helpers;
 
 public class CommonUtils
 {
