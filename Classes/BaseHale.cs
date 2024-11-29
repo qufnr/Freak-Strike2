@@ -164,7 +164,8 @@ public class BaseHale
             playerPawn.GravityScale = playerPawn.GravityScale;
             
             player.RemoveWeapons();
-            Weapons.ForEach(namedItem => player.GiveNamedItem(namedItem));
+            foreach (var weapon in Weapons)
+                player.GiveNamedItem(weapon);
             
             Server.NextFrame(() =>
             {

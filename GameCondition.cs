@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Models;
+using FreakStrike2.Utils.Helpers.Entity;
 using FreakStrike2.Utils.Helpers.Server;
 
 namespace FreakStrike2;
@@ -116,19 +117,15 @@ public partial class FreakStrike2
                 ServerUtils.PrintToCenterAll("준비 시간이 종료되면 게임이 시작됩니다.");
                 break;
             case GameStatus.Ready:
-                Utilities.GetPlayers()
-                        .ForEach(player =>
-                        {
-                            if (player.IsValid && !player.IsBot)
-                            {
-                                if (BaseGamePlayers[player.Slot].DebugModeType != DebugType.None)
-                                    player.PrintToChat($"[FS2 Debugger] Countdown: {FindInterval}");
-                                if (BaseHalePlayers[player.Slot].IsHale)
-                                    player.PrintToCenter($"{FindInterval}초 후 {BaseHalePlayers[player.Slot].MyHale!.Name} 헤일로 플레이하게 될 것입니다!");
-                                else
-                                    player.PrintToCenter($"헤일이 활동할 때 까지 {FindInterval}초 남았습니다.");
-                            }
-                        });
+                foreach (var player in PlayerUtils.FindPlayersWithoutFakeClient())
+                {
+                    if (BaseGamePlayers[player.Slot].DebugModeType != DebugType.None)
+                        player.PrintToChat($"[FS2 Debugger] Countdown: {FindInterval}");
+                    if (BaseHalePlayers[player.Slot].IsHale)
+                        player.PrintToCenter($"{FindInterval}초 후 {BaseHalePlayers[player.Slot].MyHale!.Name} 헤일로 플레이하게 될 것입니다!");
+                    else
+                        player.PrintToCenter($"헤일이 활동할 때 까지 {FindInterval}초 남았습니다.");
+                }
                 FindInterval--;
                 break;
         }

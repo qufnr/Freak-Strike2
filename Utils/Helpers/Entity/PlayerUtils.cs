@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Text.RegularExpressions;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.UserMessages;
@@ -28,15 +29,19 @@ public static class PlayerUtils
     /// 유효한 플레이어들을 반환합니다.
     /// </summary>
     /// <returns>유효한 플레이어들</returns>
-    public static List<CCSPlayerController> FindValidPlayers() =>
-        CounterStrikeSharp.API.Utilities.GetPlayers().Where(p => p.IsValid).ToList();
+    public static List<CCSPlayerController> FindValidPlayers() => Utilities.GetPlayers().Where(p => p.IsValid).ToList();
     
     /// <summary>
     /// 살아있는 플레이어들을 반환합니다.
     /// </summary>
     /// <returns>살아있는 플레이어들</returns>
-    public static List<CCSPlayerController> FindValidAndPawnAlivePlayers() => 
-        CounterStrikeSharp.API.Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive).ToList();
+    public static List<CCSPlayerController> FindValidAndPawnAlivePlayers() => Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive).ToList();
+
+    /// <summary>
+    /// Fake Client 를 제외한 유효 플레이어들을 반환합니다.
+    /// </summary>
+    /// <returns>유효한 플레이어들</returns>
+    public static List<CCSPlayerController> FindPlayersWithoutFakeClient() => Utilities.GetPlayers().Where(p => p.IsValid && !p.IsBot && !p.IsHLTV).ToList();
 
     /// <summary>
     /// 살아있는 플레이어 중에서 무작위로 한 명을 뽑습니다.
@@ -48,11 +53,8 @@ public static class PlayerUtils
     public static CCSPlayerController? GetRandomAlivePlayer()
     {
         var pawnAlivePlayers = new List<CCSPlayerController>();
-        FindValidAndPawnAlivePlayers().ForEach(player =>
-        {
-            if(player.IsValid && player.PawnIsAlive)
-                pawnAlivePlayers.Add(player);
-        });
+        foreach (var player in FindValidAndPawnAlivePlayers())
+            pawnAlivePlayers.Add(player);
         
         return pawnAlivePlayers.Count > 0 ? CommonUtils.GetRandomInList(pawnAlivePlayers) : null;
     }

@@ -1,4 +1,6 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
+using FreakStrike2.Utils.Helpers.Entity;
 
 namespace FreakStrike2.Utils.Helpers.Server;
 
@@ -54,32 +56,35 @@ public class ServerUtils
             .Where(teamManager => teamManager.TeamNum == team)
             .First()
             .Score;
-    
+
     /// <summary>
     /// 모두에게 PrintToCenter
     /// </summary>
     /// <param name="message">메시지</param>
-    public static void PrintToCenterAll(string message) =>
-        CounterStrikeSharp.API.Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
-            .ToList()
-            .ForEach(player => player.PrintToCenter(message));
+    public static void PrintToCenterAll(string message)
+    {
+        foreach (var player in PlayerUtils.FindPlayersWithoutFakeClient())
+            player.PrintToCenter(message);
+    }
 
     /// <summary>
     /// 모두에게 PrintToCenterHtml
     /// </summary>
     /// <param name="message">메시지</param>
     /// <param name="duration">유지 시간</param>
-    public static void PrintToCenterHtmlAll(string message, int duration = 5) =>
-        CounterStrikeSharp.API.Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
-            .ToList()
-            .ForEach(player => player.PrintToCenterHtml(message, duration));
-    
+    public static void PrintToCenterHtmlAll(string message, int duration = 5)
+    {
+        foreach (var player in PlayerUtils.FindPlayersWithoutFakeClient())
+            player.PrintToCenterHtml(message, duration);
+    }
+
     /// <summary>
     /// 모두에게 PrintToCenterAlert
     /// </summary>
     /// <param name="message">메시지</param>
-    public static void PrintToCenterAlertAll(string message) =>
-        CounterStrikeSharp.API.Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
-            .ToList()
-            .ForEach(player => player.PrintToCenterAlert(message));
+    public static void PrintToCenterAlertAll(string message)
+    {
+        foreach (var player in PlayerUtils.FindPlayersWithoutFakeClient())
+            player.PrintToCenterAlert(message);
+    }
 }

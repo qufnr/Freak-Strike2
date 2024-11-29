@@ -114,7 +114,7 @@ public partial class FreakStrike2
         
         Server.NextFrame(() =>
         {
-            foreach(var player in Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot))
+            foreach (var player in PlayerUtils.FindPlayersWithoutFakeClient())
                 player.PrintToCenterHtml(text, duration);
         });
         
