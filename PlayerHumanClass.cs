@@ -72,7 +72,7 @@ public partial class FreakStrike2
         {
             if (player.IsBot)
             {
-                BaseHumanPlayers[client].SetClass(player, CommonUtils.GetRandomInList(Humans));
+                BaseHumanPlayers[client].SetClass(CommonUtils.GetRandomInList(Humans));
                 if (InGameStatus != GameStatus.Start)
                     player.Respawn();
             }

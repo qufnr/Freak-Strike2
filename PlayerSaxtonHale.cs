@@ -91,9 +91,9 @@ public partial class FreakStrike2
         //  헤일 외 다른 플레이어는 인간 진영으로 이동
         foreach (var other in Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive && !BaseHalePlayers[p.Slot].IsHale))
         {
-            BaseHumanPlayers[other.Slot].SetHumanClassState(other);     //  플레이어 클래스 설정
             other.SwitchTeam((CsTeam) Fs2Team.Human);                   //  팀 변경
             other.TeleportToSpawnPoint((CsTeam) Fs2Team.Human);         //  스폰으로 텔레포트
+            BaseHumanPlayers[other.Slot].SetHumanClassState();          //  플레이어 클래스 설정
         }
     }
 

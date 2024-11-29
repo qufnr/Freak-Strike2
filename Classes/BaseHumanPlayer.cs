@@ -1,28 +1,39 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Exceptions;
 using FreakStrike2.Utils.Helpers.Entity;
 
 namespace FreakStrike2.Classes;
 
 public class BaseHumanPlayer
 {
+    private int _client;
+    private CCSPlayerController? Player => Utilities.GetPlayerFromSlot(_client);
+    
     public BaseHuman? MyClass { get; private set; } = null;
     public bool HasClass => MyClass != null;
 
     /// <summary>
     /// 기본 생성자
     /// </summary>
-    /// <param name="slot">플레이어 슬롯</param>
-    public BaseHumanPlayer(int slot = -1) => Reset(slot);
-
-    public void SetClass(CCSPlayerController player, BaseHuman human)
+    /// <param name="client">플레이어 슬롯</param>
+    public BaseHumanPlayer(int client)
     {
-        if (player.PawnIsAlive)
-            player.CommitSuicide(false, true);
+        _client = client;
+        Reset();
+    }
+
+    public void SetClass(BaseHuman human)
+    {
+        if (Player == null || !Player.IsValid)
+            return;
         
-        if (!player.IsBot)
-            Server.PrintToChatAll($"{FreakStrike2.MessagePrefix}{player.PlayerName} 이(가) " + (MyClass != null ? $"클래스를 {human.Name} (으)로 변경했습니다." : $"{human.Name} 클래스를 선택했습니다."));
+        if (Player.PawnIsAlive)
+            Player.CommitSuicide(false, true);
+        
+        if (!Player.IsBot)
+            Server.PrintToChatAll($"{FreakStrike2.MessagePrefix}{Player.PlayerName} 이(가) " + (MyClass != null ? $"인간 진영 클래스를 {human.Name} (으)로 변경했습니다." : $"{human.Name} 인간 진영 클래스를 선택했습니다."));
         
         MyClass = human;
     }
@@ -30,33 +41,33 @@ public class BaseHumanPlayer
     /// <summary>
     /// 스폰 시 플레이어의 클래스로 설정합니다.
     /// </summary>
-    /// <param name="player">플레이어 객체</param>
-    public void SetHumanClassState(CCSPlayerController player)
+    public void SetHumanClassState()
     {
-        if (MyClass == null)
+        Server.NextFrame(() =>
         {
-            player.PrintToChat("[FS2] 인간 클래스를 선택하지 않았습니다!");
-            if(player.PawnIsAlive)
-                player.ChangeTeamOnNextFrame(CsTeam.Spectator);
-            return;
-        }
-
-        MyClass.SetPlayer(player);
+            if (Player == null || !Player.IsValid || FreakStrike2.Instance.BaseHalePlayers[_client].IsHale)
+                return;
+            
+            if (MyClass == null)
+            {
+                Player.PrintToChat("[FS2] \"css_hclass <human>\" 명령어로 인간 진영 클래스를 선택 해주세요!");
+                if(Player.PawnIsAlive)
+                    Player.ChangeTeamOnNextFrame(CsTeam.Spectator);
+                return;
+            }
+            
+            MyClass.SetPlayer(Player);
+        });
     }
     
     /// <summary>
     /// 플레이어 인간 클래스 초기화
     /// </summary>
-    /// <param name="slot"></param>
-    public void Reset(int slot = -1)
+    public void Reset()
     {
         MyClass = null;
         
-        if (slot != -1)
-        {
-            var player = Utilities.GetPlayerFromSlot(slot);
-            if (player != null && player.IsValid && !player.IsBot)
-                player.ChangeTeamOnNextFrame(CsTeam.Spectator);
-        }
+        if (Player != null && Player.IsValid && !Player.IsBot)
+            Player.ChangeTeamOnNextFrame(CsTeam.Spectator);
     }
 }
