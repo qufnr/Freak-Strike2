@@ -78,7 +78,7 @@ public partial class FreakStrike2
         }
 
         var hale = CommonUtils.GetRandomInList(Hales);
-        BaseHalePlayers[player.Slot] = new BaseHalePlayer(player, hale);
+        BaseHalePlayers[player.Slot].SetHaleState(hale);
         player.SetMoveType(MoveType_t.MOVETYPE_NONE);
         playerPawn.AbsVelocity.X = 0;
         playerPawn.AbsVelocity.Y = 0;
@@ -218,7 +218,7 @@ public partial class FreakStrike2
         BaseHalePlayers[slot].MyHale!.EmitJumpSound();
         
         //  쿨타임 생성
-        BaseHalePlayers[slot].CreateSuperJumpCooldown(player);
+        BaseHalePlayers[slot].CreateSuperJumpCooldown();
     }
 
     /// <summary>
@@ -250,7 +250,7 @@ public partial class FreakStrike2
                     {
                         BaseHalePlayers[slot].WeightDownReady = false;
 
-                        BaseHalePlayers[slot].CreateWeightDownCooldown(player, playerPawn.GravityScale);
+                        BaseHalePlayers[slot].CreateWeightDownCooldown();
                         
                         var velocity = playerPawn.AbsVelocity;
                         velocity.Z = BaseHale.WeightDownZVelocity;

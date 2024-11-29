@@ -82,10 +82,10 @@ public partial class FreakStrike2
     /// <param name="client">클라이언트</param>
     private void OnClientPutInServer(int client)
     {
-        BaseGamePlayers[client] = new BaseGamePlayer();     //  플레이어 데이터 초기 설정
-        BaseHalePlayers[client] = new BaseHalePlayer();     //  헤일 데이터 초기 설정
-        PlayerQueuePoints[client] = new BaseQueuePoint();   //  큐포인트 초기 설정
-        InitializeHumanClassOnClientPutInServer(client);    //  인간 진영 클래스 초기 설정
+        BaseGamePlayers[client] = new BaseGamePlayer();         //  플레이어 데이터 초기 설정
+        BaseHalePlayers[client] = new BaseHalePlayer(client);   //  헤일 데이터 초기 설정
+        PlayerQueuePoints[client] = new BaseQueuePoint();       //  큐포인트 초기 설정
+        InitializeHumanClassOnClientPutInServer(client);        //  인간 진영 클래스 초기 설정
         
         GameStartOnClientPutInServer();                     //  게임 시작 처리
         TeamChangeOnClientPutInServer(client);              //  접속 시 팀 변경 처리
@@ -100,7 +100,7 @@ public partial class FreakStrike2
         PlayerQueuePoints.Remove(client);
         BaseGamePlayers[client].Reset(client);
         BaseHumanPlayers[client].Reset();
-        BaseHalePlayers[client].Remove(client);
+        BaseHalePlayers[client].Reset(true);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public partial class FreakStrike2
         foreach (var player in Utilities.GetPlayers().Where(p => p.IsValid))
         {
             BaseGamePlayers[player.Slot].Reset(player); //  게임 플레이어 초기화
-            BaseHalePlayers[player.Slot].Remove();      //  헤일 플레이어 초기화
+            BaseHalePlayers[player.Slot].Reset();      //  헤일 플레이어 초기화
         }
         
         CreateHalePlayerOnRoundStart();         //  헤일 플레이어 선정

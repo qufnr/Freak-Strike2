@@ -92,7 +92,7 @@ public partial class FreakStrike2
                         {
                             cmdInfo.ReplyToCommand($"{MessagePrefix}플레이어 {target.PlayerName} 을(를) 헤일 {hale.Name} (으)로 설정했습니다.");
                             Server.PrintToChatAll($"{MessagePrefix}관리자에 의해 {target.PlayerName} 이(가) 헤일 {hale.Name} (으)로 설정되었습니다.");
-                            BaseHalePlayers[target.Slot] = new BaseHalePlayer(target, hale);
+                            BaseHalePlayers[target.Slot].SetHaleState(hale);
                         }
                     }
             }

@@ -64,12 +64,18 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="team">팀</param>
     /// <returns>팀에 살아있는 플레이어 수</returns>
-    public static int GetTeamAlivePlayers(CsTeam team)
-    {
-        return CounterStrikeSharp.API.Utilities.GetPlayers()
+    public static int GetTeamAlivePlayers(CsTeam team) => Utilities.GetPlayers()
             .Where(player => player.IsValid && player.PawnIsAlive && player.Team == team)
             .Count();
-    }
+
+    /// <summary>
+    /// 특정한 팀의 플레이어 수를 반환합니다.
+    /// </summary>
+    /// <param name="team">팀</param>
+    /// <returns>팀의 플레이어 수</returns>
+    public static int GetTeamPlayers(CsTeam team) => Utilities.GetPlayers()
+        .Where(player => player.IsValid && player.Team == team)
+        .Count();
 
     /// <summary>
     /// 시점 위치 반환

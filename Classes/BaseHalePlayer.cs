@@ -13,6 +13,10 @@ namespace FreakStrike2.Classes;
 
 public class BaseHalePlayer
 {
+    private int _client;
+
+    private CCSPlayerController? Player => Utilities.GetPlayerFromSlot(_client);
+    
     public bool WeightDownReady { get; set; } = true; //  내려찍기 준비
     public float WeightDownCooldown { get; private set; } = 0f;         //  내려찍기 쿨다운
     public Timer? WeightDownCooldownTimer { get; private set; } = null; //  내려찍기 쿨다운 타이머
@@ -24,7 +28,7 @@ public class BaseHalePlayer
     public float SuperJumpCooldown { get; private set; } = 5f;
     public Timer? SuperJumpCooldownTimer { get; private set; } = null;
 
-    public bool IsHale => MyHale != null;
+    public bool IsHale => MyHale != null && Type != HaleType.None;
 
     public BaseHale? MyHale { get; private set; } = null;
     public HaleType Type { get; private set; } = HaleType.None;
@@ -32,70 +36,80 @@ public class BaseHalePlayer
     /// <summary>
     /// 맴버 변수(딕셔너리) 생성
     /// </summary>
-    public BaseHalePlayer() => Remove();
-    
-    /// <summary>
-    /// 헤일 플레이어 생성
-    /// </summary>
-    /// <param name="player">플레이어 객체</param>
-    /// <param name="hale">헤일</param>
-    /// <exception cref="PlayerNotFoundException">플레이어가 유효하지 않으면 던집니다.</exception>
-    public BaseHalePlayer(CCSPlayerController player, BaseHale hale)
+    public BaseHalePlayer(int client)
     {
-        var playerPawn = player.PlayerPawn.Value;
-        
-        if (!player.IsValid || playerPawn == null || !playerPawn.IsValid)
-            throw new PlayerNotFoundException();
-        
-        if (!player.PawnIsAlive)
-            player.Respawn();
-
-        if (player.Team != (CsTeam) Fs2Team.Hale)
-            player.SwitchTeam((CsTeam) Fs2Team.Hale);
-
-        MyHale = hale;
-        Type = HaleType.Hale;
-        SuperJumpCooldown = 0f;
-        WeightDownCooldown = 0f;
-        
-        //  스폰으로 텔레포트
-        player.TeleportToSpawnPoint((CsTeam) Fs2Team.Hale);
-        
-        MyHale.SetPlayer(player);
+        _client = client;
+        Reset();
     }
 
-    public void CreateWeightDownCooldown(CCSPlayerController player, float originGravityScale = 1.0f)
+    public void SetHaleState(BaseHale hale)
     {
-        var playerPawn = player.PlayerPawn.Value;
+        if (Player == null || !Player.IsValid)
+            return;
+        
+        var playerPawn = Player.PlayerPawn.Value;
+        
+        if (playerPawn == null || !playerPawn.IsValid)
+            throw new PlayerNotFoundException();
+
+        Reset();
+        MyHale = hale;
+        Type = HaleType.Hale;
+        
+        //  스폰으로 텔레포트
+        Player.TeleportToSpawnPoint((CsTeam) Fs2Team.Hale);
+
+        FreakStrike2.Instance.AddTimer(0.1f, () =>
+        {
+            if (Player.Team != (CsTeam) Fs2Team.Hale)
+                Player.SwitchTeam((CsTeam) Fs2Team.Hale);
+            
+            if (!Player.PawnIsAlive)
+                Player.Respawn();
+        }, TimerFlags.STOP_ON_MAPCHANGE);
+
+        FreakStrike2.Instance.AddTimer(0.15f, () => MyHale.SetPlayer(Player), TimerFlags.STOP_ON_MAPCHANGE);
+    }
+
+    /// <summary>
+    /// 슈퍼 점프 쿨타임 생성
+    /// </summary>
+    public void CreateWeightDownCooldown()
+    {
+        if (Player == null || !Player.IsValid || !IsHale)
+            return;
+        
+        var playerPawn = Player.PlayerPawn.Value;
         if (playerPawn == null)
             return;
         
         var instance = FreakStrike2.Instance;
+        var originGravityScale = playerPawn.GravityScale;
         
         WeightDownCooldown = MyHale!.WeightDownCooldown;
         WeightDownCooldownTimer = instance.AddTimer(0.1f, () =>
         {
-            var slot = player.Slot;
+            var slot = Player.Slot;
 
-            if (!player.IsValid || !IsHale)
+            if (Player == null || !Player.IsValid || !IsHale)
             {
-                Remove(slot);
+                Reset(true);
                 return;
             }
 
             //  땅에 닿을 때 원래 중력 크기로 되돌리기
-            if (playerPawn != null && playerPawn.IsValid && player.PawnIsAlive && (playerPawn.Flags & (1 << 0)) != 0)
+            if (playerPawn != null && playerPawn.IsValid && Player.PawnIsAlive && (playerPawn.Flags & (1 << 0)) != 0)
                 playerPawn.GravityScale = originGravityScale;
 
             if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
-                player.PrintToCenterAlert($"Weight Down Cooldown: {WeightDownCooldown:F1}");
+                Player.PrintToCenterAlert($"Weight Down Cooldown: {WeightDownCooldown:F1}");
 
             WeightDownCooldown -= 0.1f;
 
             if (WeightDownCooldown <= 0.0f)
             {
                 if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
-                    player.PrintToChat("[FS2 Debugger] Weight Down is Ready!");
+                    Player.PrintToChat("[FS2 Debugger] Weight Down is Ready!");
 
                 WeightDownCooldown = 0.0f;
                 WeightDownReady = true;
@@ -107,31 +121,30 @@ public class BaseHalePlayer
     /// <summary>
     /// 슈퍼 점프 쿨타임 생성
     /// </summary>
-    /// <param name="player">플레이어 객체</param>
-    public void CreateSuperJumpCooldown(CCSPlayerController player)
+    public void CreateSuperJumpCooldown()
     {
         var instance = FreakStrike2.Instance;
         
         SuperJumpCooldown = MyHale!.SuperJumpCooldown;
         SuperJumpCooldownTimer = instance.AddTimer(0.1f, () =>
         {
-            var slot = player.Slot;
-    
-            if (!player.IsValid || !IsHale)
+            if (Player == null || !Player.IsValid || !IsHale)
             {
-                Remove(slot);
+                Reset(true);
                 return;
             }
+            
+            var slot = Player.Slot;
     
             if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
-                player.PrintToCenterAlert($"Super Jump Cooldown: {SuperJumpCooldown:F1}");
+                Player.PrintToCenterAlert($"Super Jump Cooldown: {SuperJumpCooldown:F1}");
     
             SuperJumpCooldown -= 0.1f;
 
             if (SuperJumpCooldown <= 0.0f)
             {
                 if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
-                    player.PrintToChat("[FS2 Debugger] Super Jump is Ready!");
+                    Player.PrintToChat("[FS2 Debugger] Super Jump is Ready!");
         
                 SuperJumpCooldown = 0.0f;
                 SuperJumpReady = true;
@@ -144,10 +157,8 @@ public class BaseHalePlayer
     /// 멤버 변수 초기화
     /// </summary>
     /// <returns>초기화 전에 헤일이었다면 true, 아니면 false 반환</returns>
-    public bool Remove()
+    public void Reset(bool destoryClient = false)
     {
-        var isHale = IsHale;
-        
         MyHale = null;
         Type = HaleType.None;
         
@@ -163,30 +174,20 @@ public class BaseHalePlayer
         SuperJumpCooldown = 0f;
         if (SuperJumpCooldownTimer != null) SuperJumpCooldownTimer.Kill();
         SuperJumpCooldownTimer = null;
-        
-        return isHale;
-    }
-    
-    /// <summary>
-    /// 플레이어를 헤일에서 제거합니다.
-    /// </summary>
-    /// <param name="clientSlot">플레이어 슬롯</param>
-    public void Remove(int clientSlot)
-    { 
-        var player = Utilities.GetPlayerFromSlot(clientSlot);
 
-        //  제거 대상의 플레이어가 헤일이었고 진행중인 게임이 있을 경우, 라운드를 강제로 종료시킨다.
-        if (Remove() && player is not null && player.IsValid)
+        if (destoryClient)
         {
-            if (player.PawnIsAlive)
-                player.CommitSuicide(false, true);
-            
-            if (FreakStrike2.Instance.InGameStatus == GameStatus.Start && 
-                player.Team == (CsTeam) Fs2Team.Hale && 
-                PlayerUtils.GetTeamAlivePlayers(player.Team) <= 0)
+            if (Player != null)
             {
-                ServerUtils.GameRules
-                    .TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.TerroristsWin);
+                if (Player.PawnIsAlive)
+                    Player.CommitSuicide(false, true);
+                
+                if (FreakStrike2.Instance.InGameStatus == GameStatus.Start && 
+                    Player.Team == (CsTeam) Fs2Team.Hale && 
+                    PlayerUtils.GetTeamPlayers(Player.Team) <= 0)
+                    ServerUtils.GameRules.TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.TerroristsWin);
+                
+                Player.SwitchTeam((CsTeam) Fs2Team.Human);
             }
         }
     }
