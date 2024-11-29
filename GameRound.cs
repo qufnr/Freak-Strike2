@@ -1,7 +1,8 @@
 ﻿using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Models;
-using FreakStrike2.Utils;
+using FreakStrike2.Utils.Helpers.Entity;
+using FreakStrike2.Utils.Helpers.Server;
 
 namespace FreakStrike2;
 

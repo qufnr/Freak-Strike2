@@ -1,10 +1,9 @@
 ﻿using System.Runtime.InteropServices;
-using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 
-namespace FreakStrike2.Utils;
+namespace FreakStrike2.Utils.Helpers.Entity;
 
 public static class WeaponUtils
 {
@@ -135,7 +134,7 @@ public static class WeaponUtils
     public static void SetWeaponNextSecondaryAttackTick(this CBasePlayerWeapon weapon, int nextTick)
     {
         weapon.NextSecondaryAttackTick = nextTick;
-        Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_nNextSecondaryAttackTick");
+        CounterStrikeSharp.API.Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_nNextSecondaryAttackTick");
     }
     
     /// <summary>

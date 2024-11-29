@@ -1,6 +1,6 @@
 ﻿using CounterStrikeSharp.API.Modules.Utils;
 
-namespace FreakStrike2.Utils;
+namespace FreakStrike2.Utils.Helpers.Math;
 
 public class VectorUtils
 {
@@ -33,6 +33,6 @@ public class VectorUtils
         var x = vec1.X - vec2.X;
         var y = vec1.Y - vec2.Y;
         var z = vec1.Z - vec2.Z;
-        return (float) Math.Sqrt(x * x + y * y + z * z);
+        return (float) MathF.Sqrt(x * x + y * y + z * z);
     }
 }

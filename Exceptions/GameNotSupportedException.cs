@@ -1,4 +1,4 @@
-﻿namespace FreakStrike2.Utils.Exceptions;
+﻿namespace FreakStrike2.Exceptions;
 
 public class GameNotSupportedException : Exception
 {

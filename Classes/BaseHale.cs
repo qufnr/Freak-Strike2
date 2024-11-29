@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
-using FreakStrike2.Utils;
+using FreakStrike2.Utils.Helpers.Entity;
 
 namespace FreakStrike2.Classes;
 public class BaseHale

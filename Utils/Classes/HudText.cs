@@ -1,10 +1,8 @@
 ﻿using System.Runtime.InteropServices;
-using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
-using FreakStrike2.Utils.Exceptions;
+using FreakStrike2.Exceptions;
 
 namespace FreakStrike2.Utils.Classes;
 
@@ -21,7 +19,7 @@ public class HudText
             throw new Exception("플레이어 객체가 잘못 되었습니다.");
 
         Target = player;
-        Entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext");
+        Entity = CounterStrikeSharp.API.Utilities.CreateEntityByName<CPointWorldText>("point_worldtext");
         if (Entity is null)
             throw new GameNotSupportedException();
         
@@ -90,7 +88,7 @@ public class HudText
     /// <param name="attribute">텍스트 속성</param>
     public static void PrintToAll(string text, HudTextAttribute? attribute)
     {
-        var players = Utilities.GetPlayers();
+        var players = CounterStrikeSharp.API.Utilities.GetPlayers();
         foreach (var player in players)
         {
             if (player.IsValid && !player.IsBot && !player.IsHLTV)

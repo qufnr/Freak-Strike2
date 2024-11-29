@@ -1,9 +1,9 @@
 ﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using FreakStrike2.Models;
-using FreakStrike2.Utils;
+using FreakStrike2.Utils.Helpers;
+using FreakStrike2.Utils.Helpers.Entity;
 using Microsoft.Extensions.Logging;
 using Serilog;
 

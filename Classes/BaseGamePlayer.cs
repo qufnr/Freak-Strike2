@@ -1,9 +1,8 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Models;
-using FreakStrike2.Utils;
+using FreakStrike2.Utils.Helpers.Entity;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace FreakStrike2.Classes;

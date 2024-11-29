@@ -1,10 +1,11 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using FreakStrike2.Models;
-using FreakStrike2.Utils;
+using FreakStrike2.Utils.Helpers;
+using FreakStrike2.Utils.Helpers.Entity;
+using FreakStrike2.Utils.Helpers.Server;
 using Microsoft.Extensions.Logging;
 
 namespace FreakStrike2;

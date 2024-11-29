@@ -1,7 +1,6 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 
-namespace FreakStrike2.Utils;
+namespace FreakStrike2.Utils.Helpers.Server;
 
 public class ServerUtils
 {
@@ -9,13 +8,13 @@ public class ServerUtils
     /// cs_player_manager 찾기
     /// </summary>
     public static CCSPlayerResource PlayerResource =>
-        Utilities.FindAllEntitiesByDesignerName<CCSPlayerResource>("cs_player_manager").First();
+        CounterStrikeSharp.API.Utilities.FindAllEntitiesByDesignerName<CCSPlayerResource>("cs_player_manager").First();
 
     /// <summary>
     /// cs_gamerules 찾기
     /// </summary>
     public static CCSGameRules GameRules =>
-        Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").First().GameRules!;
+        CounterStrikeSharp.API.Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").First().GameRules!;
 
     /// <summary>
     /// 현재 라운드 남은 시간을 반환합니다.
@@ -24,7 +23,7 @@ public class ServerUtils
     public static float GetRaminingRoundTime()
     {
         var gamerules = GameRules;
-        return gamerules.RoundStartTime + gamerules.RoundTime - Server.CurrentTime;
+        return gamerules.RoundStartTime + gamerules.RoundTime - CounterStrikeSharp.API.Server.CurrentTime;
     }
 
     /// <summary>
@@ -34,13 +33,13 @@ public class ServerUtils
     /// <param name="score">설정할 점수</param>
     public static void SetTeamScore(int team, int score)
     {
-        var teamManagers = Utilities.FindAllEntitiesByDesignerName<CCSTeam>("cs_team_manager");
+        var teamManagers = CounterStrikeSharp.API.Utilities.FindAllEntitiesByDesignerName<CCSTeam>("cs_team_manager");
         foreach (var teamManager in teamManagers)
         {
             if (teamManager.TeamNum == team)
             {
                 teamManager.Score = score;
-                Utilities.SetStateChanged(teamManager, "CTeam", "m_iScore");
+                CounterStrikeSharp.API.Utilities.SetStateChanged(teamManager, "CTeam", "m_iScore");
             }
         }
     }
@@ -51,7 +50,7 @@ public class ServerUtils
     /// <param name="team">팀 번호</param>
     /// <returns>팀 점수</returns>
     public static int GetTeamScore(int team) =>
-        Utilities.FindAllEntitiesByDesignerName<CCSTeam>("cs_team_manager")
+        CounterStrikeSharp.API.Utilities.FindAllEntitiesByDesignerName<CCSTeam>("cs_team_manager")
             .Where(teamManager => teamManager.TeamNum == team)
             .First()
             .Score;
@@ -61,7 +60,7 @@ public class ServerUtils
     /// </summary>
     /// <param name="message">메시지</param>
     public static void PrintToCenterAll(string message) =>
-        Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
+        CounterStrikeSharp.API.Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
             .ToList()
             .ForEach(player => player.PrintToCenter(message));
 
@@ -71,7 +70,7 @@ public class ServerUtils
     /// <param name="message">메시지</param>
     /// <param name="duration">유지 시간</param>
     public static void PrintToCenterHtmlAll(string message, int duration = 5) =>
-        Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
+        CounterStrikeSharp.API.Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
             .ToList()
             .ForEach(player => player.PrintToCenterHtml(message, duration));
     
@@ -80,7 +79,7 @@ public class ServerUtils
     /// </summary>
     /// <param name="message">메시지</param>
     public static void PrintToCenterAlertAll(string message) =>
-        Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
+        CounterStrikeSharp.API.Utilities.GetPlayers().Where(player => player.IsValid && !player.IsBot)
             .ToList()
             .ForEach(player => player.PrintToCenterAlert(message));
 }

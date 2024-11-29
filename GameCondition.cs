@@ -1,9 +1,8 @@
 ﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Models;
-using FreakStrike2.Utils;
+using FreakStrike2.Utils.Helpers.Server;
 
 namespace FreakStrike2;
 public partial class FreakStrike2

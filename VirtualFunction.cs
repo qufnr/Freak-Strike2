@@ -1,12 +1,8 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
-using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Models;
-using FreakStrike2.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace FreakStrike2;
 

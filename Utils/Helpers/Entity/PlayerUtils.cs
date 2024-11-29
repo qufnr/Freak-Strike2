@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
 using System.Text.RegularExpressions;
-using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.UserMessages;
 using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Utils.Helpers.Server;
 
-namespace FreakStrike2.Utils;
+namespace FreakStrike2.Utils.Helpers.Entity;
 
 public static class PlayerUtils
 {
@@ -29,14 +29,14 @@ public static class PlayerUtils
     /// </summary>
     /// <returns>유효한 플레이어들</returns>
     public static List<CCSPlayerController> FindValidPlayers() =>
-        Utilities.GetPlayers().Where(p => p.IsValid).ToList();
+        CounterStrikeSharp.API.Utilities.GetPlayers().Where(p => p.IsValid).ToList();
     
     /// <summary>
     /// 살아있는 플레이어들을 반환합니다.
     /// </summary>
     /// <returns>살아있는 플레이어들</returns>
     public static List<CCSPlayerController> FindValidAndPawnAlivePlayers() => 
-        Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive).ToList();
+        CounterStrikeSharp.API.Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive).ToList();
 
     /// <summary>
     /// 살아있는 플레이어 중에서 무작위로 한 명을 뽑습니다.
@@ -64,7 +64,7 @@ public static class PlayerUtils
     /// <returns>팀에 살아있는 플레이어 수</returns>
     public static int GetTeamAlivePlayers(CsTeam team)
     {
-        return Utilities.GetPlayers()
+        return CounterStrikeSharp.API.Utilities.GetPlayers()
             .Where(player => player.IsValid && player.PawnIsAlive && player.Team == team)
             .Count();
     }
@@ -147,7 +147,7 @@ public static class PlayerUtils
         if (playerPawn is null)
             return;
         playerPawn.CBodyComponent!.SceneNode!.Scale = scale;
-        Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_CBodyComponent");
+        CounterStrikeSharp.API.Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_CBodyComponent");
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public static class PlayerUtils
         
         playerPawn.MoveType = moveType;
         playerPawn.ActualMoveType = moveType;
-        Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_MoveType");
+        CounterStrikeSharp.API.Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_MoveType");
     }
 
     /// <summary>
@@ -178,9 +178,9 @@ public static class PlayerUtils
             return;
         
         playerPawn.ProgressBarDuration = duration > 0 ? duration : 0;
-        playerPawn.ProgressBarStartTime = duration > 0 ? Server.CurrentTime : 0;
-        Utilities.SetStateChanged(playerPawn, "CCSPlayerPawnBase", "m_iProgressBarDuration");
-        Utilities.SetStateChanged(playerPawn, "CCSPlayerPawnBase", "m_flProgressBarStartTime");
+        playerPawn.ProgressBarStartTime = duration > 0 ? CounterStrikeSharp.API.Server.CurrentTime : 0;
+        CounterStrikeSharp.API.Utilities.SetStateChanged(playerPawn, "CCSPlayerPawnBase", "m_iProgressBarDuration");
+        CounterStrikeSharp.API.Utilities.SetStateChanged(playerPawn, "CCSPlayerPawnBase", "m_flProgressBarStartTime");
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public static class PlayerUtils
             CCSPlayer_ItemServices services = new(itemServices.Handle);
             services.HasHelmet = helmet;
             services.HasHeavyArmor = heavy;
-            Utilities.SetStateChanged(playerPawn, "CBasePlayerPawn", "m_pItemServices");
+            CounterStrikeSharp.API.Utilities.SetStateChanged(playerPawn, "CBasePlayerPawn", "m_pItemServices");
         }
     }
 
@@ -217,7 +217,7 @@ public static class PlayerUtils
             return;
 
         playerPawn.ArmorValue = value;
-        Utilities.SetStateChanged(playerPawn, "CCSPlayerPawn", "m_ArmorValue");
+        CounterStrikeSharp.API.Utilities.SetStateChanged(playerPawn, "CCSPlayerPawn", "m_ArmorValue");
     }
 
     /// <summary>
@@ -237,7 +237,7 @@ public static class PlayerUtils
         if (withMaxHealth && playerPawn.Health > playerPawn.MaxHealth)
             playerPawn.MaxHealth = health;
 
-        Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_iHealth");
+        CounterStrikeSharp.API.Utilities.SetStateChanged(playerPawn, "CBaseEntity", "m_iHealth");
     }
 
     /// <summary>
@@ -266,7 +266,7 @@ public static class PlayerUtils
         if (inGameMoneyServices != null)
         {
             inGameMoneyServices.Account = amount;
-            Utilities.SetStateChanged(player, "CCSPlayerController", "m_pInGameMoneyServices");
+            CounterStrikeSharp.API.Utilities.SetStateChanged(player, "CCSPlayerController", "m_pInGameMoneyServices");
         }
     }
 
@@ -289,7 +289,7 @@ public static class PlayerUtils
                 ? "info_player_terrorist" 
                 : throw new Exception("Team is invalid!");
         
-        var spawnpoints = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>(entityName);
+        var spawnpoints = CounterStrikeSharp.API.Utilities.FindAllEntitiesByDesignerName<SpawnPoint>(entityName);
         var spawnpointEntities = new List<SpawnPoint>();
         foreach (var spawnpoint in spawnpoints)
             if (spawnpoint.IsValid)
@@ -314,7 +314,7 @@ public static class PlayerUtils
         if (player.TeamNum == (byte)team)
             return;
         
-        Server.NextFrame(() =>
+        CounterStrikeSharp.API.Server.NextFrame(() =>
         {
             player.ChangeTeam(team);
 
@@ -336,10 +336,10 @@ public static class PlayerUtils
         {
             int userId;
             if (int.TryParse(matchUserId.Groups[1].Value, out userId))
-                return Utilities.GetPlayerFromUserid(userId);
+                return CounterStrikeSharp.API.Utilities.GetPlayerFromUserid(userId);
         }
 
-        return Utilities.GetPlayers().Where(player => containsName 
+        return CounterStrikeSharp.API.Utilities.GetPlayers().Where(player => containsName 
                 ? player.PlayerName.Contains(val) 
                 : player.PlayerName.Equals(val))
             .FirstOrDefault();

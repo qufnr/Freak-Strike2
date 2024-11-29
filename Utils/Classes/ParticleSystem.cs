@@ -1,7 +1,6 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
-using FreakStrike2.Utils.Exceptions;
+using FreakStrike2.Exceptions;
 
 namespace FreakStrike2.Utils.Classes;
 
@@ -11,7 +10,7 @@ public class ParticleSystem
 
     public ParticleSystem(string effectName)
     {
-        var particle = Utilities.CreateEntityByName<CParticleSystem>("info_particle_system");
+        var particle = CounterStrikeSharp.API.Utilities.CreateEntityByName<CParticleSystem>("info_particle_system");
         if (particle == null)
             throw new GameNotSupportedException();
         
@@ -41,9 +40,9 @@ public class ParticleSystem
         Particle.DataCPValue.X = end.X;
         Particle.DataCPValue.Y = end.Y;
         Particle.DataCPValue.Z = end.Z;
-        Utilities.SetStateChanged(Particle, "CParticleSystem", "m_vecDataCPValue");
+        CounterStrikeSharp.API.Utilities.SetStateChanged(Particle, "CParticleSystem", "m_vecDataCPValue");
         Particle.Teleport(start);
-        Server.RunOnTick(Server.TickCount + 1, () => Particle.AcceptInput("Start"));
+        CounterStrikeSharp.API.Server.RunOnTick(CounterStrikeSharp.API.Server.TickCount + 1, () => Particle.AcceptInput("Start"));
     }
 
     public void Remove()
