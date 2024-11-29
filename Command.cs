@@ -122,7 +122,7 @@ public partial class FreakStrike2
                                 cmdInfo.ReplyToCommand($"{MessagePrefix}스턴 시간은 0 이상이어야 합니다.");
                             else
                             {
-                                BaseGamePlayers[target.Slot].ActivateStun(target, stunTime);
+                                BaseGamePlayers[target.Slot].ActivateStun(stunTime);
                                 cmdInfo.ReplyToCommand($"{MessagePrefix}플레이어 {target.PlayerName} 을(를) 스턴 상태({stunTime}초)로 변경했습니다.");
                                 Server.PrintToChatAll($"{MessagePrefix}관리자에 의해 플레이어 {target.PlayerName} 이(가) 스턴 상태({stunTime}초)로 변경되었습니다.");
                             }
