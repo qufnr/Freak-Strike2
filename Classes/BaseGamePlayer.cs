@@ -62,7 +62,7 @@ public class BaseGamePlayer
             if (playerPawn.IsValid && (playerPawn.Flags & (1 << 0)) != 0 && playerPawn.MoveType != MoveType_t.MOVETYPE_NONE)
                 Player.SetMoveType(MoveType_t.MOVETYPE_NONE);
         
-            if (instance.BaseGamePlayers[Player.Slot].DebugModeType == DebugType.HumanPlayer && Player.IsValid)
+            if (instance.BaseGamePlayers[_client].DebugModeType == DebugType.HumanPlayer && Player.IsValid)
                 Player.PrintToCenterAlert($"Stun Time: {StunTime - Server.CurrentTime:F2}");
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }

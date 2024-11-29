@@ -89,8 +89,6 @@ public class BaseHalePlayer
         WeightDownCooldown = MyHale!.WeightDownCooldown;
         WeightDownCooldownTimer = instance.AddTimer(0.1f, () =>
         {
-            var slot = Player.Slot;
-
             if (Player == null || !Player.IsValid || !IsHale)
             {
                 Reset(true);
@@ -101,14 +99,14 @@ public class BaseHalePlayer
             if (playerPawn != null && playerPawn.IsValid && Player.PawnIsAlive && (playerPawn.Flags & (1 << 0)) != 0)
                 playerPawn.GravityScale = originGravityScale;
 
-            if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
+            if (instance.BaseGamePlayers[_client].DebugModeType == DebugType.HalePlayer)
                 Player.PrintToCenterAlert($"Weight Down Cooldown: {WeightDownCooldown:F1}");
 
             WeightDownCooldown -= 0.1f;
 
             if (WeightDownCooldown <= 0.0f)
             {
-                if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
+                if (instance.BaseGamePlayers[_client].DebugModeType == DebugType.HalePlayer)
                     Player.PrintToChat("[FS2 Debugger] Weight Down is Ready!");
 
                 WeightDownCooldown = 0.0f;
@@ -133,17 +131,15 @@ public class BaseHalePlayer
                 Reset(true);
                 return;
             }
-            
-            var slot = Player.Slot;
     
-            if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
+            if (instance.BaseGamePlayers[_client].DebugModeType == DebugType.HalePlayer)
                 Player.PrintToCenterAlert($"Super Jump Cooldown: {SuperJumpCooldown:F1}");
     
             SuperJumpCooldown -= 0.1f;
 
             if (SuperJumpCooldown <= 0.0f)
             {
-                if (instance.BaseGamePlayers[slot].DebugModeType == DebugType.HalePlayer)
+                if (instance.BaseGamePlayers[_client].DebugModeType == DebugType.HalePlayer)
                     Player.PrintToChat("[FS2 Debugger] Super Jump is Ready!");
         
                 SuperJumpCooldown = 0.0f;

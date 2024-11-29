@@ -50,7 +50,7 @@ public class BaseHumanPlayer
             
             if (MyClass == null)
             {
-                Player.PrintToChat("[FS2] \"css_hclass <human>\" 명령어로 인간 진영 클래스를 선택 해주세요!");
+                Player.PrintToChat($"{FreakStrike2.MessagePrefix}\"css_hclass <human>\" 명령어로 인간 진영 클래스를 선택 해주세요!");
                 if(Player.PawnIsAlive)
                     Player.ChangeTeamOnNextFrame(CsTeam.Spectator);
                 return;
