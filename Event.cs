@@ -122,10 +122,11 @@ public partial class FreakStrike2
         CreateInGameTimer();                    //  게임 타이머 생성
         CreateRoundTimerOnRoundStart();         //  라운드 타이머 생성
 
-        foreach (var player in Utilities.GetPlayers().Where(p => p.IsValid))
+        foreach (var player in PlayerUtils.FindValidPlayers())
         {
             BaseGamePlayers[player.Slot].Reset();       //  게임 플레이어 초기화
             BaseHalePlayers[player.Slot].Reset();       //  헤일 플레이어 초기화
+            CreatePlayerHudTextOnRoundStart(player);    //  허드 텍스트 생성
         }
         
         CreateHalePlayerOnRoundStart();         //  헤일 플레이어 선정
@@ -158,6 +159,11 @@ public partial class FreakStrike2
         DistributeQueuePointsOnRoundEnd();
         
         PrintRankOfDamagesToAll();
+
+        foreach (var player in PlayerUtils.FindValidPlayers())
+        {
+            KillPlayerHudTextOnRoundEnd(player);
+        }
         
         InGameStatus = GameStatus.End;
         

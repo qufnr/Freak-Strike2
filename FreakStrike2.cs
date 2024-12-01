@@ -3,7 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
 using FreakStrike2.Models;
-
+using FreakStrike2.Utils.Classes;
 using Timer = CounterStrikeSharp.API.Modules.Timers.Timer;
 
 namespace FreakStrike2;
@@ -34,10 +34,12 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
     public Timer? InGameRoundTimer = null;              //  라운드 타이머
     public int FindInterval = 0;                        //  헤일을 찾는 시간
 
-    public Dictionary<int, BaseGamePlayer> BaseGamePlayers = new(64);    //  서버 내 플레이어 정보
-    public Dictionary<int, BaseHalePlayer> BaseHalePlayers = new(64);    //  서버 내 플레이어 헤일 정보
-    public Dictionary<int, BaseHumanPlayer> BaseHumanPlayers = new(64);  //  서버 내 플레이어 인간 클래스 정보
-    public Dictionary<int, BaseQueuePoint> PlayerQueuePoints = new(64);  //  서버 내 플레이어 큐포인트 정보
+    public Dictionary<int, BaseGamePlayer> BaseGamePlayers = new(64);   //  서버 내 플레이어 정보
+    public Dictionary<int, BaseHalePlayer> BaseHalePlayers = new(64);   //  서버 내 플레이어 헤일 정보
+    public Dictionary<int, BaseHumanPlayer> BaseHumanPlayers = new(64); //  서버 내 플레이어 인간 클래스 정보
+    public Dictionary<int, BaseQueuePoint> PlayerQueuePoints = new(64); //  서버 내 플레이어 큐포인트 정보
+
+    public Dictionary<int, HudText> HudTexts = new(64);                 //  허드 텍스트
     
     public override void Load(bool hotReload)
     {

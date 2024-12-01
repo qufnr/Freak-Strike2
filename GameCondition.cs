@@ -137,6 +137,12 @@ public partial class FreakStrike2
     private void OnTickGlobalGameTimer()
     {
         DebugPrintOnGlobalGameTimerTick();
+        
+        //  플레이어에게 호출
+        foreach (var player in PlayerUtils.FindValidPlayers())
+        {
+            PrintHudTextStatusOnGlobalTimerTick(player);
+        }
     }
 }
 
