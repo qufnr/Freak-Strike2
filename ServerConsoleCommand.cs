@@ -10,6 +10,8 @@ public partial class FreakStrike2
         Server.ExecuteCommand("mp_autoteambalance 0");
         Server.ExecuteCommand("mp_humanteam t");
         
+        Server.ExecuteCommand("sv_staminajumpcost 0");
+        Server.ExecuteCommand("sv_staminalandcost 0");
         Server.ExecuteCommand("sv_disable_teamselect_menu 0");
         
         //  Bot Commands
