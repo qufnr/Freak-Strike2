@@ -284,6 +284,12 @@ public partial class FreakStrike2
         }
     }
 
+    private void HalePlayerRageChargeOnPlayerHurt(CCSPlayerController victim, CCSPlayerController attacker, int damage)
+    {
+        if (BaseHalePlayers[victim.Slot].IsHale && !BaseHalePlayers[attacker.Slot].IsHale && BaseHalePlayers[victim.Slot].MyHale!.CanUseRage && damage > 0)
+            BaseHalePlayers[victim.Slot].Rage += BaseHalePlayers[victim.Slot].MyHale!.GetRageRangeByTakeDamage(damage);
+    }
+
     /// <summary>
     /// 헤일 이름으로 헤일을 찾습니다.
     /// </summary>

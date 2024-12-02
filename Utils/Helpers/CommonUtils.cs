@@ -20,4 +20,6 @@ public class CommonUtils
     {
         return new Random().Next(min, max + 1);
     }
+
+    public static float GetRandomFloat(float min, float max) => (float)new Random().NextDouble() * (max - min) + min;
 }

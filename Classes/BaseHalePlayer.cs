@@ -25,8 +25,11 @@ public class BaseHalePlayer
     public bool DoSuperJumpHold { get; set; } = false;          //  높이 점프 홀드
     public float SuperJumpHoldTicks { get; set; } = 0f;         //  높이 점프 홀드 틱
     public float SuperJumpHoldStartTicks { get; set; } = 0f;    //  높이 점프 홀드 시작 틱
-    public float SuperJumpCooldown { get; private set; } = 5f;
+    public float SuperJumpCooldown { get; private set; } = 0f;
     public Timer? SuperJumpCooldownTimer { get; private set; } = null;
+    
+    public float Rage { get; set; } = 0f;                       //  분노 게이지
+    public Timer? RageChargeTimer { get; private set; } = null; //  분노 게이지 충전 타이머
 
     public bool IsHale => MyHale != null && Type != HaleType.None;
 
@@ -66,6 +69,17 @@ public class BaseHalePlayer
             
             if (!Player.PawnIsAlive)
                 Player.Respawn();
+
+            if (MyHale.CanUseRage)
+                RageChargeTimer = FreakStrike2.Instance.AddTimer(MyHale.RageChargeInterval, () =>
+                {
+                    if (Player.PawnIsAlive)
+                    {
+                        var range = MyHale.GetRageRangeByCharge();
+                        Rage = Rage + range > BaseHale.MaxRage ? BaseHale.MaxRage : Rage + range;
+                    }
+                }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
+
         }, TimerFlags.STOP_ON_MAPCHANGE);
 
         FreakStrike2.Instance.AddTimer(0.15f, () => MyHale.SetPlayer(Player), TimerFlags.STOP_ON_MAPCHANGE);
@@ -170,6 +184,10 @@ public class BaseHalePlayer
         SuperJumpCooldown = 0f;
         if (SuperJumpCooldownTimer != null) SuperJumpCooldownTimer.Kill();
         SuperJumpCooldownTimer = null;
+
+        Rage = 0;
+        if (RageChargeTimer != null) RageChargeTimer.Kill();
+        RageChargeTimer = null;
 
         if (destoryClient)
         {

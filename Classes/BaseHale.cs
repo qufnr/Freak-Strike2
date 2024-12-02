@@ -4,6 +4,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Models;
+using FreakStrike2.Utils.Helpers;
 using FreakStrike2.Utils.Helpers.Entity;
 
 namespace FreakStrike2.Classes;
@@ -16,6 +17,8 @@ public class BaseHale
     public static float WeightDownAngleXRange = 60f;            //  내려찍기 시 시점 X 각도 범위
     public static float WeightDownZVelocity = -1000f;           //  내려찍기 Z 축 속력
     public static float WeightDownGravityScale = 6f;            //  내려찍기 중력
+
+    public static float MaxRage = 100f;                         //  분노 최대 값
     
     [JsonPropertyName("Name")] public required string Name { get; set; }                    //  헤일 이름
     [JsonPropertyName("DesignerName")] public required string DesignerName { get; set; }    //  헤일 클래스명
@@ -30,6 +33,10 @@ public class BaseHale
     [JsonPropertyName("Laggedmovement")] public float Laggedmovement { get; set; } = 1f;    //  이동 속도
     [JsonPropertyName("Gravity")] public float Gravity { get; set; } = 1f;                  //  중력
     [JsonPropertyName("CanUseRage")] public bool CanUseRage { get; set; } = true;           //  분노 사용 가능 여부
+    [JsonPropertyName("RageChargeInterval")] public float RageChargeInterval { get; set; } = 1f;    //  분노 충전 간격
+    [JsonPropertyName("RageRangeByTakeDamage")] public string RageRangeByTakeDamage { get; set; } = "1.0:5.0";  //  분노 충전량 (피해 시)
+    [JsonPropertyName("RageRangeByTakeDamageMultipler")] public float RageRangeByTakeDamageMultiplier { get; set; } = 1f;   //  분노 충전량 추가
+    [JsonPropertyName("RageRangeByCharge")] public string RageRangeByCharge { get; set; } = "0.5:1.0";          //  분노 충전량 (자연 충전 시)
     [JsonPropertyName("CanUseSuperJump")] public bool CanUseSuperJump { get; set; } = true; //  높이 점프 사용 가능 여부
     [JsonPropertyName("CanUseWeightDown")] public bool CanUseWeightDown { get; set; } = true;   //  내려찍기 사용 가능 여부
     [JsonPropertyName("SuperJumpVectorScale")] public float SuperJumpVectorScale { get; set; } = 1f;        //  높이 점프 백터 값
@@ -147,6 +154,50 @@ public class BaseHale
         {
             //  TODO :: 배경음 재생
         }
+    }
+
+    public float GetRageRangeByTakeDamage(int damage)
+    {
+        if (CanUseRage && !string.IsNullOrEmpty(RageRangeByTakeDamage))
+        {
+            var range = 0f;
+            
+            if (RageRangeByTakeDamage.Contains(":"))
+            {
+                var explode = RageRangeByTakeDamage.Split(':');
+                var rangeMin = float.Parse(explode[0]);
+                var rangeMax = float.Parse(explode[1]);
+
+                range = CommonUtils.GetRandomFloat(rangeMin, rangeMax);
+            }
+
+            else if (float.TryParse(RageRangeByTakeDamage, out var result))
+                range = result;
+
+            return range * ((damage / 50f) * RageRangeByTakeDamageMultiplier);
+        }
+
+        return 0;
+    }
+
+    public float GetRageRangeByCharge()
+    {
+        if (CanUseRage && !string.IsNullOrEmpty(RageRangeByCharge))
+        {
+            if (RageRangeByCharge.Contains(":"))
+            {
+                var explode = RageRangeByCharge.Split(':');
+                var rangeMin = float.Parse(explode[0]);
+                var rangeMax = float.Parse(explode[1]);
+
+                return CommonUtils.GetRandomFloat(rangeMin, rangeMax);
+            }
+
+            if (float.TryParse(RageRangeByCharge, out var range))
+                return range;
+        }
+
+        return 0;
     }
 
     /// <summary>

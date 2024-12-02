@@ -184,11 +184,12 @@ public partial class FreakStrike2
         var weapon = @event.Weapon;
         var hitgroup = @event.Hitgroup;
 
-        if (victim != null && victim.IsValid && attacker != null && attacker.IsValid)
+        if (victim != null && victim.IsValid && attacker != null && attacker.IsValid && victim != attacker)
         {
             //  피해량 추가
             AddDamageOnPlayerHurt(victim, attacker, damage);
             KnockbackOnPlayerHurt(victim, attacker, damage, weapon, hitgroup);    //  넉백 계산
+            HalePlayerRageChargeOnPlayerHurt(victim, attacker, damage);
         }
         
         return HookResult.Continue;
