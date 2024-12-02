@@ -1,7 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using CounterStrikeSharp.API;
+﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Exceptions;
 using FreakStrike2.Utils.Helpers.Entity;
@@ -16,10 +14,9 @@ public class HudText
     public HudText(CCSPlayerController player)
     {
         Target = player;
-        if (Entity != null && Entity.IsValid)
-            Entity.Remove();
+        KillText();
         
-        Entity = CounterStrikeSharp.API.Utilities.CreateEntityByName<CPointWorldText>("point_worldtext");
+        Entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext");
         if (Entity == null)
             throw new GameNotSupportedException();
             

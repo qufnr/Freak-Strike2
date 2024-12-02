@@ -31,6 +31,6 @@ public partial class FreakStrike2
                 HudTexts[player.Slot].SetMessage($"분노: 0%\n점프 쿨다운: {BaseHalePlayers[player.Slot].SuperJumpCooldown}\n내려 찍기 쿨다운: {BaseHalePlayers[player.Slot].WeightDownCooldown}", new HudTextAttribute());
             else
                 HudTexts[player.Slot].SetMessage($"현재 피해량: {BaseGamePlayers[player.Slot].Damages} DMG", new HudTextAttribute());
-        }        
+        }
     }
 }
