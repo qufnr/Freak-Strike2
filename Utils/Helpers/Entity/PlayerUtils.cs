@@ -330,6 +330,55 @@ public static class PlayerUtils
                 task.Invoke();
         });
     }
+
+    public static void SetRenderColour(this CCSPlayerController player, Color colour)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+            return;
+
+        playerPawn.Render = colour;
+        Utilities.SetStateChanged(playerPawn, "CBaseModelEntity", "m_clrRender");
+    }
+    
+    /// <summary>
+    /// 플레이어의 모습을 감춥니다.
+    /// </summary>
+    /// <remarks>모습을 감췄을 때 아이템을 장착하면 아이템만 보이게 됩니다. 해결 방법으로는 아이템을 주웠을 때 한 번 더 호출합니다. 예) EventItemPickup</remarks>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="visible">숨김 여부</param>
+    public static void SetVisibility(this CCSPlayerController player, bool visible = true)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+            return;
+
+        var colour = Color.FromArgb(visible ? 255 : 0, 255, 255, 255);
+        
+        player.SetRenderColour(colour);
+
+        var weaponService = playerPawn.WeaponServices;
+
+        if (weaponService != null)
+        {
+            var activeWeapon = weaponService.ActiveWeapon.Value;
+            if (activeWeapon != null && activeWeapon.IsValid)
+            {
+                activeWeapon.ShadowStrength = 1f;
+                activeWeapon.SetRenderColour(colour);
+            }
+
+            foreach (var weapon in weaponService.MyWeapons)
+            {
+                var myWeapon = weapon.Value;
+                if (myWeapon != null)
+                {
+                    myWeapon.ShadowStrength = 1f;
+                    myWeapon.SetRenderColour(colour);
+                }
+            }
+        }
+    }
     
     /// <summary>
     /// #UserId 혹은 플레이어 이름으로 플레이어 객체를 찾습니다.

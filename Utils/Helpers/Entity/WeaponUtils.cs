@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Drawing;
+using System.Runtime.InteropServices;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -190,5 +192,11 @@ public static class WeaponUtils
             player.PlayerPawn.Value.WeaponServices.ActiveWeapon.Raw = weapon.Raw;
             player.DropActiveWeapon();
         }
+    }
+
+    public static void SetRenderColour(this CBasePlayerWeapon weapon, Color colour)
+    {
+        weapon.Render = colour;
+        Utilities.SetStateChanged(weapon, "CBaseModelEntity", "m_clrRender");
     }
 }
