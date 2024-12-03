@@ -163,6 +163,20 @@ public class BaseHalePlayer
         }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
 
+    public void ActiveRage(bool force = false)
+    {
+        if (Player == null || !Player.IsValid || !Player.PawnIsAlive || !IsHale)
+            return;
+        
+        if (force ? true : Rage >= BaseHale.MaxRage)
+        {
+            //  TODO :: 헤일 분노 API 호출
+            Rage = 0;
+        }
+        else
+            Player.PrintToChat($"{FreakStrike2.MessagePrefix} 아직 분노를 사용할 수 없습니다!");
+    }
+
     /// <summary>
     /// 멤버 변수 초기화
     /// </summary>

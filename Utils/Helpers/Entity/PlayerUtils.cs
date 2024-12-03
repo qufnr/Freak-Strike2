@@ -379,6 +379,23 @@ public static class PlayerUtils
             }
         }
     }
+
+    /// <summary>
+    /// 플레이어 에임 펀치 수치 설정
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    /// <param name="vector">에임 펀치 수치</param>
+    public static void SetAimPunchAngle(this CCSPlayerController player, Vector vector)
+    {
+        var playerPawn = player.PlayerPawn.Value;
+        if (playerPawn == null)
+            return;
+
+        playerPawn.AimPunchAngle.X = vector.X;
+        playerPawn.AimPunchAngle.Y = vector.Y;
+        playerPawn.AimPunchAngle.Z = vector.Z;
+        Utilities.SetStateChanged(playerPawn, "CCSPlayerPawn", "m_aimPunchAngle");
+    }
     
     /// <summary>
     /// #UserId 혹은 플레이어 이름으로 플레이어 객체를 찾습니다.

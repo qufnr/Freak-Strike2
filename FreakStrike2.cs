@@ -33,6 +33,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
     public Timer? InGameGlobalTimer = null;             //  전역 타이머 (.1초 마다 계속 실행)
     public Timer? InGameRoundTimer = null;              //  라운드 타이머
     public int FindInterval = 0;                        //  헤일을 찾는 시간
+    public Timer? DamageRankingTimer = null;            //  피해량 순위 표시 타이머
 
     public Dictionary<int, BaseGamePlayer> BaseGamePlayers = new(64);   //  서버 내 플레이어 정보
     public Dictionary<int, BaseHalePlayer> BaseHalePlayers = new(64);   //  서버 내 플레이어 헤일 정보
@@ -55,6 +56,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
         
         GameEventRegister();
         HookVirtualFunctions();
+        RegisterCommands();
         
         ReadHaleJsonOnLoad(hotReload);
         ReadHumanJsonOnLoad(hotReload);
@@ -66,6 +68,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
         IgnoreRoundWinConditions();
         GameResetOnHotReload();
         GameEventDeregister();
+        RemoveCommands();
         UnhookVirtualFunctions();
     }
 

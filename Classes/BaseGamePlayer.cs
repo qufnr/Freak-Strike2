@@ -14,8 +14,10 @@ public class BaseGamePlayer
     private CCSPlayerController Player => Utilities.GetPlayerFromSlot(_client) ?? throw new PlayerNotFoundException();
     
     public int Damages { get; set; } = 0;                           //  플레이어가 입힌 피해량
+    
     public float StunTime { get; private set; } = 0f;               //  스턴 지속 시간
     public Timer? StunTimer { get; private set; } = null;           //  스턴 타이머
+    
     public DebugType DebugModeType { get; set; } = DebugType.None;  //  디버그 모드 활성화 여부
 
     public BaseGamePlayer(int client)

@@ -2,7 +2,9 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
+using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Models;
+using FreakStrike2.Utils.Helpers.Entity;
 
 namespace FreakStrike2;
 
@@ -91,11 +93,7 @@ public partial class FreakStrike2
                     else
                     {
                         if (info.Damage > 3)
-                        {
-                            victimPawn.AimPunchAngle.X = info.Damage * 0.25f;
-                            victimPawn.AimPunchAngle.Y = info.Damage * 0.25f;
-                            victimPawn.AimPunchAngle.Z = info.Damage * 0.25f;
-                        }
+                            victim.SetAimPunchAngle(new Vector() { X = info.Damage * .25f, Y = info.Damage * .5f, Z = info.Damage * .25f });
                         
                         if (Config.UnrealityFallDamage)
                         {

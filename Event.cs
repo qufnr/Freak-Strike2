@@ -232,8 +232,12 @@ public partial class FreakStrike2
                 var activeWeapon = playerPawn.WeaponServices!.ActiveWeapon.Value;
                 if (activeWeapon != null)
                 {
-                    activeWeapon.As<CCSWeaponBase>().FlRecoilIndex = 0;
-                    activeWeapon.As<CCSWeaponBase>().AccuracyPenalty = 0;
+                    var weapon = activeWeapon.As<CCSWeaponBase>();
+                    
+                    weapon.FlRecoilIndex = 0;
+                    Utilities.SetStateChanged(weapon, "CCSWeaponBase", "m_flRecoilIndex");
+                    weapon.AccuracyPenalty = 0;
+                    Utilities.SetStateChanged(weapon, "CCSWeaponBase", "m_fAccuracyPenalty");
                 }
             }
         }

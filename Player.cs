@@ -1,9 +1,11 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Models;
 using FreakStrike2.Utils.Helpers.Entity;
 using FreakStrike2.Utils.Helpers.Math;
+using FreakStrike2.Utils.Helpers.Server;
 
 namespace FreakStrike2;
 public partial class FreakStrike2
@@ -81,9 +83,8 @@ public partial class FreakStrike2
     /// <summary>
     /// 플레이어에게 피해량 순위를 출력합니다.
     /// </summary>
-    /// <param name="duration">표시 시간</param>
     /// <param name="top">표시 순위권</param>
-    private void PrintRankOfDamagesToAll(int duration = 10, int top = 3)
+    private void PrintRankOfDamagesToAll(int top = 3)
     {
         if (top > 5)
             top = 5;
@@ -111,26 +112,23 @@ public partial class FreakStrike2
             else
                 text += $"<br />#-- | -- | -- DMG";
         }
-        
-        Server.NextFrame(() =>
-        {
-            foreach (var player in PlayerUtils.FindPlayersWithoutFakeClient())
-                player.PrintToCenterHtml(text, duration);
-        });
-        
-    }
 
-    /// <summary>
-    /// 가장 피해를 많이 입힌 플레이어 순서대로 딕셔너리 자료형으로 반환합니다.
-    /// </summary>
-    /// <returns>피해량 순서 플레이어 딕셔너리</returns>
-    private Dictionary<string, int> GetPlayersDamageRank()
-    {
-        var ranking = new Dictionary<string, int>();
-        foreach(var player in Utilities.GetPlayers().Where(player => player.IsValid))
-            ranking.Add(player.PlayerName, BaseGamePlayers[player.Slot].Damages);
-        
-        return ranking.OrderByDescending(pair => pair.Value)
-            .ToDictionary();
+        var duration = Server.CurrentTime + ConVarUtils.GetRoundRestartDelay() - 1;
+
+        if (DamageRankingTimer != null)
+            DamageRankingTimer.Kill();
+
+        DamageRankingTimer = AddTimer(0.1f, () =>
+        {
+            if (Server.CurrentTime > duration)
+            {
+                DamageRankingTimer!.Kill();
+                DamageRankingTimer = null;
+                return;
+            }
+
+            foreach (var player in PlayerUtils.FindPlayersWithoutFakeClient())
+                player.PrintToCenterHtml(text, 1);
+        }, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
 }

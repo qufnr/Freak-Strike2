@@ -12,6 +12,14 @@ using FreakStrike2.Utils.Helpers.Entity;
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
+    private void RegisterCommands()
+    {
+    }
+
+    private void RemoveCommands()
+    {
+    }
+    
     [ConsoleCommand("css_fs2", "FS2 Default command.")]
     [CommandHelper(whoCanExecute: CommandUsage.CLIENT_AND_SERVER)]
     public void OnFs2Command(CCSPlayerController? player, CommandInfo cmdInfo)
