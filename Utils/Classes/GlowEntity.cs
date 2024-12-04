@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using FreakStrike2.Exceptions;
 
@@ -9,11 +10,11 @@ public class GlowEntity
     private CBaseEntity? Entity { get; set; } = null;
     private CDynamicProp? Glow { get; set; } = null;
 
-    public Color Colour { get; set; } = Color.Transparent;
-    public int Range { get; set; } = 5000;
-    public int RangeMin { get; set; } = 0;
-    public int Team { get; set; } = 2;
-    public int Type { get; set; } = 3;
+    public Color Colour { get; private set; } = Color.Transparent;
+    public int Range { get; private set; } = 5000;
+    public int RangeMin { get; private set; } = 0;
+    public int Team { get; private set; } = 2;
+    public int Type { get; private set; } = 3;
 
     /// <summary>
     /// Glow 생성자
@@ -22,7 +23,7 @@ public class GlowEntity
     /// <exception cref="GameNotSupportedException">게임 미지원</exception>
     public GlowEntity(CBaseEntity entity)
     {
-        Glow = CounterStrikeSharp.API.Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
+        Glow = Utilities.CreateEntityByName<CDynamicProp>("prop_dynamic");
 
         if (Glow == null || !Glow.IsValid)
             throw new GameNotSupportedException();
@@ -35,16 +36,66 @@ public class GlowEntity
         Glow.SetModel(Entity.CBodyComponent!.SceneNode!.GetSkeletonInstance().ModelState.ModelName);
         Glow.DispatchSpawn();
 
-        Glow.Glow.GlowColorOverride = Colour;
-        Glow.Glow.GlowRange = Range;
-        Glow.Glow.GlowRangeMin = RangeMin;
-        Glow.Glow.GlowTeam = Team;
-        Glow.Glow.GlowType = Team;
+        SetColour(Colour);
+        SetRange(Range);
+        SetRangeMin(RangeMin);
+        SetTeam(Team);
+        SetType(Type);
         
         Glow.Teleport(Entity.AbsOrigin, Entity.AbsRotation, Entity.AbsVelocity);
         Glow.AcceptInput("SetParent", Entity, Glow, "!activator");
     }
 
+    public void SetColour(Color colour)
+    {
+        if (Glow == null || !Glow.IsValid)
+            return;
+        
+        Colour = colour;
+        Glow.Glow.GlowColorOverride = Colour;
+        Utilities.SetStateChanged(Glow, "CGlowProperty", "m_glowColorOverride");
+    }
+
+    public void SetRange(int range)
+    {
+        if (Glow == null || !Glow.IsValid)
+            return;
+
+        Range = range;
+        Glow.Glow.GlowRange = Range;
+        Utilities.SetStateChanged(Glow, "CGlowProperty", "m_nGlowRange");
+    }
+
+    public void SetRangeMin(int rangeMin)
+    {
+        if (Glow == null || !Glow.IsValid)
+            return;
+
+        RangeMin = rangeMin;
+        Glow.Glow.GlowRangeMin = RangeMin;
+        Utilities.SetStateChanged(Glow, "CGlowProperty", "m_nGlowRangeMin");
+    }
+
+    public void SetTeam(int teamnum)
+    {
+        if (Glow == null || !Glow.IsValid)
+            return;
+
+        Team = teamnum;
+        Glow.Glow.GlowTeam = Team;
+        Utilities.SetStateChanged(Glow, "CGlowProperty", "m_iGlowTeam");
+    }
+
+    public void SetType(int type)
+    {
+        if (Glow == null || !Glow.IsValid)
+            return;
+
+        Type = type;
+        Glow.Glow.GlowType = Type;
+        Utilities.SetStateChanged(Glow, "CGlowProperty", "m_iGlowType");
+    }
+    
     /// <summary>
     /// Glow 비활성화
     /// </summary>
@@ -85,11 +136,11 @@ public class GlowEntity
     {
         if (Glow == null)
             return;
-
-        Glow.Glow.GlowColorOverride = colour;
-        Glow.Glow.GlowRange = range;
-        Glow.Glow.GlowRangeMin = rangeMin;
-        Glow.Glow.GlowTeam = team;
-        Glow.Glow.GlowType = type;
+        
+        SetColour(colour);
+        SetRange(range);
+        SetRangeMin(rangeMin);
+        SetTeam(team);
+        SetType(type);
     }
 }
