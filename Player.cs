@@ -81,11 +81,14 @@ public partial class FreakStrike2
     }
 
     /// <summary>
-    /// 플레이어에게 피해량 순위를 출력합니다.
+    /// 플레이어에게 피해량 순위를 출력합니다. (라운드 종료 처리 전에 호출함. GameStatus.End 로 되기 전)
     /// </summary>
     /// <param name="top">표시 순위권</param>
     private void PrintRankOfDamagesToAll(int top = 3)
     {
+        if (InGameStatus != GameStatus.Start || PlayerUtils.FindValidPlayers().Count <= 1)
+            return;
+        
         if (top > 5)
             top = 5;
 

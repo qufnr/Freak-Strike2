@@ -159,11 +159,7 @@ public partial class FreakStrike2
         DistributeQueuePointsOnRoundEnd();
         
         PrintRankOfDamagesToAll();
-
-        foreach (var player in PlayerUtils.FindValidPlayers())
-        {
-            KillPlayerHudTextOnRoundEnd(player);
-        }
+        KillHudTextAllOnRoundEnd();
         
         InGameStatus = GameStatus.End;
         

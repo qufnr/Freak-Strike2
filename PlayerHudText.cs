@@ -3,6 +3,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using FreakStrike2.Utils.Classes;
+using FreakStrike2.Utils.Helpers.Entity;
 
 namespace FreakStrike2;
 
@@ -17,17 +18,17 @@ public partial class FreakStrike2
         }, TimerFlags.STOP_ON_MAPCHANGE);
     }
 
-    private void KillPlayerHudTextOnRoundEnd(CCSPlayerController player)
+    private void KillHudTextAllOnRoundEnd()
     {
-        if (!player.IsBot && !player.IsHLTV)
-            HudTexts[player.Slot].KillText();
+        foreach (var player in PlayerUtils.FindValidPlayers())
+            if (HudTexts.ContainsKey(player.Slot) && !player.IsBot && !player.IsHLTV)
+                HudTexts[player.Slot].KillText();
     }
 
     private void PrintHudTextStatusOnGlobalTimerTick(CCSPlayerController player)
     {
         if (!player.IsBot && !player.IsHLTV && HudTexts.ContainsKey(player.Slot))
         {
-            // HudTexts[player.Slot].UpdatePosition();
             if (BaseHalePlayers[player.Slot].IsHale)
             {
                 var jumpStatus = BaseHalePlayers[player.Slot].SuperJumpCooldown > 0
