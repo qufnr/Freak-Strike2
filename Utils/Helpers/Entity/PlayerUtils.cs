@@ -297,7 +297,7 @@ public static class PlayerUtils
                 ? "info_player_terrorist" 
                 : throw new Exception("Team is invalid!");
         
-        var spawnpoints = CounterStrikeSharp.API.Utilities.FindAllEntitiesByDesignerName<SpawnPoint>(entityName);
+        var spawnpoints = Utilities.FindAllEntitiesByDesignerName<SpawnPoint>(entityName);
         var spawnpointEntities = new List<SpawnPoint>();
         foreach (var spawnpoint in spawnpoints)
             if (spawnpoint.IsValid)
@@ -307,7 +307,7 @@ public static class PlayerUtils
         {
             var candidate = CommonUtils.GetRandomInList(spawnpointEntities);
             if (candidate.IsValid && candidate.AbsOrigin != null)
-                playerPawn.Teleport(new Vector() { X = candidate.AbsOrigin.X, Y = candidate.AbsOrigin.Y + 1f, Z = candidate.AbsOrigin.Z });
+                playerPawn.Teleport(new Vector() { X = candidate.AbsOrigin.X, Y = candidate.AbsOrigin.Y + 1f, Z = candidate.AbsOrigin.Z }, new QAngle(0, 0, 0), new Vector(0, 0, 0));
         }
     }
 

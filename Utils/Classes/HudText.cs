@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Drawing;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Exceptions;
@@ -14,6 +15,7 @@ public class HudText
     public HudText(CCSPlayerController player)
     {
         Target = player;
+        
         KillText();
         
         Entity = Utilities.CreateEntityByName<CPointWorldText>("point_worldtext");
@@ -21,48 +23,103 @@ public class HudText
             throw new GameNotSupportedException();
             
         Entity.Enabled = true;
-            
+        
+        SetFullbright();
+        SetDepthOffset();
+        SetSize();
+        SetColor(Color.White);
+        SetScale();
+        SetJustifyHorizontal();
+        SetJustifyVertical();
+        SetReorientMode();
+        
         Entity.DispatchSpawn();
         
         UpdatePosition();
     }
 
-    public void SetMessage(string message, HudTextAttribute attribute)
+    public void SetText(string message, float duration = 0f)
     {
         if (!Target.IsValid || Entity == null || !Entity.IsValid)
             return;
         
-        var playerPawn = Target.PlayerPawn.Value;
-        var playerCameraService = playerPawn?.CameraServices;
-        if (!Target.IsValid || playerPawn == null || !playerPawn.IsValid || playerCameraService == null)
-            throw new PlayerNotFoundException();
-
-        if (string.IsNullOrEmpty(message))
-            return;
-
-        var vmHandle = playerPawn.ViewModelServices!.Handle;
-        if (vmHandle == IntPtr.Zero)
-            throw new Exception("ViewModelServices.Handle is null.");
-        
         Entity.MessageText = message;
         Utilities.SetStateChanged(Entity, "CPointWorldText", "m_messageText");
         
-        Entity.Fullbright = true;
-        Entity.DepthOffset = .0f;
-        Entity.FontSize = attribute.FontSize;
-        Entity.Color = attribute.Color;
-        Entity.WorldUnitsPerPx = attribute.Scale;
-        Entity.JustifyHorizontal = attribute.JustifyHorizontal;
-        Entity.JustifyVertical = attribute.JustifyVertical;
-        Entity.ReorientMode = attribute.PeorientMode;
-        if (attribute.Duration > 0.0)
-            Entity.AddEntityIOEvent("Kill", Entity, null, "", attribute.Duration);
-        
-        Utilities.SetStateChanged(Entity, "CPointWorldText", "m_bFullbright");
-        Utilities.SetStateChanged(Entity, "CPointWorldText", "m_flDepthOffset");
-        Utilities.SetStateChanged(Entity, "CPointWorldText", "m_flFontSize");
-        Utilities.SetStateChanged(Entity, "CPointWorldText", "m_Color");
-        Utilities.SetStateChanged(Entity, "CPointWorldText", "m_flWorldUnitsPerPx");
+        if (duration > 0.0)
+            Entity.AddEntityIOEvent("Kill", Entity, null, "", duration);
+    }
+
+    public void SetSize(float size = 23)
+    {
+        if (Entity != null && Entity.IsValid)
+        {
+            Entity.FontSize = size;
+            Utilities.SetStateChanged(Entity, "CPointWorldText", "m_flFontSize");
+        }
+    }
+
+    public void SetColor(Color color)
+    {
+        if (Entity != null && Entity.IsValid)
+        {
+            Entity.Color = color;
+            Utilities.SetStateChanged(Entity, "CPointWorldText", "m_Color");
+        }
+    }
+
+    public void SetScale(float scale = 0.12f)
+    {
+        if (Entity != null && Entity.IsValid)
+        {
+            Entity.WorldUnitsPerPx = scale;
+            Utilities.SetStateChanged(Entity, "CPointWorldText", "m_flWorldUnitsPerPx");
+        }
+    }
+
+    public void SetJustifyHorizontal(PointWorldTextJustifyHorizontal_t justifyHorizontal = PointWorldTextJustifyHorizontal_t.POINT_WORLD_TEXT_JUSTIFY_HORIZONTAL_LEFT)
+    {
+        if (Entity != null && Entity.IsValid)
+        {
+            Entity.JustifyHorizontal = justifyHorizontal;
+            Utilities.SetStateChanged(Entity, "CPointWorldText", "m_nJustifyHorizontal");
+        }
+    }
+
+    public void SetJustifyVertical(PointWorldTextJustifyVertical_t justifyVertical = PointWorldTextJustifyVertical_t.POINT_WORLD_TEXT_JUSTIFY_VERTICAL_TOP)
+    {
+        if (Entity != null && Entity.IsValid)
+        {
+            Entity.JustifyVertical = justifyVertical;
+            Utilities.SetStateChanged(Entity, "CPointWorldText", "m_nJustifyVertical");
+        }
+    }
+
+    public void SetReorientMode(PointWorldTextReorientMode_t reorientMode = PointWorldTextReorientMode_t.POINT_WORLD_TEXT_REORIENT_NONE)
+    {
+        if (Entity != null && Entity.IsValid)
+        {
+            Entity.ReorientMode = reorientMode;
+            Utilities.SetStateChanged(Entity, "CPointWorldText", "m_nReorientMode");
+        }
+    }
+
+    private void SetDepthOffset()
+    {
+        if (Entity != null && Entity.IsValid)
+        {
+            Entity.DepthOffset = .0f;
+            Utilities.SetStateChanged(Entity, "CPointWorldText", "m_flDepthOffset");
+        }
+    }
+
+    private void SetFullbright()
+    {
+        if (Entity != null && Entity.IsValid)
+        {
+            Entity.Fullbright = true;
+            Utilities.SetStateChanged(Entity, "CPointWorldText", "m_bFullbright");
+        }
     }
 
     public void UpdatePosition()
@@ -76,7 +133,7 @@ public class HudText
         
         Vector eyePosition = new();
         eyePosition += forward * 50;
-        eyePosition += right * -10;
+        eyePosition += right * 25;
 
         QAngle angles = new()
         {
