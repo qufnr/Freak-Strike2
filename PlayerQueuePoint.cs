@@ -30,12 +30,8 @@ public partial class FreakStrike2
     /// 플레이어 큐포인트 순위를 표시합니다.
     /// </summary>
     /// <param name="player">출력할 플레이어 객체</param>
-    /// <param name="top">출력 최대 순위</param>
-    private void PrintRankOfQueuePoints(CCSPlayerController? player, int top = 5)
+    private void PrintQueuePointScoreboard(CCSPlayerController? player)
     {
-        if (top > 10)
-            top = 10;
-        
         var rankedPlayers = PlayerQueuePoints.Where(pair =>
                 //  유효한 플레이어만 필터
             {
@@ -48,16 +44,17 @@ public partial class FreakStrike2
             .Select((pair, index) => new { Rank = index + 1, Name = pair.Name, Points = pair.Points })
             .ToList();
         
-        if (player == null || !player.IsValid) Server.PrintToConsole($"[FS2] -- Queue Points Rank TOP {top}!");
-        else player.PrintToChat($"[FS2] -- 큐포인트 순위 TOP {top}!");
+        if (player == null || !player.IsValid) Server.PrintToConsole($"[FS2] -- Queue Points Rank TOP {Config.QueuePointRankRows}!");
+        else player.PrintToChat($"[FS2] -- 큐포인트 순위 TOP {Config.QueuePointRankRows}!");
         
-        for (var i = 0; i < top; i++)
+        for (var i = 0; i < Config.QueuePointRankRows; i++)
         {
             if (i < rankedPlayers.Count)
             {
                 var data = rankedPlayers[i];
-                if (player == null || !player.IsValid) Server.PrintToConsole($"[FS2] -- #{data.Rank} | {data.Name} | {data.Points} QP");
-                else player.PrintToChat($"[FS2] -- #{data.Rank} | {data.Name} | {data.Points} QP");
+                var nextRoundHaleText = data.Rank == 1 ? " [다음 라운드에 헤일!]" : string.Empty;
+                if (player == null || !player.IsValid) Server.PrintToConsole($"[FS2] -- #{data.Rank} | {data.Name} | {data.Points} QP {nextRoundHaleText}");
+                else player.PrintToChat($"[FS2] -- #{data.Rank} | {data.Name} | {data.Points} QP {nextRoundHaleText}");
             }
             else
             {

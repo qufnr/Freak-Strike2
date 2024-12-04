@@ -65,10 +65,8 @@ public partial class FreakStrike2
     private void CreateInGameTimer()
     {
         var gameRule = ServerUtils.GameRules;
-        if (gameRule.FreezePeriod)
-            return;
         
-        FindInterval = Config.FindInterval;
+        ReadyInterval = Config.ReadyInterval;
 
         if (gameRule.WarmupPeriod) InGameStatus = GameStatus.Warmup;
         else if (Utilities.GetPlayers().Count <= 1) InGameStatus = GameStatus.PlayerWaiting;
@@ -101,7 +99,7 @@ public partial class FreakStrike2
         if (players.Count <= 1)
             InGameStatus = GameStatus.PlayerWaiting;
 
-        if (FindInterval <= 0)
+        if (ReadyInterval <= 0)
         {
             HalePlayerAllActiveOnTimerEnd();    //  헤일 활동 시작!!!
             KillInGameTimer();
@@ -120,13 +118,13 @@ public partial class FreakStrike2
                 foreach (var player in PlayerUtils.FindPlayersWithoutFakeClient())
                 {
                     if (BaseGamePlayers[player.Slot].DebugModeType != DebugType.None)
-                        player.PrintToChat($"[FS2 Debugger] Countdown: {FindInterval}");
+                        player.PrintToChat($"[FS2 Debugger] Countdown: {ReadyInterval}");
                     if (BaseHalePlayers[player.Slot].IsHale)
-                        player.PrintToCenter($"{FindInterval}초 후 {BaseHalePlayers[player.Slot].MyHale!.Name} 헤일로 플레이하게 될 것입니다!");
+                        player.PrintToCenter($"{ReadyInterval}초 후 {BaseHalePlayers[player.Slot].MyHale!.Name} 헤일로 플레이하게 될 것입니다!");
                     else
-                        player.PrintToCenter($"헤일이 활동할 때 까지 {FindInterval}초 남았습니다.");
+                        player.PrintToCenter($"헤일이 활동할 때 까지 {ReadyInterval}초 남았습니다.");
                 }
-                FindInterval--;
+                ReadyInterval--;
                 break;
         }
     }

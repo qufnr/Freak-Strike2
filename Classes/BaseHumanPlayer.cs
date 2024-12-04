@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Exceptions;
+using FreakStrike2.Utils.Helpers;
 using FreakStrike2.Utils.Helpers.Entity;
 
 namespace FreakStrike2.Classes;
@@ -24,6 +25,8 @@ public class BaseHumanPlayer
         Reset();
     }
 
+    public void SetClass() => SetClass(CommonUtils.GetRandomInList(FreakStrike2.Instance.Humans));
+    
     public void SetClass(BaseHuman human)
     {
         if (Player == null || !Player.IsValid)

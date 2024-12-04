@@ -10,15 +10,9 @@ public partial class FreakStrike2
     /// <param name="gameConf">Configuration</param>
     public void OnConfigParsed(GameConfig gameConf)
     {
-        if (gameConf.FindInterval < 5)
-            gameConf.FindInterval = 5;
-
-        if (gameConf.RoundTime < .5)
-            gameConf.RoundTime = .5f;
-        
-        Server.ExecuteCommand($"mp_roundtime {gameConf.RoundTime}");
-        Server.ExecuteCommand($"mp_roundtime_defuse {gameConf.RoundTime}");
-        Server.ExecuteCommand($"mp_roundtime_hostage {gameConf.RoundTime}");
+        if (gameConf.ReadyInterval < 5) gameConf.ReadyInterval = 5;
+        if (gameConf.DamageRankRows > 5) gameConf.DamageRankRows = 5;
+        if (gameConf.QueuePointRankRows > 10) gameConf.QueuePointRankRows = 10;
 
         Config = gameConf;
     }

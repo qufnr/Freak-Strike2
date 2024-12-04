@@ -158,7 +158,7 @@ public partial class FreakStrike2
         KillInGameRoundTimer();
         DistributeQueuePointsOnRoundEnd();
         
-        PrintRankOfDamagesToAll();
+        PrintDamageScoreboard();
         KillHudTextAllOnRoundEnd();
         
         InGameStatus = GameStatus.End;

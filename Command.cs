@@ -159,7 +159,7 @@ public partial class FreakStrike2
         {
             //  초기화
             case "reset":
-                if (!Config.CanResetQueuepoints)
+                if (!Config.CanResetQueuePoint)
                     cmdInfo.ReplyToCommand($"{MessagePrefix}서버측에서 큐포인트 초기화가 비활성화 되어있습니다.");
                 else if (player is null || !player.IsValid)
                     cmdInfo.ReplyToCommand($"{MessagePrefix}클라이언트 측 명령어입니다.");
@@ -173,7 +173,7 @@ public partial class FreakStrike2
             
             //  순위
             case "rank":
-                PrintRankOfQueuePoints(player);
+                PrintQueuePointScoreboard(player);
                 return;
             
             //  플레이어 큐포인트 설정

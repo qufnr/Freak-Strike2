@@ -70,22 +70,27 @@ public partial class FreakStrike2
         var player = Utilities.GetPlayerFromSlot(client);
         if (player != null && player.IsValid)
         {
-            if (player.IsBot)
+            if (player.IsBot || Config.RandomHumanClassOnJoin)
             {
-                BaseHumanPlayers[client].SetClass(CommonUtils.GetRandomInList(Humans));
+                BaseHumanPlayers[client].SetClass();
                 if (InGameStatus != GameStatus.Start)
-                    player.Respawn();
+                {
+                    //  다음 프레임에 팀 변경
+                    player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human, () =>
+                    {
+                        if (!player.PawnIsAlive)
+                            player.Respawn();
+                        
+                        //  또 그 다음 프레임에...
+                        Server.NextFrame(() => BaseHumanPlayers[client].MyClass!.SetPlayer(player));
+                    });
+                }
             }
             else
             {
                 player.PrintToChat($"{MessagePrefix}명령어 \"css_hclass\" 로 인간 진영 클래스를 선택해주세요.");
-                Server.NextFrame(() =>
-                {
-                    if (InGameStatus == GameStatus.Warmup)
-                        player.ChangeTeamOnNextFrame(CsTeam.Spectator);
-                    else if (player.PawnIsAlive)
-                        player.CommitSuicide(false, true);
-                });
+                if (InGameStatus == GameStatus.Warmup)
+                    player.ChangeTeamOnNextFrame(CsTeam.Spectator);
             }
         }
     }

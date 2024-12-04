@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
+using FreakStrike2.Classes;
 using FreakStrike2.Models;
 using FreakStrike2.Utils.Helpers.Entity;
 using FreakStrike2.Utils.Helpers.Math;
@@ -84,13 +85,10 @@ public partial class FreakStrike2
     /// 플레이어에게 피해량 순위를 출력합니다. (라운드 종료 처리 전에 호출함. GameStatus.End 로 되기 전)
     /// </summary>
     /// <param name="top">표시 순위권</param>
-    private void PrintRankOfDamagesToAll(int top = 3)
+    private void PrintDamageScoreboard()
     {
         if (InGameStatus != GameStatus.Start || PlayerUtils.FindValidPlayers().Count <= 1)
             return;
-        
-        if (top > 5)
-            top = 5;
 
         var rankedPlayers = BaseGamePlayers.Where(pair =>
             {
@@ -103,9 +101,9 @@ public partial class FreakStrike2
             .Select((pair, index) => new { Rank = index + 1, Name = pair.Name, Damages = pair.Damages })
             .ToList();
 
-        var text = $"가장 피해를 많이 입힌 플레이어 TOP {top}!";
+        var text = $"가장 피해를 많이 입힌 플레이어 TOP {Config.DamageRankRows}!";
 
-        for (var i = 0; i < top; i++)
+        for (var i = 0; i < Config.DamageRankRows; i++)
         {
             if (i < rankedPlayers.Count)
             {
