@@ -14,6 +14,8 @@ public class BaseGamePlayer
     private CCSPlayerController Player => Utilities.GetPlayerFromSlot(_client) ?? throw new PlayerNotFoundException();
     
     public int Damages { get; set; } = 0;                           //  플레이어가 입힌 피해량
+
+    public int ModifiedNextAttack { get; set; } = 0;                //  다음 공격 틱
     
     public float StunTime { get; private set; } = 0f;               //  스턴 지속 시간
     public Timer? StunTimer { get; private set; } = null;           //  스턴 타이머
@@ -86,6 +88,7 @@ public class BaseGamePlayer
     public void Reset()
     {
         Damages = 0;
+        ModifiedNextAttack = 0;
         DeactivateStun();
     }
 

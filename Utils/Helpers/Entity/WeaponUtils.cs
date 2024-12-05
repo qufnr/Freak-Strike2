@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 
@@ -9,6 +10,52 @@ namespace FreakStrike2.Utils.Helpers.Entity;
 
 public static class WeaponUtils
 {
+    public static readonly Dictionary<string, ushort> WeaponDefinitions = new()
+    {
+        { "weapon_glock", (ushort) ItemDefinition.GLOCK_18 },
+        { "weapon_hkp2000", (ushort) ItemDefinition.P2000 },
+        { "weapon_usp_silencer", (ushort) ItemDefinition.USP_S },
+        { "weapon_p250", (ushort) ItemDefinition.P250 },
+        { "weapon_fiveseven", (ushort) ItemDefinition.FIVE_SEVEN },
+        { "weapon_elite", (ushort) ItemDefinition.DUAL_BERETTAS },
+        { "weapon_tec9", (ushort) ItemDefinition.TEC_9 },
+        { "wepaon_cz75a", (ushort) ItemDefinition.CZ75_AUTO },
+        { "weapon_deagle", (ushort) ItemDefinition.DESERT_EAGLE },
+        { "weapon_revolver", (ushort) ItemDefinition.R8_REVOLVER },
+        { "weapon_taser", (ushort) ItemDefinition.ZEUS_X27 },
+        { "weapon_mp9", (ushort) ItemDefinition.MP9 },
+        { "weapon_mp7", (ushort) ItemDefinition.MP7 },
+        { "weapon_mp5sd", (ushort) ItemDefinition.MP5_SD },
+        { "weapon_mac10", (ushort) ItemDefinition.MAC_10 },
+        { "weapon_ump45", (ushort) ItemDefinition.UMP_45 },
+        { "weapon_bizon", (ushort) ItemDefinition.PP_BIZON },
+        { "weapon_p90", (ushort) ItemDefinition.P90 },
+        { "weapon_nova", (ushort) ItemDefinition.NOVA },
+        { "weapon_sawedoff", (ushort) ItemDefinition.SAWED_OFF },
+        { "weapon_xm1014", (ushort) ItemDefinition.XM1014 },
+        { "weapon_mag7", (ushort) ItemDefinition.MAG_7 },
+        { "weapon_negev", (ushort) ItemDefinition.NEGEV },
+        { "weapon_m249", (ushort) ItemDefinition.M249 },
+        { "weapon_famas", (ushort) ItemDefinition.FAMAS },
+        { "weapon_galilar", (ushort) ItemDefinition.GALIL_AR },
+        { "weapon_ssg08", (ushort) ItemDefinition.SSG_08 },
+        { "weapon_m4a1_silencer", (ushort) ItemDefinition.M4A1_S },
+        { "weapon_m4a4", (ushort) ItemDefinition.M4A4 },
+        { "weapon_ak47", (ushort) ItemDefinition.AK_47 },
+        { "weapon_aug", (ushort) ItemDefinition.AUG },
+        { "weapon_sg556", (ushort) ItemDefinition.SG_553 },
+        { "weapon_awp", (ushort) ItemDefinition.AWP },
+        { "weapon_g3sg1", (ushort) ItemDefinition.G3SG1 },
+        { "weapon_scar20", (ushort) ItemDefinition.SCAR_20 },
+        { "weapon_hegrenade", (ushort) ItemDefinition.HIGH_EXPLOSIVE_GRENADE },
+        { "weapon_flashbang", (ushort) ItemDefinition.FLASHBANG },
+        { "weapon_smokegrenade", (ushort) ItemDefinition.SMOKE_GRENADE },
+        { "weapon_molotov", (ushort) ItemDefinition.MOLOTOV },
+        { "weapon_incgrenade", (ushort) ItemDefinition.INCENDIARY_GRENADE },
+        { "weapon_decoy", (ushort) ItemDefinition.DECOY_GRENADE },
+        { "weapon_healthshot", (ushort) ItemDefinition.HEALTHSHOT }
+    };
+    
     /// <summary>
     /// 조금 더 정확한 무기의 Designer 명을 반환합니다.
     /// </summary>
@@ -136,7 +183,18 @@ public static class WeaponUtils
     public static void SetWeaponNextSecondaryAttackTick(this CBasePlayerWeapon weapon, int nextTick)
     {
         weapon.NextSecondaryAttackTick = nextTick;
-        CounterStrikeSharp.API.Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_nNextSecondaryAttackTick");
+        Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_nNextSecondaryAttackTick");
+    }
+
+    /// <summary>
+    /// 무기 주 공격 다음 틱을 설정합니다.
+    /// </summary>
+    /// <param name="weapon">무기 객체</param>
+    /// <param name="nextTick">틱</param>
+    public static void SetWeaponNextPrimaryAttackTick(this CBasePlayerWeapon weapon, int nextTick)
+    {
+        weapon.NextPrimaryAttackTick = nextTick;
+        Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_nNextPrimaryAttackTick");
     }
     
     /// <summary>

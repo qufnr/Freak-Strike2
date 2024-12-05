@@ -19,6 +19,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
     public static string PluginConfigDirectory = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
     public static string HaleConfigFilename = "playable_hales.json";
     public static string HumanConfigFilename = "playable_humans.json";
+    public static string WeaponFilename = "weapons.json";
 
     public static string MessagePrefix = "[FS2] ";
     public static string LogMessagePrefix = "[FreakStrike2] ";
@@ -41,6 +42,8 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
     public Dictionary<int, BaseQueuePoint> PlayerQueuePoints = new(64); //  서버 내 플레이어 큐포인트 정보
 
     public Dictionary<int, HudText> HudTexts = new(64);                 //  허드 텍스트
+
+    public Dictionary<string, BaseWeapon> Weapons = new(72);
     
     public override void Load(bool hotReload)
     {

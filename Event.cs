@@ -19,6 +19,7 @@ public partial class FreakStrike2
         RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
         RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
         RegisterEventHandler<EventWeaponFire>(OnWeaponFirePre, HookMode.Pre);
+        RegisterEventHandler<EventWeaponFire>(OnWeaponFire);
         RegisterEventHandler<EventPlayerTeam>(OnPlayerTeam, HookMode.Pre);
         
         RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
@@ -27,6 +28,7 @@ public partial class FreakStrike2
         RegisterListener<Listeners.OnClientPutInServer>(OnClientPutInServer);
         RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnect);
         RegisterListener<Listeners.OnTick>(OnTick);
+        RegisterListener<Listeners.OnEntitySpawned>(OnEntitySpawned);
     }
 
     /// <summary>
@@ -40,6 +42,7 @@ public partial class FreakStrike2
         DeregisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
         DeregisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
         DeregisterEventHandler<EventWeaponFire>(OnWeaponFirePre, HookMode.Pre);
+        DeregisterEventHandler<EventWeaponFire>(OnWeaponFire);
         RegisterEventHandler<EventPlayerTeam>(OnPlayerTeam, HookMode.Pre);
 
         RemoveListener(OnServerPrecacheResources);
@@ -48,6 +51,7 @@ public partial class FreakStrike2
         RemoveListener(OnClientPutInServer);
         RemoveListener(OnClientDisconnect);
         RemoveListener(OnTick);
+        RemoveListener(OnEntitySpawned);
     }
 
     private void OnServerPrecacheResources(ResourceManifest manifest)
@@ -184,7 +188,6 @@ public partial class FreakStrike2
         {
             //  피해량 추가
             AddDamageOnPlayerHurt(victim, attacker, damage);
-            KnockbackOnPlayerHurt(victim, attacker, damage, weapon, hitgroup);    //  넉백 계산
             HalePlayerRageChargeOnPlayerHurt(victim, attacker, damage);
         }
         
@@ -210,7 +213,7 @@ public partial class FreakStrike2
     }
 
     /// <summary>
-    /// 무기 발사
+    /// 무기 발사 (Pre)
     /// </summary>
     /// <param name="event">이벤트</param>
     /// <param name="eventInfo">이벤트 정보</param>
@@ -242,6 +245,21 @@ public partial class FreakStrike2
     }
 
     /// <summary>
+    /// 무기 발사
+    /// </summary>
+    /// <param name="event">이벤트</param>
+    /// <param name="eventInfo">이벤트 정보</param>
+    /// <returns>훅 결과</returns>
+    private HookResult OnWeaponFire(EventWeaponFire @event, GameEventInfo eventInfo)
+    {
+        var player = @event.Userid;
+        
+        ModifyWeaponFireRateOnWeaponFire(player);
+
+        return HookResult.Continue;
+    }
+
+    /// <summary>
     /// 플레이어 팀 선택
     /// </summary>
     /// <param name="event">이벤트</param>
@@ -252,5 +270,10 @@ public partial class FreakStrike2
         // @event.Silent = true;
         eventInfo.DontBroadcast = true;
         return HookResult.Changed;
+    }
+
+    private void OnEntitySpawned(CEntityInstance entityInstance)
+    {
+        WeaponClipAndAmmoUpdateOnEntitySpawned(entityInstance);
     }
 }

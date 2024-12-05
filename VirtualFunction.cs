@@ -70,6 +70,7 @@ public partial class FreakStrike2
         var info = hook.GetParam<CTakeDamageInfo>(1);
         var victimEntity = hook.GetParam<CEntityInstance>(0);
         var attackerEntity = info.Attacker.Value;
+        var weapon = info.Ability.Value;
         
         //  피해자가 플레이어일 경우
         if (victimEntity.DesignerName == "player")
@@ -85,7 +86,6 @@ public partial class FreakStrike2
                     if (BaseHalePlayers[victim.Slot].IsHale)
                     {
                         info.Damage = 0;
-                        info.OriginalDamage = 0;
 
                         return HookResult.Stop;
                     }
@@ -100,13 +100,13 @@ public partial class FreakStrike2
                             if (info.Damage <= 5)
                             {
                                 info.Damage = 0;
-                                info.OriginalDamage = 0;
+                                
                                 return HookResult.Stop;
                             }
                             else
                             {
                                 info.Damage = 10;
-                                info.OriginalDamage = 10;
+                                
                                 return HookResult.Changed;
                             }
                         }
@@ -122,13 +122,28 @@ public partial class FreakStrike2
 
                 if (victim != null && victim.IsValid && attacker != null && attacker.IsValid)
                 {
-                    //  라운드 종료 시 헤일에 대한 피해 무효 처리
-                    if (InGameStatus != GameStatus.Start && BaseHalePlayers[attacker.Slot].IsHale)
+                    //  라운드 종료 시 플레이어간의 피해 무효 처리
+                    if (InGameStatus != GameStatus.Start)
                     {
                         info.Damage = 0;
-                        info.OriginalDamage = 0;
                     
                         return HookResult.Stop;
+                    }
+                    
+                    //  무기 피해량 수정 / 넉백 만들기
+                    if (weapon != null && !BaseHalePlayers[attacker.Slot].IsHale)
+                    {
+                        var changed = false;
+                        
+                        if (Weapons.TryGetValue(weapon.DesignerName, out var baseWeapon))
+                        {
+                            info.Damage = baseWeapon.Damage.Equals(-1.0f) ? 0 : info.Damage * baseWeapon.Damage;
+                            changed = true;
+                        }
+
+                        PlayerKnockbackOnTakeDamage(victimPawn, attackerPawn, baseWeapon, info.Damage);
+
+                        return changed ? HookResult.Changed : HookResult.Continue;
                     }
                 }
             }

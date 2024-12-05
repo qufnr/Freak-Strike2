@@ -40,31 +40,26 @@ public partial class FreakStrike2
     /// <summary>
     /// 피해자가 가해자로 부터 피해를 입을 때 넉백을 처리합니다.
     /// </summary>
-    /// <param name="victim">피해자</param>
-    /// <param name="attacker">가해자</param>
-    /// <param name="damage">피해량</param>
-    /// <param name="weapon">무기 이름</param>
-    /// <param name="hitgroup">히트 그룹</param>
-    private void KnockbackOnPlayerHurt(CCSPlayerController victim, CCSPlayerController attacker, int damage, string weapon, int hitgroup)
+    private void PlayerKnockbackOnTakeDamage(CCSPlayerPawn victim, CCSPlayerPawn attacker, BaseWeapon? baseWeapon, float damage)
     {
-        if (victim == attacker || (!BaseHalePlayers[victim.Slot].IsHale && BaseHalePlayers[attacker.Slot].IsHale))
-            return;
-
-        var victimPawn = victim.PlayerPawn.Value;
-        var attackerPawn = attacker.PlayerPawn.Value;
-
-        if (victimPawn == null || attackerPawn == null)
-            return;
-
-        var victimPosition = victimPawn.AbsOrigin ?? new Vector();
-        var attackerPosition = attackerPawn.AbsOrigin ?? new Vector();
+        var victimPosition = victim.AbsOrigin ?? new Vector();
+        var attackerPosition = attacker.AbsOrigin ?? new Vector();
 
         var direction = VectorUtils.NormalizeVector(victimPosition - attackerPosition);
-        
-        //  TODO : 무기 설정에 따라 넉백량 처리
 
-        victimPawn.AbsVelocity.Add(direction * damage);
-        // victimPawn.Teleport(null, null, direction * damage);
+        var vectorScale = direction * damage;
+
+        if (baseWeapon != null)
+        {
+            vectorScale *= baseWeapon.KnockbackScale;
+
+            var distance = VectorUtils.GetDistance(victimPosition, attackerPosition);
+
+            if (distance >= 0 && baseWeapon.KnockbackMaximumDistance > distance)
+                vectorScale *= (baseWeapon.KnockbackMaximumDistance - distance) / 10f;
+        }
+        
+        victim.AbsVelocity.Add(vectorScale);
     }
 
     /// <summary>
@@ -84,7 +79,6 @@ public partial class FreakStrike2
     /// <summary>
     /// 플레이어에게 피해량 순위를 출력합니다. (라운드 종료 처리 전에 호출함. GameStatus.End 로 되기 전)
     /// </summary>
-    /// <param name="top">표시 순위권</param>
     private void PrintDamageScoreboard()
     {
         if (InGameStatus != GameStatus.Start || PlayerUtils.FindValidPlayers().Count <= 1)
