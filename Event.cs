@@ -92,7 +92,6 @@ public partial class FreakStrike2
         InitializeHumanClassOnClientPutInServer(client);        //  인간 진영 클래스 초기 설정
         
         GameStartOnClientPutInServer();                     //  게임 시작 처리
-        TeamChangeOnClientPutInServer(client);              //  접속 시 팀 변경 처리
     }
 
     /// <summary>
@@ -254,8 +253,6 @@ public partial class FreakStrike2
     {
         var player = @event.Userid;
         
-        ModifyWeaponFireRateOnWeaponFire(player);
-
         return HookResult.Continue;
     }
 

@@ -14,10 +14,35 @@ public partial class FreakStrike2
 {
     private void RegisterCommands()
     {
+        AddCommandListener("jointeam", OnJoinTeamCommand);
     }
 
     private void RemoveCommands()
     {
+        RemoveCommandListener("jointeam", OnJoinTeamCommand, HookMode.Pre);
+    }
+
+    public HookResult OnJoinTeamCommand(CCSPlayerController? player, CommandInfo info)
+    {
+        if (player == null || !player.IsValid)
+            return HookResult.Continue;
+
+        if (player.PawnIsAlive)
+            return HookResult.Handled;
+        
+        //   2 - ct, 3 - t
+        var team = info.ArgByIndex(1);
+
+        if (team == "2" || team == "3")
+        {
+            player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human, () =>
+            {
+                if (player.PawnIsAlive)
+                    BaseHumanPlayers[player.Slot].SetHumanClassState();
+            });
+        }
+
+        return HookResult.Continue;
     }
     
     [ConsoleCommand("css_fs2", "FS2 Default command.")]

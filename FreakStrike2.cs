@@ -63,12 +63,12 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<GameConfig>
         
         ReadHaleJsonOnLoad(hotReload);
         ReadHumanJsonOnLoad(hotReload);
+        ReadWeaponJsonOnLoad(hotReload);
         // ServerCommandInitialize();
     }
 
     public override void Unload(bool hotReload)
     {
-        IgnoreRoundWinConditions();
         GameResetOnHotReload();
         GameEventDeregister();
         RemoveCommands();

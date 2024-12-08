@@ -43,17 +43,24 @@ public partial class FreakStrike2
         if (!player.IsValid || !player.PawnIsAlive)
             return HookResult.Continue;
 
+        var weaponName = weaponVData.Name;
+        if (weaponName.Contains("knife_"))
+        {
+            var explode = weaponName.Split('_');
+            weaponName = $"{explode[0]}_${explode[1]}";
+        }
+        
         if (BaseHalePlayers[player.Slot].IsHale)
         {
             //  헤일 무기 못 줍게 하기
-            if (!BaseHalePlayers[player.Slot].MyHale!.Weapons.Contains(weaponVData.Name))
+            if (!BaseHalePlayers[player.Slot].MyHale!.Weapons.Contains(weaponName))
                 return HookResult.Stop;
         }
         else
         {
             //  인간 클래스 전용 무기 외 못 줍게 하기
             var humanClass = BaseHumanPlayers[player.Slot].MyClass;
-            if (humanClass != null && !humanClass.ExclusiveWeapons.Contains(weaponVData.Name))
+            if (humanClass != null && !humanClass.ExclusiveWeapons.Contains(weaponName))
                 return HookResult.Stop;    
         }
         
@@ -120,7 +127,9 @@ public partial class FreakStrike2
                 var attackerPawn = new CCSPlayerPawn(attackerEntity.Handle);
                 var attacker = attackerPawn.OriginalController.Get();
 
-                if (victim != null && victim.IsValid && attacker != null && attacker.IsValid)
+                if (victim != null && victim.IsValid && 
+                    attacker != null && attacker.IsValid &&
+                    victimPawn.TeamNum != attackerPawn.TeamNum)
                 {
                     //  라운드 종료 시 플레이어간의 피해 무효 처리
                     if (InGameStatus != GameStatus.Start)
@@ -165,6 +174,7 @@ public partial class FreakStrike2
             SuperJumpOnPostThinkPost(player);
             WeightDownOnPostThinkPost(player);
             HalePlayerSecondaryAttackBlockOnPostThinkPost(player);
+            ModifyWeaponFireRateOnPostThink(player);
         }
         
         return HookResult.Continue;

@@ -60,7 +60,7 @@ public partial class FreakStrike2
     /// </summary>
     private void CreateHalePlayerOnRoundStart()
     {
-        if (ServerUtils.GameRules.WarmupPeriod)
+        if (ServerUtils.GameRules.WarmupPeriod || Utilities.GetPlayers().Count <= 1)
             return;
         
         var player = BaseQueuePoint.GetPlayerWithMostQueuePoints() ?? PlayerUtils.GetRandomAlivePlayer();
@@ -278,7 +278,7 @@ public partial class FreakStrike2
                 {
                     var activeWeapon = playerPawn.WeaponServices.ActiveWeapon.Value;
                     if (activeWeapon != null && activeWeapon.GetDesignerNameEx().Contains("knife"))
-                        activeWeapon.SetWeaponNextSecondaryAttackTick((int) Server.CurrentTime + 99999);
+                        activeWeapon.SetWeaponNextSecondaryAttackTick(Server.TickCount + 99999);
                 }
             }
         }

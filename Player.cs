@@ -11,31 +11,6 @@ using FreakStrike2.Utils.Helpers.Server;
 namespace FreakStrike2;
 public partial class FreakStrike2
 {
-    /// <summary>
-    /// 클라이언트 접속 시 팀 변경
-    /// </summary>
-    /// <param name="client">클라이언트</param>
-    private void TeamChangeOnClientPutInServer(int client)
-    {
-        var player = Utilities.GetPlayerFromSlot(client);
-        if (player is not null && player.IsValid && !player.IsHLTV)
-        {
-            switch (InGameStatus)
-            {
-                case GameStatus.PlayerWaiting:
-                case GameStatus.Ready:
-                    player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human, () =>
-                    {
-                        if (!player.PawnIsAlive)
-                            player.Respawn();
-                    });
-                    break;
-                default:
-                    player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human);
-                    break;
-            }
-        }
-    }
 
     /// <summary>
     /// 피해자가 가해자로 부터 피해를 입을 때 넉백을 처리합니다.

@@ -41,39 +41,28 @@ public partial class FreakStrike2
     /// <param name="entity">스폰 엔티티 객체</param>
     private void WeaponClipAndAmmoUpdateOnEntitySpawned(CEntityInstance entity)
     {
-        if (Weapons.TryGetValue(entity.DesignerName, out var baseWeapon))
+        if (entity.DesignerName.Contains("knife") || !Weapons.TryGetValue(entity.DesignerName, out var baseWeapon))
             return;
 
         if (entity.As<CCSWeaponBase>().VData is not CCSWeaponBaseVData weaponVData)
             return;
 
-        if (baseWeapon?.Clip != null)
-            weaponVData.MaxClip1 = baseWeapon.Clip;
-
-        if (baseWeapon?.Ammo != null)
-            weaponVData.PrimaryReserveAmmoMax = baseWeapon.Ammo;
+        weaponVData.MaxClip1 = baseWeapon.Clip;
+        weaponVData.PrimaryReserveAmmoMax = baseWeapon.Ammo;
     }
 
-    /// <summary>
-    /// 무기 공격 속도 설정
-    /// </summary>
-    /// <param name="player">플레이어 객체</param>
-    private void ModifyWeaponFireRateOnWeaponFire(CCSPlayerController? player)
+    private void ModifyWeaponFireRateOnPostThink(CCSPlayerController player)
     {
-        if (player == null || !player.IsValid || !player.PawnIsAlive)
+        if (!player.PawnIsAlive || player.PlayerPawn.Value is not CCSPlayerPawn playerPawn)
             return;
         
-        var playerPawn = player.PlayerPawn.Value;
-        if (playerPawn == null || !playerPawn.IsValid)
-            return;
-
         var activeWeapon = playerPawn.WeaponServices!.ActiveWeapon.Value;
-        if (activeWeapon == null)
+        if (activeWeapon == null || activeWeapon.DesignerName.Contains("knife"))
             return;
 
         if (!Weapons.TryGetValue(WeaponUtils.GetDesignerNameEx(activeWeapon), out var baseWeapon))
             return;
-        
+
         var weaponNextAttackTick = activeWeapon.NextPrimaryAttackTick / baseWeapon.FireRate;
         activeWeapon.SetWeaponNextPrimaryAttackTick((int) weaponNextAttackTick);
     }

@@ -71,7 +71,7 @@ public partial class FreakStrike2
         if (gameRule.WarmupPeriod) InGameStatus = GameStatus.Warmup;
         else if (Utilities.GetPlayers().Count <= 1) InGameStatus = GameStatus.PlayerWaiting;
         else InGameStatus = GameStatus.Ready;
-        
+
         if (InGameTimer == null)
             InGameTimer = AddTimer(1.0f, OnGameTimerInterval, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }

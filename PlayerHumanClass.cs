@@ -67,31 +67,6 @@ public partial class FreakStrike2
     private void InitializeHumanClassOnClientPutInServer(int client)
     {
         BaseHumanPlayers[client] = new BaseHumanPlayer(client);
-        var player = Utilities.GetPlayerFromSlot(client);
-        if (player != null && player.IsValid)
-        {
-            if (player.IsBot || Config.RandomHumanClassOnJoin)
-            {
-                BaseHumanPlayers[client].SetClass();
-                if (InGameStatus != GameStatus.Start)
-                {
-                    //  다음 프레임에 팀 변경
-                    player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human, () =>
-                    {
-                        if (!player.PawnIsAlive)
-                            player.Respawn();
-                        
-                        //  또 그 다음 프레임에...
-                        Server.NextFrame(() => BaseHumanPlayers[client].MyClass!.SetPlayer(player));
-                    });
-                }
-            }
-            else
-            {
-                player.PrintToChat($"{MessagePrefix}명령어 \"css_hclass\" 로 인간 진영 클래스를 선택해주세요.");
-                if (InGameStatus == GameStatus.Warmup)
-                    player.ChangeTeamOnNextFrame(CsTeam.Spectator);
-            }
-        }
+        BaseHumanPlayers[client].SetClass();
     }
 }
