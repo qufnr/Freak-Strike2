@@ -62,7 +62,7 @@ public partial class FreakStrike2
         var rankedPlayers = BaseGamePlayers.Where(pair =>
             {
                 var pl = Utilities.GetPlayerFromSlot(pair.Key);
-                return pl != null && pl.IsValid;
+                return pl != null && pl.IsValid && pl.TeamNum == (byte) Fs2Team.Human;
             })
             .Select(pair => new { Name = Utilities.GetPlayerFromSlot(pair.Key)!.PlayerName, Damages = pair.Value.Damages })
             .OrderByDescending(pair => pair.Damages)
