@@ -57,7 +57,7 @@ public class BaseHumanPlayer
             ReserveClass = null;
             Player.PrintToChat($"[{FreakStrike2.MessagePrefix}] 인간 진영 클래스가 {MyClass.Name} (으)로 변경되었습니다.");
         }
-
+        
         _instance.AddTimer(0.1f, () =>
         {
             if (Player == null || !Player.IsValid || _instance.BaseHalePlayers[_client].IsHale)
@@ -66,7 +66,6 @@ public class BaseHumanPlayer
             if (MyClass == null)
             {
                 Player.PrintToChat($"{FreakStrike2.MessagePrefix}\"css_hclass <human>\" 명령어로 인간 진영 클래스를 선택 해주세요!");
-
                 Player.ChangeTeamOnNextFrame(CsTeam.Spectator);
                 return;
             }
