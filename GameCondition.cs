@@ -60,7 +60,7 @@ public partial class FreakStrike2
     }
 
     /// <summary>
-    /// 게임 타이머를 생성합니다. (OnRoundStart)
+    /// 게임 타이머를 생성합니다. (OnRoundStart, OnRoundFreezeEnd)
     /// </summary>
     private void CreateInGameTimer()
     {
@@ -72,7 +72,7 @@ public partial class FreakStrike2
         else if (Utilities.GetPlayers().Count <= 1) InGameStatus = GameStatus.PlayerWaiting;
         else InGameStatus = GameStatus.Ready;
 
-        if (InGameTimer == null)
+        if (InGameTimer == null && !gameRule.FreezePeriod)
             InGameTimer = AddTimer(1.0f, OnGameTimerInterval, TimerFlags.REPEAT | TimerFlags.STOP_ON_MAPCHANGE);
     }
 

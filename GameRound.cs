@@ -10,24 +10,24 @@ public partial class FreakStrike2
 {
     private void CreateRoundTimerOnRoundStart()
     {
+        if (InGameStatus == GameStatus.Warmup)
+            return;
+        
         KillInGameRoundTimer();
         
         var gameRules = ServerUtils.GameRules;
+        var roundTime = ServerUtils.GetRaminingRoundTime() - 0.5f;
 
-        if (!gameRules.WarmupPeriod && InGameStatus != GameStatus.Warmup)
+        Console.WriteLine($"ROUND TIME {roundTime}");
+        
+        InGameRoundTimer = AddTimer(roundTime, () =>
         {
-            var roundTime = ServerUtils.GetRaminingRoundTime() - 0.5f;
-
-            Console.WriteLine($"ROUND TIME {roundTime}");
+            var humanCount = PlayerUtils.GetTeamAlivePlayers((CsTeam) Fs2Team.Human);
+            gameRules.TerminateRound(ConVarUtils.GetRoundRestartDelay(), humanCount > 0 ? RoundEndReason.TerroristsWin : RoundEndReason.CTsWin);
             
-            InGameRoundTimer = AddTimer(roundTime, () =>
-            {
-                var humanCount = PlayerUtils.GetTeamAlivePlayers((CsTeam) Fs2Team.Human);
-                gameRules.TerminateRound(ConVarUtils.GetRoundRestartDelay(), humanCount > 0 ? RoundEndReason.TerroristsWin : RoundEndReason.CTsWin);
-
-                KillInGameTimer();
-            });
-        }
+            KillInGameTimer();
+            KillInGameRoundTimer();
+        });
     }
 
     /// <summary>
