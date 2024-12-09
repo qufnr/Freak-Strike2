@@ -19,7 +19,6 @@ public partial class FreakStrike2
         RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
         RegisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
         RegisterEventHandler<EventWeaponFire>(OnWeaponFirePre, HookMode.Pre);
-        RegisterEventHandler<EventWeaponFire>(OnWeaponFire);
         RegisterEventHandler<EventPlayerTeam>(OnPlayerTeam, HookMode.Pre);
         
         RegisterListener<Listeners.OnServerPrecacheResources>(OnServerPrecacheResources);
@@ -42,7 +41,6 @@ public partial class FreakStrike2
         DeregisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
         DeregisterEventHandler<EventPlayerSpawn>(OnPlayerSpawn);
         DeregisterEventHandler<EventWeaponFire>(OnWeaponFirePre, HookMode.Pre);
-        DeregisterEventHandler<EventWeaponFire>(OnWeaponFire);
         RegisterEventHandler<EventPlayerTeam>(OnPlayerTeam, HookMode.Pre);
 
         RemoveListener(OnServerPrecacheResources);
@@ -220,39 +218,9 @@ public partial class FreakStrike2
     private HookResult OnWeaponFirePre(EventWeaponFire @event, GameEventInfo eventInfo)
     {
         var player = @event.Userid;
-        
-        if (player != null && player.IsValid)
-        {
-            //  TODO :: 테스트 후 삭제
-            var playerPawn = player.PlayerPawn.Value;
-            if (playerPawn != null && playerPawn.IsValid)
-            {
-                var activeWeapon = playerPawn.WeaponServices!.ActiveWeapon.Value;
-                if (activeWeapon != null)
-                {
-                    var weapon = activeWeapon.As<CCSWeaponBase>();
-                    
-                    weapon.FlRecoilIndex = 0;
-                    Utilities.SetStateChanged(weapon, "CCSWeaponBase", "m_flRecoilIndex");
-                    weapon.AccuracyPenalty = 0;
-                    Utilities.SetStateChanged(weapon, "CCSWeaponBase", "m_fAccuracyPenalty");
-                }
-            }
-        }
 
-        return HookResult.Continue;
-    }
+        ModifyWeaponFireOnWeaponFire(player);
 
-    /// <summary>
-    /// 무기 발사
-    /// </summary>
-    /// <param name="event">이벤트</param>
-    /// <param name="eventInfo">이벤트 정보</param>
-    /// <returns>훅 결과</returns>
-    private HookResult OnWeaponFire(EventWeaponFire @event, GameEventInfo eventInfo)
-    {
-        var player = @event.Userid;
-        
         return HookResult.Continue;
     }
 

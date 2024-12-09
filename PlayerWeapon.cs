@@ -51,19 +51,30 @@ public partial class FreakStrike2
         weaponVData.PrimaryReserveAmmoMax = baseWeapon.Ammo;
     }
 
-    private void ModifyWeaponFireRateOnPostThink(CCSPlayerController player)
+    /// <summary>
+    /// 무기 발사 수정
+    /// </summary>
+    /// <param name="player">플레이어 객체</param>
+    private void ModifyWeaponFireOnWeaponFire(CCSPlayerController? player)
     {
-        if (!player.PawnIsAlive || player.PlayerPawn.Value is not CCSPlayerPawn playerPawn)
+        if (player == null || !player.PawnIsAlive || player.PlayerPawn.Value is not CCSPlayerPawn playerPawn)
             return;
         
         var activeWeapon = playerPawn.WeaponServices!.ActiveWeapon.Value;
-        if (activeWeapon == null || activeWeapon.DesignerName.Contains("knife"))
+        if (activeWeapon == null)
             return;
 
-        if (!Weapons.TryGetValue(WeaponUtils.GetDesignerNameEx(activeWeapon), out var baseWeapon))
+        var weaponName = activeWeapon.GetDesignerNameEx();
+        
+        if (weaponName.Contains("knife") || !Weapons.TryGetValue(weaponName, out var baseWeapon))
             return;
 
         var weaponNextAttackTick = activeWeapon.NextPrimaryAttackTick / baseWeapon.FireRate;
         activeWeapon.SetWeaponNextPrimaryAttackTick((int) weaponNextAttackTick);
+        
+        //  TODO :: 반동, 스프레드 없애기 테스트
+        var weapon = activeWeapon.As<CCSWeaponBase>();
+        weapon.FlRecoilIndex = 0;
+        weapon.AccuracyPenalty = 0;
     }
 }
