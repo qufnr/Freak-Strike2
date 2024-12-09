@@ -34,13 +34,7 @@ public partial class FreakStrike2
         var team = info.ArgByIndex(1);
 
         if (team == "2" || team == "3")
-        {
-            player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human, () =>
-            {
-                if (player.PawnIsAlive)
-                    BaseHumanPlayers[player.Slot].SetHumanClassState();
-            });
-        }
+            BaseHumanPlayers[player.Slot].SetHumanClassState();
 
         return HookResult.Continue;
     }
@@ -327,18 +321,12 @@ public partial class FreakStrike2
                     cmdInfo.ReplyToCommand($"{MessagePrefix}귀하는 현재 헤일 상태입니다. 인간 진영에서 클래스를 변경 해주세요.");
                 else
                 {
-                    BaseHumanPlayers[player.Slot].SetClass(myHuman);
-                    if (InGameStatus != GameStatus.Start)
+                    if (InGameStatus == GameStatus.Ready)
                     {
-                        player.ChangeTeamOnNextFrame((CsTeam) Fs2Team.Human, () =>
-                        {
-                            if (!player.PawnIsAlive)
-                            {
-                                player.Respawn();
-                                BaseHumanPlayers[player.Slot].SetHumanClassState();
-                            }
-                        });
+
                     }
+                    else
+                        BaseHumanPlayers[player.Slot].ReserveClass = myHuman;
                 }
             }
         }

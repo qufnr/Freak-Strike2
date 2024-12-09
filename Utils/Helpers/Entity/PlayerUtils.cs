@@ -283,8 +283,9 @@ public static class PlayerUtils
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <param name="team">팀</param>
+    /// <param name="killAngles">앵글 초기화</param>
     /// <exception cref="Exception">팀이 유효하지 않습니다.</exception>
-    public static void TeleportToSpawnPoint(this CCSPlayerController player, CsTeam team)
+    public static void TeleportToSpawnPoint(this CCSPlayerController player, CsTeam team, bool killAngles = true)
     {
         var playerPawn = player.PlayerPawn.Value;
         
@@ -307,12 +308,12 @@ public static class PlayerUtils
         {
             var candidate = CommonUtils.GetRandomInList(spawnpointEntities);
             if (candidate.IsValid && candidate.AbsOrigin != null)
-                playerPawn.Teleport(new Vector() { X = candidate.AbsOrigin.X, Y = candidate.AbsOrigin.Y + 1f, Z = candidate.AbsOrigin.Z }, new QAngle(0, 0, 0), new Vector(0, 0, 0));
+                playerPawn.Teleport(new Vector() { X = candidate.AbsOrigin.X, Y = candidate.AbsOrigin.Y + 1f, Z = candidate.AbsOrigin.Z }, killAngles ? new QAngle(0, 0, 0) : null, new Vector(0, 0, 0));
         }
     }
 
     /// <summary>
-    /// 다음 프레임에 팀을 변경합니다.
+    /// 다음 프레임에 팀을 변경합니다. Switches the team of the player, has the same effect as the "jointeam" console command.
     /// </summary>
     /// <param name="player">플레이어 객체</param>
     /// <param name="team">변경할 팀</param>
