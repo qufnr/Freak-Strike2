@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API;
+﻿using System.Drawing;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using FreakStrike2.Classes;
@@ -88,6 +89,9 @@ public partial class FreakStrike2
         player.PrintToCenterAlert($"귀하가 이번 라운드의 헤일 {BaseHalePlayers[player.Slot].MyHale!.Name} (으)로 선정되었습니다!");
         Logger.LogInformation($"[FreakStrike2] {player.PlayerName}({player.AuthorizedSteamID!.SteamId64}) has been chosen as the Hale for {hale.Name}!");
         
+        player.SetColorScreen(Color.Black, ConVarUtils.GetFreezeTime() + ReadyInterval, 0.2f, PlayerUtils.ScreenFadeFlags.FadeOut);
+        player.SetVisibility(false);
+        
         //  헤일 외 다른 플레이어는 인간 진영으로 이동
         foreach (var other in Utilities.GetPlayers().Where(p => p.IsValid && p.PawnIsAlive && !BaseHalePlayers[p.Slot].IsHale))
         {
@@ -114,9 +118,9 @@ public partial class FreakStrike2
                 {
                     if (BaseHalePlayers[player.Slot].IsHale)
                     {
-                        var playerPawn = player.PlayerPawn.Value;
-                        if (playerPawn != null && playerPawn.IsValid)
-                            player.SetMoveType(MoveType_t.MOVETYPE_WALK);
+                        player.SetMoveType(MoveType_t.MOVETYPE_WALK);
+                        player.SetVisibility();
+                        
                         player.PrintToCenter("라운드가 시작했습니다. 모든 인간 진영을 처치하세요!");
                     }
                     else

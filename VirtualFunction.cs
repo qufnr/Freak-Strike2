@@ -44,10 +44,11 @@ public partial class FreakStrike2
             return HookResult.Continue;
 
         var weaponName = weaponVData.Name;
+        //  칼 스킨 있는 사람은 칼 이름이 달라서 weapon_knife 로 통일
         if (weaponName.Contains("knife_"))
         {
             var explode = weaponName.Split('_');
-            weaponName = $"{explode[0]}_${explode[1]}";
+            weaponName = $"{explode[0]}_{explode[1]}";
         }
         
         if (BaseHalePlayers[player.Slot].IsHale)
@@ -85,8 +86,18 @@ public partial class FreakStrike2
             var victimPawn = victimEntity.As<CCSPlayerPawn>();
             var victim = victimPawn.OriginalController.Get();
             
+            #region 플레이어가 무언가로 부터 피해를 입었을 때
             if (victim != null && victim.IsValid)
             {
+                //  헤일 준비 상태에서 피해 무효화
+                if (ReadyInterval > 0 && BaseHalePlayers[victim.Slot].IsHale)
+                {
+                    info.Damage = 0;
+                    
+                    return HookResult.Stop;
+                }
+                
+                //  낙하 피해 확인
                 if (info.BitsDamageType == DamageTypes_t.DMG_FALL)
                 {
                     //  플레이어가 헤일일 경우 낙하 피해 무시
@@ -120,7 +131,9 @@ public partial class FreakStrike2
                     }
                 }
             }
+            #endregion
             
+            #region 플레이어와 플레이어간 피해를 가했을 때
             //  플레이어(피해자)와 플레이어(가해자)간의 피해
             if (attackerEntity != null && attackerEntity.DesignerName == "player")
             {
@@ -156,6 +169,7 @@ public partial class FreakStrike2
                     }
                 }
             }
+            #endregion
         }
 
         return HookResult.Continue;
