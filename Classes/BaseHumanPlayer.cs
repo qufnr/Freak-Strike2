@@ -58,7 +58,7 @@ public class BaseHumanPlayer
             Player.PrintToChat($"[{FreakStrike2.MessagePrefix}] 인간 진영 클래스가 {MyClass.Name} (으)로 변경되었습니다.");
         }
         
-        _instance.AddTimer(0.1f, () =>
+        _instance.AddTimer(0.15f, () =>
         {
             if (Player == null || !Player.IsValid || _instance.BaseHalePlayers[_client].IsHale)
                 return;

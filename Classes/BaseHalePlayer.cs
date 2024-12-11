@@ -13,6 +13,8 @@ namespace FreakStrike2.Classes;
 
 public class BaseHalePlayer
 {
+    private FreakStrike2 _instance = FreakStrike2.Instance;
+    
     private int _client;
 
     private CCSPlayerController? Player => Utilities.GetPlayerFromSlot(_client);
@@ -62,7 +64,7 @@ public class BaseHalePlayer
         //  스폰으로 텔레포트
         Player.TeleportToSpawnPoint((CsTeam) Fs2Team.Hale);
 
-        FreakStrike2.Instance.AddTimer(0.1f, () =>
+        _instance.AddTimer(0.1f, () =>
         {
             if (Player.Team != (CsTeam) Fs2Team.Hale)
                 Player.SwitchTeam((CsTeam) Fs2Team.Hale);
@@ -71,7 +73,7 @@ public class BaseHalePlayer
                 Player.Respawn();
 
             if (MyHale.CanUseRage)
-                RageChargeTimer = FreakStrike2.Instance.AddTimer(MyHale.RageChargeInterval, () =>
+                RageChargeTimer = _instance.AddTimer(MyHale.RageChargeInterval, () =>
                 {
                     if (Player.PawnIsAlive)
                     {
@@ -82,7 +84,7 @@ public class BaseHalePlayer
 
         }, TimerFlags.STOP_ON_MAPCHANGE);
 
-        FreakStrike2.Instance.AddTimer(0.15f, () => MyHale.SetPlayer(Player), TimerFlags.STOP_ON_MAPCHANGE);
+        _instance.AddTimer(0.15f, () => MyHale.SetPlayer(Player), TimerFlags.STOP_ON_MAPCHANGE);
     }
 
     /// <summary>
@@ -97,11 +99,10 @@ public class BaseHalePlayer
         if (playerPawn == null)
             return;
         
-        var instance = FreakStrike2.Instance;
         var originGravityScale = playerPawn.GravityScale;
         
         WeightDownCooldown = MyHale!.WeightDownCooldown;
-        WeightDownCooldownTimer = instance.AddTimer(0.1f, () =>
+        WeightDownCooldownTimer = _instance.AddTimer(0.1f, () =>
         {
             if (Player == null || !Player.IsValid || !IsHale)
             {
@@ -113,14 +114,14 @@ public class BaseHalePlayer
             if (playerPawn != null && playerPawn.IsValid && Player.PawnIsAlive && (playerPawn.Flags & (1 << 0)) != 0)
                 playerPawn.GravityScale = originGravityScale;
 
-            if (instance.BaseGamePlayers[_client].DebugModeType == DebugType.HalePlayer)
+            if (_instance.BaseGamePlayers[_client].DebugModeType == DebugType.HalePlayer)
                 Player.PrintToCenterAlert($"Weight Down Cooldown: {WeightDownCooldown:F1}");
 
             WeightDownCooldown -= 0.1f;
 
             if (WeightDownCooldown <= 0.0f)
             {
-                if (instance.BaseGamePlayers[_client].DebugModeType == DebugType.HalePlayer)
+                if (_instance.BaseGamePlayers[_client].DebugModeType == DebugType.HalePlayer)
                     Player.PrintToChat("[FS2 Debugger] Weight Down is Ready!");
 
                 WeightDownCooldown = 0.0f;
@@ -135,7 +136,7 @@ public class BaseHalePlayer
     /// </summary>
     public void CreateSuperJumpCooldown()
     {
-        var instance = FreakStrike2.Instance;
+        var instance = _instance;
         
         SuperJumpCooldown = MyHale!.SuperJumpCooldown;
         SuperJumpCooldownTimer = instance.AddTimer(0.1f, () =>
@@ -210,7 +211,7 @@ public class BaseHalePlayer
                 if (Player.PawnIsAlive)
                     Player.CommitSuicide(false, true);
                 
-                if (FreakStrike2.Instance.InGameStatus == GameStatus.Start && 
+                if (_instance.InGameStatus == GameStatus.Start && 
                     Player.Team == (CsTeam) Fs2Team.Hale && 
                     PlayerUtils.GetTeamPlayers(Player.Team) <= 0)
                     ServerUtils.GameRules.TerminateRound(ConVarUtils.GetRoundRestartDelay(), RoundEndReason.TerroristsWin);
