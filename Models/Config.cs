@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using CounterStrikeSharp.API.Core;
 
-namespace FreakStrike2.Classes;
+namespace FreakStrike2.Models;
 
-public class GameConfig : BasePluginConfig
+public class Config : BasePluginConfig
 {
     //  게임이 시작되기 전 준비 시간 (Freeze Time 별도)
     [JsonPropertyName("ReadyInterval")] public int ReadyInterval { get; set; } = 10;
