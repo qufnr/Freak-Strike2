@@ -1,9 +1,9 @@
 ﻿using CounterStrikeSharp.API;
 
-namespace FreakStrike2;
-public partial class FreakStrike2
+namespace FreakStrike2.Managers;
+public class ServerConVarManager
 {
-    private void ServerCommandInitialize()
+    public static void Execute()
     {
         Server.ExecuteCommand("mp_restartgame 1");
         Server.ExecuteCommand("mp_limitteams 0");

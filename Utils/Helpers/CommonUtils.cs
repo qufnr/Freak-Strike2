@@ -1,4 +1,7 @@
-﻿namespace FreakStrike2.Utils.Helpers;
+﻿using System.Text.Json;
+using FreakStrike2.Exceptions;
+
+namespace FreakStrike2.Utils.Helpers;
 
 public class CommonUtils
 {
@@ -22,4 +25,24 @@ public class CommonUtils
     }
 
     public static float GetRandomFloat(float min, float max) => (float)new Random().NextDouble() * (max - min) + min;
+
+    /// <summary>
+    /// JSON 파일 읽어오기
+    /// </summary>
+    /// <param name="dir">디렉토리</param>
+    /// <param name="filename">파일명</param>
+    /// <typeparam name="T">추출 클래스 타입</typeparam>
+    /// <returns>클래스 객체</returns>
+    /// <exception cref="JsonConfigNotExistsException">파일을 읽을 수 없음</exception>
+    public static T? JsonFileToObject<T>(string dir, string filename)
+    {
+        if (!Directory.Exists(dir))
+            throw new JsonConfigNotExistsException(dir);
+
+        var file = Path.Combine(dir, filename);
+        if (!File.Exists(file))
+            throw new JsonConfigNotExistsException(file);
+
+        return JsonSerializer.Deserialize<T>(File.ReadAllText(file));
+    }
 }
