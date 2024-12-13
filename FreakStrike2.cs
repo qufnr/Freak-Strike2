@@ -1,8 +1,13 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
+using FreakStrike2.Managers;
 using FreakStrike2.Models;
+using FreakStrike2.Models.Human;
+using FreakStrike2.Models.Player;
+using FreakStrike2.Models.SaxtonHale;
 
 namespace FreakStrike2;
-public partial class FreakStrike2 : BasePlugin, IPluginConfig<Config>
+public class FreakStrike2 : BasePlugin, IPluginConfig<Config>
 {
     internal static FreakStrike2 Instance { get; private set; } = new();
     
@@ -12,15 +17,21 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<Config>
     public override string ModuleDescription => "Freak Fortress 2 in Counter-Strike 2.";
 
     public static string PluginConfigDirectory = "csgo\\addons\\counterstrikesharp\\configs\\plugins\\FreakStrike2\\";
-    public static string HaleConfigFilename = "playable_hales.json";
-    public static string HumanConfigFilename = "playable_humans.json";
-    public static string WeaponFilename = "weapons.json";
 
     public Config Config { get; set; } = new(); //  플러그인 콘피그
+
+    public List<FSSaxtonHale> SaxtonHales = new(72);        //  서버 내 정의된 색스턴 헤일
+    public List<FSHuman> Humans = new(72);                  //  서버 내 정의된 인간 진영 클래스
+
+    public CCSGameRules? GameRules;
+    
+    public Dictionary<int, FSPlayer> FSPlayers = new(0);    //  플레이어 데이터 풀
     
     public override void Load(bool hotReload)
     {
         Instance = this;
+
+        FSPlayers = new(Server.MaxPlayers);
     }
 
     public override void Unload(bool hotReload)
@@ -29,6 +40,7 @@ public partial class FreakStrike2 : BasePlugin, IPluginConfig<Config>
 
     public override void OnAllPluginsLoaded(bool hotReload)
     {
+        ServerConVarManager.Execute();
     }
 
     public void OnConfigParsed(Config config)
